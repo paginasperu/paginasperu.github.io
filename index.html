@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listado de Premios Moderno</title>
+    <title>Listado de Premios - Versión Compacta</title>
     <style>
-        /* --- Estilos Generales --- */
+        /* --- Estilos Base --- */
         :root {
-            --primary-color: #6366f1;
             --bg-color: #f3f4f6;
             --card-bg: #ffffff;
             --text-dark: #1f2937;
             --text-gray: #6b7280;
             --points-bg: #e0e7ff;
             --points-text: #4338ca;
+            --img-size-desktop: 130px; /* Tamaño del cuadrado en PC */
+            --img-size-mobile: 100px;  /* Tamaño del cuadrado en Móvil */
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
             background-color: var(--bg-color);
             margin: 0;
             padding: 20px;
@@ -33,98 +34,114 @@
             gap: 16px;
         }
 
-        /* --- Estilos de la Tarjeta (Modificado) --- */
+        /* --- Tarjeta --- */
         .reward-card {
             background-color: var(--card-bg);
-            border-radius: 16px;
-            /* Padding eliminado para que la imagen toque el borde */
-            padding: 0; 
-            display: flex;
-            align-items: stretch; /* Estira los elementos para que ocupen toda la altura */
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
-                        0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-radius: 12px;
+            padding: 0; /* Sin padding para que la imagen toque el borde */
+            display: flex; /* Siempre 2 columnas (incluso en móvil) */
+            align-items: center; /* Centra verticalmente el contenido */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            overflow: hidden; /* Recorta la imagen en las esquinas redondeadas */
             cursor: pointer;
-            overflow: hidden; /* Asegura que nada se salga de los bordes redondeados */
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: var(--img-size-desktop); /* Altura fija igual al ancho de la imagen */
         }
 
         .reward-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
-                        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.1);
         }
 
-        /* Columna Izquierda: Imagen (Modificado) */
+        /* --- Columna Izquierda: Imagen --- */
         .reward-image {
-            width: 120px; /* Un poco más grande para balancear */
-            flex-shrink: 0;
-            position: relative;
-            /* No necesitamos border-radius aquí porque el overflow:hidden de la tarjeta lo recorta */
+            width: var(--img-size-desktop);
+            height: var(--img-size-desktop);
+            flex-shrink: 0; /* Evita que se aplaste */
         }
 
         .reward-image img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            display: block; /* Elimina espacios fantasma debajo de la imagen */
-            position: absolute; /* Posicionamiento absoluto para llenar el contenedor padre */
-            top: 0;
-            left: 0;
+            object-fit: cover; /* Mantiene la imagen perfecta en el cuadrado */
+            display: block;
         }
 
-        /* Columna Derecha: Contenido (Modificado) */
+        /* --- Columna Derecha: Contenido --- */
         .reward-content {
             flex-grow: 1;
+            padding: 0 20px; /* Espacio interno para el texto */
             display: flex;
             flex-direction: column;
             justify-content: center;
-            /* Añadimos padding aquí porque lo quitamos de la tarjeta principal */
-            padding: 20px; 
+            min-width: 0; /* Truco CSS vital para que el texto se corte bien en Flexbox */
         }
 
-        /* Badge de Puntos */
+        /* Puntos */
         .reward-points {
             display: inline-block;
             background-color: var(--points-bg);
             color: var(--points-text);
+            font-size: 0.8rem;
             font-weight: 700;
-            font-size: 0.85rem;
-            padding: 4px 12px;
-            border-radius: 20px;
+            padding: 4px 10px;
+            border-radius: 50px;
+            margin-bottom: 6px;
             align-self: flex-start;
-            margin-bottom: 10px;
         }
 
+        /* Título */
         .reward-title {
-            margin: 0 0 8px 0;
-            font-size: 1.15rem;
+            margin: 0 0 4px 0;
+            font-size: 1.1rem;
             color: var(--text-dark);
             font-weight: 700;
-            line-height: 1.2;
+            white-space: nowrap;      /* Texto en una sola línea */
+            overflow: hidden;         /* Ocultar lo que sobra */
+            text-overflow: ellipsis;  /* Puntos suspensivos ... */
         }
 
+        /* Descripción */
         .reward-desc {
             margin: 0;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--text-gray);
-            line-height: 1.5;
+            line-height: 1.4;
+            /* Por defecto en PC mostramos hasta 2 líneas */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
-        /* Responsividad para móviles */
+        /* --- Estilos para Móviles --- */
         @media (max-width: 480px) {
-            .reward-card {
-                flex-direction: column;
-            }
+            
+            /* Ajustamos altura y ancho de imagen */
+            .reward-card, 
             .reward-image {
-                width: 100%;
-                height: 160px; /* Altura fija para la imagen tipo banner en móvil */
+                height: var(--img-size-mobile); /* 100px */
             }
-            /* En móvil, la imagen ya no necesita posición absoluta porque tiene altura definida */
-            .reward-image img {
-                 position: relative;
+            
+            .reward-image {
+                width: var(--img-size-mobile); /* 100px cuadrado exacto */
             }
+
             .reward-content {
-                padding: 20px 24px; /* Un poco más de padding lateral en móvil se ve mejor */
+                padding: 0 12px; /* Menos padding lateral */
+            }
+
+            .reward-title {
+                font-size: 1rem;
+            }
+
+            /* Descripción limitada a 1 sola línea en móvil */
+            .reward-desc {
+                display: block; /* Quitamos el line-clamp de webkit para usar el método standard */
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                font-size: 0.85rem;
             }
         }
     </style>
@@ -135,23 +152,23 @@
         
         <article class="reward-card">
             <div class="reward-image">
-                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&q=80" alt="Zapatillas Deportivas">
+                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&q=80" alt="Zapatillas">
             </div>
             <div class="reward-content">
                 <span class="reward-points">2,500 Pts</span>
                 <h3 class="reward-title">Zapatillas Running Pro</h3>
-                <p class="reward-desc">Modelo ergonómico con suela de aire, ideal para maratones y entrenamiento diario.</p>
+                <p class="reward-desc">Modelo ergonómico con suela de aire, ideal para maratones y entrenamiento diario intenso.</p>
             </div>
         </article>
 
         <article class="reward-card">
             <div class="reward-image">
-                <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=300&q=80" alt="Reloj Inteligente">
+                <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=300&q=80" alt="Smartwatch">
             </div>
             <div class="reward-content">
                 <span class="reward-points">5,000 Pts</span>
                 <h3 class="reward-title">Smartwatch Series 5</h3>
-                <p class="reward-desc">Control de ritmo cardíaco, GPS integrado y resistencia al agua hasta 50m.</p>
+                <p class="reward-desc">Control de ritmo cardíaco, GPS, resistencia al agua y batería de 48 horas.</p>
             </div>
         </article>
 
@@ -162,22 +179,13 @@
             <div class="reward-content">
                 <span class="reward-points">1,200 Pts</span>
                 <h3 class="reward-title">Auriculares Bluetooth</h3>
-                <p class="reward-desc">Cancelación de ruido activa y batería de larga duración (20 horas).</p>
+                <p class="reward-desc">Cancelación de ruido activa, conexión multipunto y estuche de carga rápida.</p>
             </div>
         </article>
 
         <article class="reward-card">
             <div class="reward-image">
-                <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=300&q=80" alt="Vale de Compra">
+                <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=300&q=80" alt="Gift Card">
             </div>
             <div class="reward-content">
-                <span class="reward-points">500 Pts</span>
-                <h3 class="reward-title">Gift Card $20</h3>
-                <p class="reward-desc">Canjeable en toda nuestra tienda online sin monto mínimo de compra.</p>
-            </div>
-        </article>
-
-    </div>
-
-</body>
-</html>
+                <span class="reward-points">500
