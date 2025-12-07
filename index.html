@@ -3,23 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listado de Premios - Tipografía Ajustada</title>
+    <title>Listado de Premios - Negrita Suave</title>
     <style>
         /* --- Estilos Base --- */
         :root {
             --bg-color: #f3f4f6;
             --card-bg: #ffffff;
-            --text-dark: #1f2937;
+            --text-dark: #374151; /* Un gris oscuro (no negro puro) ayuda a que se vea menos grueso */
             --text-gray: #6b7280;
             --points-bg: #e0e7ff;
-            --points-text: #4338ca;
+            --points-text: #4f46e5; /* Ajustado ligeramente */
             
-            /* Tamaños de las tarjetas (Cuadrados) */
+            /* Tamaños */
             --img-size-desktop: 140px; 
-            --img-size-mobile: 110px; /* Aumentado un poco para que quepa la letra grande */
+            --img-size-mobile: 110px;
             
-            /* Tipografía unificada */
-            --font-size-main: 1.1rem; /* Mismo tamaño para Puntos y Título */
+            --font-size-main: 1.1rem;
         }
 
         body {
@@ -29,6 +28,10 @@
             padding: 20px;
             display: flex;
             justify-content: center;
+            
+            /* TRUCO: Esto hace que la letra se vea más nítida y fina en Chrome/Safari */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .rewards-container {
@@ -58,7 +61,7 @@
             box-shadow: 0 8px 12px rgba(0,0,0,0.1);
         }
 
-        /* --- Columna Izquierda: Imagen (Cuadrada) --- */
+        /* --- Imagen --- */
         .reward-image {
             width: var(--img-size-desktop);
             height: var(--img-size-desktop);
@@ -72,25 +75,26 @@
             display: block;
         }
 
-        /* --- Columna Derecha: Contenido --- */
+        /* --- Contenido --- */
         .reward-content {
             flex-grow: 1;
             padding: 0 20px; 
             display: flex;
             flex-direction: column;
             justify-content: center;
-            min-width: 0; /* Vital para que el texto se corte bien */
+            min-width: 0; 
             height: 100%;
         }
 
-        /* Puntos (Tamaño aumentado) */
+        /* Puntos (Negrita Ajustada) */
         .reward-points {
             display: inline-block;
             background-color: var(--points-bg);
             color: var(--points-text);
             
-            font-size: var(--font-size-main); /* IGUAL AL TÍTULO */
-            font-weight: 800; /* Un poco más grueso para destacar */
+            font-size: var(--font-size-main); 
+            /* Cambio clave: de 800 a 600 */
+            font-weight: 600; 
             
             padding: 4px 12px;
             border-radius: 50px;
@@ -99,12 +103,13 @@
             line-height: 1;
         }
 
-        /* Título */
+        /* Título (Negrita Ajustada) */
         .reward-title {
             margin: 0 0 6px 0;
             
-            font-size: var(--font-size-main); /* IGUAL A LOS PUNTOS */
-            font-weight: 700;
+            font-size: var(--font-size-main);
+            /* Cambio clave: de 700 a 600 */
+            font-weight: 600;
             
             color: var(--text-dark);
             white-space: nowrap;      
@@ -119,34 +124,32 @@
             color: var(--text-gray);
             line-height: 1.4;
             display: -webkit-box;
-            -webkit-line-clamp: 2; /* 2 líneas en PC */
+            -webkit-line-clamp: 2; 
             -webkit-box-orient: vertical;
             overflow: hidden;
+            font-weight: 400; /* Regular */
         }
 
-        /* --- Estilos para Móviles --- */
+        /* --- Móvil --- */
         @media (max-width: 480px) {
             
             .reward-card, 
             .reward-image {
-                height: var(--img-size-mobile); /* 110px */
+                height: var(--img-size-mobile); 
             }
             
             .reward-image {
-                width: var(--img-size-mobile); /* Cuadrado perfecto */
+                width: var(--img-size-mobile); 
             }
 
             .reward-content {
                 padding: 0 14px; 
             }
 
-            /* Ajuste de fuentes para móvil si se desea un poco más pequeño, 
-               pero manteniendo la igualdad entre puntos y título */
             :root {
                 --font-size-main: 1rem; 
             }
 
-            /* Descripción limitada a 1 sola línea en móvil */
             .reward-desc {
                 display: block; 
                 white-space: nowrap;
