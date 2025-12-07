@@ -245,31 +245,36 @@
         categoryFilter.addEventListener('change', filterRewards);
         vendorFilter.addEventListener('change', filterRewards);
 
-        // --- LÓGICA DE URL PARA GITHUB PAGES (?vendedor=...) ---
-document.addEventListener("DOMContentLoaded", () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const vendedorParam = urlParams.get('vendedor');
+       // --- LÓGICA DE NAVEGACIÓN CON HASH (#) ---
 
-    if (vendedorParam) {
-        const options = vendorFilter.options;
-        for (let i = 0; i < options.length; i++) {
-            // Comparamos ignorando mayúsculas/minúsculas
-            if (options[i].value.toLowerCase() === vendedorParam.toLowerCase()) {
-                vendorFilter.selectedIndex = i; 
-                filterRewards();
-                
-                // TRUCO FINAL DE MAGIA:
-                // Esto cambia la URL en el navegador visualmente sin recargar la página.
-                // El usuario verá: premios.pe (pero viendo solo el contenido de Augusto)
-                // Opcional: puedes dejarlo así para que sientan que están en su "app".
-                const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-                window.history.replaceState({path:newUrl},'',newUrl);
-                
-                break;
-            }
+// 1. Función que lee el hash y aplica el filtro
+function checkHash() {
+    // Obtenemos el hash (ej: "#/negocio/nike" o "#nike")
+    let hash = window.location.hash;
+
+    // Si no hay hash, no hacemos nada (o mostramos el home)
+    if (!hash) return;
+
+    // Limpiamos el hash para quedarnos solo con el nombre (ej: "nike")
+    // Esto elimina "#/negocio/" o simplemente "#"
+    let slug = hash.replace("#/negocio/", "").replace("#", "").toLowerCase();
+
+    // Buscamos si existe en el filtro
+    const options = vendorFilter.options;
+    for (let i = 0; i < options.length; i++) {
+        if (options[i].value.toLowerCase() === slug) {
+            vendorFilter.selectedIndex = i;
+            filterRewards(); // Ejecutamos el filtro visual
+            break;
         }
     }
-});
+}
+
+// 2. Ejecutar cuando la página carga por primera vez
+document.addEventListener("DOMContentLoaded", checkHash);
+
+// 3. ¡MAGIA! Ejecutar si el usuario cambia el hash manualmente o usa los botones Atrás/Adelante
+window.addEventListener("hashchange", checkHash);
 
         // --- Modal (Igual que antes) ---
         const modal = document.getElementById('rewardModal');
