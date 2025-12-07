@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Club de Beneficios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa; /* Gris muy suave */
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        .app-container {
+            max-width: 450px; /* Ancho máximo tipo celular */
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            padding-bottom: 50px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Degradado moderno */
+            color: white;
+            padding: 40px 20px 30px;
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            text-align: center;
+        }
+        .card-puntos {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin: -30px 20px 20px; /* Efecto flotante sobre el header */
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+        .nivel-badge {
+            background-color: #FFD700;
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .puntos-grandes {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #333;
+            line-height: 1;
+        }
+        .btn-consultar {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 20px;
+            background: #764ba2;
+            border: none;
+        }
+        .btn-consultar:hover { background: #5a387e; }
+        
+        /* Ocultar elementos al inicio */
+        #resultado-panel { display: none; }
+        #loading { display: none; }
+        #error-msg { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <div id="login-panel">
+        <div class="header">
+            <h3>Bienvenido al Club</h3>
+            <p>Consulta tus beneficios</p>
+        </div>
+
+        <div class="p-4">
+            <div class="mb-3">
+                <label class="form-label text-muted">Tu Número de Celular</label>
+                <input type="tel" id="input-celular" class="form-control form-control-lg" placeholder="Ej: 999123456">
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label text-muted">Tu PIN (Últimos 4 dígitos)</label>
+                <input type="password" id="input-pin" class="form-control form-control-lg" placeholder="****" maxlength="4">
+            </div>
+
+            <p id="error-msg" class="text-danger text-center small">Usuario no encontrado o PIN incorrecto</p>
+
+            <button onclick="consultarPuntos()" class="btn btn-primary btn-consultar">
+                VER MIS PUNTOS
+            </button>
+            
+            <div id="loading" class="text-center mt-3">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="small text-muted mt-2">Buscando en la base de datos...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultado-panel">
+        <div class="header" style="padding-bottom: 50px;">
+            <h2 id="user-nombre">Hola, Cliente</h2>
+            <p>Es un gusto verte de nuevo</p>
+        </div>
+
+        <div class="card-puntos">
+            <span class="nivel-badge" id="user-nivel">Nivel Bronce</span>
+            <p class="text-muted mb-0">Tienes acumulados</p>
+            <div class="puntos-grandes" id="user-puntos">0</div>
+            <p class="text-muted">Puntos</p>
+        </div>
+
+        <div class="p-4">
+            <h5 class="mb-3 fw-bold text-secondary">Premios Disponibles</h5>
+            
+            <div class="list-group">
+                <div class="list-group-item d-flex justify-content-between align-items-center border-0 mb-2 shadow-sm rounded">
+                    <div>
+                        <span class="material-icons align-middle text-warning me-2">local_cafe</span>
+                        <strong>Café Gratis</strong>
+                    </div>
+                    <span class="badge bg-light text-dark rounded-pill">100 pts</span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between align-items-center border-0 mb-2 shadow-sm rounded">
+                    <div>
+                        <span class="material-icons align-middle text-danger me-2">lunch_dining</span>
+                        <strong>Hamburguesa Simple</strong>
+                    </div>
+                    <span class="badge bg-light text-dark rounded-pill">500 pts</span>
+                </div>
+            </div>
+
+            <button onclick="volver()" class="btn btn-outline-secondary w-100 mt-4">
+                Salir / Consultar otro
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // ==========================================
+    // CONFIGURACIÓN: PEGA AQUÍ TU URL DE GOOGLE APPS SCRIPT
+    // ==========================================
+    var URL_BACKEND = "AQUI_PEGA_TU_URL_DEL_SCRIPT"; 
+    // Ejemplo: "https://script.google.com/macros/s/AKfycbx.../exec"
+
+    function consultarPuntos() {
+        var celular = document.getElementById("input-celular").value;
+        var pin = document.getElementById("input-pin").value;
+        var errorMsg = document.getElementById("error-msg");
+        var loading = document.getElementById("loading");
+
+        // Limpiar errores previos
+        errorMsg.style.display = "none";
+
+        // Validar que escribió algo
+        if(celular.length < 5 || pin.length < 1) {
+            errorMsg.innerText = "Por favor completa los datos";
+            errorMsg.style.display = "block";
+            return;
+        }
+
+        // Mostrar carga
+        loading.style.display = "block";
+
+        // Construir la URL de consulta (Defensa de Estructura)
+        var consulta = URL_BACKEND + "?celular=" + encodeURIComponent(celular) + "&pin=" + encodeURIComponent(pin);
+
+        // Hacer la petición (Fetch)
+        fetch(consulta)
+        .then(response => response.json())
+        .then(data => {
+            loading.style.display = "none";
+            
+            if(data.error) {
+                // Si el Script devuelve error (No encontrado o PIN mal)
+                errorMsg.innerText = data.error;
+                errorMsg.style.display = "block";
+            } else {
+                // ¡ÉXITO! Mostrar datos
+                mostrarResultados(data);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            loading.style.display = "none";
+            errorMsg.innerText = "Error de conexión. Intenta de nuevo.";
+            errorMsg.style.display = "block";
+        });
+    }
+
+    function mostrarResultados(data) {
+        // Llenar los datos en el HTML
+        document.getElementById("user-nombre").innerText = "Hola, " + data.nombre;
+        document.getElementById("user-puntos").innerText = data.puntos;
+        document.getElementById("user-nivel").innerText = "Nivel " + data.nivel;
+
+        // Cambiar de pantalla (Efecto simple)
+        document.getElementById("login-panel").style.display = "none";
+        document.getElementById("resultado-panel").style.display = "block";
+    }
+
+    function volver() {
+        // Limpiar inputs
+        document.getElementById("input-celular").value = "";
+        document.getElementById("input-pin").value = "";
+        
+        // Regresar a pantalla 1
+        document.getElementById("resultado-panel").style.display = "none";
+        document.getElementById("login-panel").style.display = "block";
+    }
+</script>
+
+</body>
+</html>
