@@ -1,1 +1,205 @@
-hola
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#fff">
+  <title>Club de Beneficios</title>
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7@8.3.0/framework7-bundle.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7-icons@5.0.5/css/framework7-icons.css">
+  
+  <style>
+    /* Tu personalización de colores para la marca */
+    :root {
+      --f7-theme-color: #6200ee; /* Color Principal */
+      --f7-theme-color-rgb: 98, 0, 238;
+    }
+    .nivel-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      margin: 16px;
+      box-shadow: 0 10px 20px rgba(118, 75, 162, 0.4);
+    }
+    .puntos-gigantes {
+      font-size: 3.5em;
+      font-weight: 800;
+      line-height: 1;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="view view-main">
+      
+      <div class="page" data-name="home">
+        <div class="navbar">
+          <div class="navbar-bg"></div>
+          <div class="navbar-inner justify-content-center">
+            <div class="title">Mi Club</div>
+          </div>
+        </div>
+        
+        <div class="page-content login-screen-content">
+          <div class="login-screen-title">Bienvenido</div>
+          
+          <div class="list form-list">
+            <ul>
+              <li class="item-content item-input">
+                <div class="item-inner">
+                  <div class="item-title item-label">Celular</div>
+                  <div class="item-input-wrap">
+                    <input type="tel" name="username" id="input-celular" placeholder="Ej: 999123456">
+                    <span class="input-clear-button"></span>
+                  </div>
+                </div>
+              </li>
+              <li class="item-content item-input">
+                <div class="item-inner">
+                  <div class="item-title item-label">PIN (4 dígitos)</div>
+                  <div class="item-input-wrap">
+                    <input type="password" name="password" id="input-pin" placeholder="****" maxlength="4">
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="block">
+            <button class="button button-fill button-large button-round" onclick="consultarPuntos()">VER MIS PUNTOS</button>
+            <div class="block-footer text-align-center" style="margin-top: 20px;">
+              Programa de Beneficios<br>Standard & Seguro
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <template id="template-resultados">
+        <div class="page">
+          <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+              <div class="left">
+                <a href="#" class="link back">
+                  <i class="icon f7-icons">arrow_left</i>
+                  <span class="if-not-md">Atrás</span>
+                </a>
+              </div>
+              <div class="title">Mis Beneficios</div>
+            </div>
+          </div>
+          
+          <div class="page-content">
+            <div class="nivel-card">
+              <div style="font-size: 1.2em; opacity: 0.9;">Hola, <span id="res-nombre">${nombre}</span></div>
+              <div class="puntos-gigantes">${puntos}</div>
+              <div>PUNTOS ACUMULADOS</div>
+              <div class="chip chip-outline color-white" style="margin-top: 10px;">
+                <div class="chip-label">Nivel ${nivel}</div>
+              </div>
+            </div>
+
+            <div class="block-title">PREMIOS DISPONIBLES</div>
+            <div class="list media-list inset">
+              <ul>
+                <li>
+                  <div class="item-content">
+                    <div class="item-media"><i class="icon f7-icons color-blue">gift_fill</i></div>
+                    <div class="item-inner">
+                      <div class="item-title-row">
+                        <div class="item-title">Café Americano</div>
+                        <div class="item-after"><span class="badge color-green">100 pts</span></div>
+                      </div>
+                      <div class="item-subtitle">Canjeable en caja</div>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="item-content">
+                    <div class="item-media"><i class="icon f7-icons color-red">ticket_fill</i></div>
+                    <div class="item-inner">
+                      <div class="item-title-row">
+                        <div class="item-title">Vale de Descuento</div>
+                        <div class="item-after"><span class="badge color-green">500 pts</span></div>
+                      </div>
+                      <div class="item-subtitle">S/ 20.00 de descuento</div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            
+            <div class="block">
+                <p class="text-align-center text-color-gray">Presenta tu DNI en caja para canjear</p>
+            </div>
+          </div>
+        </div>
+      </template>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/framework7@8.3.0/framework7-bundle.min.js"></script>
+  <script>
+    // 1. INICIALIZAR FRAMEWORK7
+    var app = new Framework7({
+      el: '#app', // Donde vive la app
+      name: 'Club Beneficios',
+      theme: 'auto', // Detecta si es iOS o Android y cambia el diseño solo
+    });
+
+    var mainView = app.views.create('.view-main');
+    
+    // TU URL DEL SCRIPT (PÉGALA AQUÍ)
+    var URL_BACKEND = "AQUI_PEGA_TU_URL_DEL_SCRIPT"; 
+
+    // 2. LÓGICA DE CONSULTA
+    function consultarPuntos() {
+      var celular = document.getElementById('input-celular').value;
+      var pin = document.getElementById('input-pin').value;
+
+      if (!celular || !pin) {
+        app.dialog.alert('Por favor ingresa tu celular y PIN', 'Faltan datos');
+        return;
+      }
+
+      // Mostrar Cargando nativo de App
+      app.preloader.show();
+
+      // Petición al Backend
+      fetch(URL_BACKEND + "?celular=" + encodeURIComponent(celular) + "&pin=" + encodeURIComponent(pin))
+        .then(response => response.json())
+        .then(data => {
+          app.preloader.hide(); // Ocultar cargando
+
+          if (data.error) {
+            app.dialog.alert(data.error, 'Error');
+          } else {
+            // NAVEGACIÓN TIPO APP:
+            // Creamos la nueva ruta dinámicamente inyectando los datos
+            var template = document.getElementById('template-resultados').innerHTML;
+            
+            // Reemplazo manual simple (Template strings)
+            // Nota: En producción Framework7 tiene su propio motor de templates, 
+            // pero esto es JS puro para que sea fácil para ti.
+            var htmlFinal = template
+                .replace('${nombre}', data.nombre)
+                .replace('${puntos}', data.puntos)
+                .replace('${nivel}', data.nivel);
+
+            // Cargar la nueva página con animación
+            mainView.router.loadContent(htmlFinal);
+          }
+        })
+        .catch(error => {
+          app.preloader.hide();
+          app.dialog.alert('Error de conexión. Intenta nuevamente.', 'Ops');
+        });
+    }
+  </script>
+</body>
+</html>
