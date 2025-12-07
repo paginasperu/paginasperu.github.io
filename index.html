@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premios</title>
+    <title>Directorio de Negocios</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,25 +13,9 @@
     <div id="shortcode-filtros"></div>
 
     <div class="rewards-container" id="rewardsList">
-        <article class="reward-card" data-category="escolar" data-vendor="augusto" data-long-desc="Kit completo de útiles escolares.">
-            <div class="reward-image"><img src="https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=300&q=80"></div>
-            <div class="reward-content"><div class="reward-vendor">I.E. Augusto Salazar Bondy</div><h3 class="reward-title">Kit Escolar Premium</h3><span class="reward-points">1,500 puntos</span><p class="reward-desc">Pack completo de útiles escolares.</p></div>
-        </article>
-
-        <article class="reward-card" data-category="deporte" data-vendor="nike" data-long-desc="Zapatillas con tecnología FlyKnit.">
-            <div class="reward-image"><img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&q=80"></div>
-            <div class="reward-content"><div class="reward-vendor">Nike Store</div><h3 class="reward-title">Zapatillas Running Pro</h3><span class="reward-points">2,500 puntos</span><p class="reward-desc">Modelo ergonómico con suela de aire.</p></div>
-        </article>
-        
-        <article class="reward-card" data-category="tecnologia" data-vendor="ishop" data-long-desc="El Smartwatch Series 5 es tu compañero ideal.">
-            <div class="reward-image"><img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=300&q=80"></div>
-            <div class="reward-content"><div class="reward-vendor">iShop</div><h3 class="reward-title">Smartwatch Series 5</h3><span class="reward-points">5,000 puntos</span><p class="reward-desc">Control de ritmo cardíaco, GPS.</p></div>
-        </article>
-        
-        <article class="reward-card" data-category="accesorios" data-vendor="falabella" data-long-desc="Mochila diseñada para la vida urbana.">
-            <div class="reward-image"><img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=300&q=80"></div>
-            <div class="reward-content"><div class="reward-vendor">Falabella</div><h3 class="reward-title">Mochila Urbana</h3><span class="reward-points">850 puntos</span><p class="reward-desc">Diseño antirrobo con puerto USB.</p></div>
-        </article>
+        <p style="text-align:center; color:#64748b; width:100%; margin-top: 20px;">
+            Cargando directorio de negocios...
+        </p>
     </div>
 
     <div id="rewardModal" class="modal-backdrop">
@@ -39,13 +23,20 @@
             <div class="close-btn" onclick="closeModal()"><span>&times;</span></div>
             <img id="modalImg" src="" class="modal-img">
             <div class="modal-body">
-                <div class="modal-header-row"><span id="modalVendor" class="modal-vendor">NEGOCIO</span><span id="modalCategory" class="modal-category">Categoría</span></div>
-                <h2 id="modalTitle" class="modal-title">Título</h2><span id="modalPoints" class="modal-points">0 puntos</span><p id="modalDesc" class="modal-desc-long">Descripción...</p>
+                <div class="modal-header-row">
+                    <span id="modalVendor" class="modal-vendor">NEGOCIO</span>
+                    <span id="modalCategory" class="modal-category">Categoría</span>
+                </div>
+                <h2 id="modalTitle" class="modal-title">Título</h2>
+                <span id="modalPoints" class="modal-points">0 puntos</span>
+                <p id="modalDesc" class="modal-desc-long">Descripción...</p>
             </div>
         </div>
     </div>
 
     <script src="filtros.js"></script>
+    
     <script src="main.js"></script>
+    
 </body>
 </html>
