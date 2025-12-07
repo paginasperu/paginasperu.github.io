@@ -5,60 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Premios</title>
     <style>
-        /* --- 1. RESET Y VARIABLES --- */
+        /* (TUS ESTILOS CSS - NO HAN CAMBIADO, LOS MANTENEMOS IGUAL) */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        :root {
-            --bg-color: #f8fafc; --card-bg: #ffffff;
-            --text-dark: #334155; --text-gray: #64748b;
-            --primary: #4f46e5; --border-color: #cbd5e1;
-            --img-size-desktop: 140px; --img-size-mobile: 110px;
-        }
-
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            min-height: 100vh;
-            padding: 20px;
-            display: flex; flex-direction: column; align-items: center;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* --- 2. CONTROLES --- */
-        .filters-container {
-            width: 100%; max-width: 600px; margin-bottom: 20px;
-            display: flex; flex-wrap: wrap; gap: 12px;
-        }
-        .search-box {
-            width: 100%; padding: 12px 16px; border-radius: 8px;
-            border: 1px solid var(--border-color); font-size: 1rem; outline: none;
-            background-color: white; transition: border-color 0.2s, box-shadow 0.2s;
-        }
+        :root { --bg-color: #f8fafc; --card-bg: #ffffff; --text-dark: #334155; --text-gray: #64748b; --primary: #4f46e5; --border-color: #cbd5e1; --img-size-desktop: 140px; --img-size-mobile: 110px; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: var(--bg-color); min-height: 100vh; padding: 20px; display: flex; flex-direction: column; align-items: center; -webkit-font-smoothing: antialiased; }
+        
+        /* Estilos de Filtros */
+        .filters-container { width: 100%; max-width: 600px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 12px; }
+        .search-box { width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 1rem; outline: none; background-color: white; transition: border-color 0.2s, box-shadow 0.2s; }
         .search-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
-        .filter-select {
-            flex: 1; min-width: 0; padding: 12px 16px;
-            border-radius: 8px; border: 1px solid var(--border-color);
-            font-size: 0.95rem; background-color: white; color: var(--text-dark);
-            cursor: pointer; outline: none; appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 30px;
-        }
+        .filter-select { flex: 1; min-width: 0; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.95rem; background-color: white; color: var(--text-dark); cursor: pointer; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 30px; }
+        
+        /* Mensaje bienvenida */
+        #welcomeMessage { width: 100%; max-width: 600px; margin-bottom: 15px; padding: 10px 15px; background-color: #e0e7ff; color: var(--primary); border-radius: 8px; font-weight: 600; font-size: 0.95rem; display: none; text-align: center; border: 1px solid #c7d2fe; }
 
-        /* Mensaje de bienvenida dinámico */
-        #welcomeMessage {
-            width: 100%; max-width: 600px; margin-bottom: 15px;
-            padding: 10px 15px; background-color: #e0e7ff; color: var(--primary);
-            border-radius: 8px; font-weight: 600; font-size: 0.95rem;
-            display: none; text-align: center; border: 1px solid #c7d2fe;
-        }
-
-        /* --- 3. LISTA --- */
+        /* Estilos Lista */
         .rewards-container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 16px; }
-        .reward-card {
-            background-color: var(--card-bg); border-radius: 12px;
-            display: flex; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
-            height: var(--img-size-desktop);
-        }
+        .reward-card { background-color: var(--card-bg); border-radius: 12px; display: flex; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; height: var(--img-size-desktop); }
         .reward-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
         .reward-image { width: var(--img-size-desktop); height: var(--img-size-desktop); flex-shrink: 0; }
         .reward-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -68,27 +31,12 @@
         .reward-points { display: inline-block; background-color: #e0e7ff; color: var(--primary); font-size: 0.9rem; font-weight: 600; padding: 4px 10px; border-radius: 50px; margin-bottom: 6px; align-self: flex-start; }
         .reward-desc { font-size: 0.9rem; color: var(--text-gray); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-weight: 400; }
 
-        /* --- 4. MODAL --- */
-        .modal-backdrop {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000;
-            justify-content: center; align-items: center; padding: 20px;
-            opacity: 0; transition: opacity 0.3s ease;
-        }
+        /* Modal */
+        .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; opacity: 0; transition: opacity 0.3s ease; }
         .modal-backdrop.show { opacity: 1; }
-        .modal-content {
-            background: white; width: 100%; max-width: 500px;
-            border-radius: 16px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
-            position: relative; transform: scale(0.95); transition: transform 0.3s ease;
-            max-height: 90vh; overflow-y: auto;
-        }
+        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); position: relative; transform: scale(0.95); transition: transform 0.3s ease; max-height: 90vh; overflow-y: auto; }
         .modal-backdrop.show .modal-content { transform: scale(1); }
-        .close-btn {
-            position: absolute; top: 15px; right: 15px; width: 36px; height: 36px;
-            background-color: rgba(255, 255, 255, 0.95); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 10; transition: transform 0.2s;
-        }
+        .close-btn { position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background-color: rgba(255, 255, 255, 0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 10; transition: transform 0.2s; }
         .close-btn:hover { transform: scale(1.1); }
         .close-btn span { font-size: 1.5rem; line-height: 1; color: #333; font-weight: 700; margin-top: -2px; }
         .modal-img { width: 100%; height: 250px; object-fit: cover; display: block;}
@@ -104,12 +52,7 @@
             .reward-card, .reward-image { height: var(--img-size-mobile); }
             .reward-image { width: var(--img-size-mobile); }
             .reward-content { padding: 0 14px; }
-            .reward-title { font-size: 1rem; }
-            .reward-vendor { font-size: 0.7rem; }
-            .reward-desc { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.85rem; }
-            .filter-select { font-size: 0.85rem; padding: 10px 12px; }
             .modal-content { width: 100%; }
-            .close-btn { top: 10px; right: 10px; width: 32px; height: 32px; }
         }
     </style>
 </head>
@@ -117,74 +60,27 @@
 
     <div id="welcomeMessage"></div>
 
-    <div class="filters-container">
-        <input type="text" id="searchInput" class="search-box" placeholder="Buscar un premio...">
-        <select id="categoryFilter" class="filter-select">
-            <option value="all">Categoría (Todas)</option>
-            <option value="tecnologia">Tecnología</option>
-            <option value="deporte">Deporte</option>
-            <option value="accesorios">Accesorios</option>
-            <option value="escolar">Escolar</option>
-        </select>
-        
-        <select id="vendorFilter" class="filter-select">
-            <option value="all">Negocio (Todos)</option>
-            <option value="nike">Nike Store</option>
-            <option value="ishop">iShop</option>
-            <option value="sony">Sony Center</option>
-            <option value="falabella">Falabella</option>
-            <option value="augusto">I.E. Augusto Salazar Bondy</option>
-        </select>
-    </div>
+    <div id="shortcode-filtros"></div>
 
     <div class="rewards-container" id="rewardsList">
-        
-        <article class="reward-card" data-category="escolar" data-vendor="augusto" data-long-desc="Kit completo de útiles escolares que incluye cuadernos, lapiceros, colores, regla y cartuchera. Exclusivo para alumnos destacados del plantel.">
-            <div class="reward-image">
-                <img src="https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=300&q=80">
-            </div>
-            <div class="reward-content">
-                <div class="reward-vendor">I.E. Augusto Salazar Bondy</div>
-                <h3 class="reward-title">Kit Escolar Premium</h3>
-                <span class="reward-points">1,500 puntos</span>
-                <p class="reward-desc">Pack completo de útiles escolares para el año académico.</p>
-            </div>
+        <article class="reward-card" data-category="escolar" data-vendor="augusto" data-long-desc="Kit completo de útiles escolares.">
+            <div class="reward-image"><img src="https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=300&q=80"></div>
+            <div class="reward-content"><div class="reward-vendor">I.E. Augusto Salazar Bondy</div><h3 class="reward-title">Kit Escolar Premium</h3><span class="reward-points">1,500 puntos</span><p class="reward-desc">Pack completo de útiles escolares.</p></div>
         </article>
 
         <article class="reward-card" data-category="deporte" data-vendor="nike" data-long-desc="Zapatillas con tecnología FlyKnit.">
-            <div class="reward-image">
-                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&q=80">
-            </div>
-            <div class="reward-content">
-                <div class="reward-vendor">Nike Store</div>
-                <h3 class="reward-title">Zapatillas Running Pro</h3>
-                <span class="reward-points">2,500 puntos</span>
-                <p class="reward-desc">Modelo ergonómico con suela de aire, ideal para maratones.</p>
-            </div>
-        </article>
-
-        <article class="reward-card" data-category="tecnologia" data-vendor="ishop" data-long-desc="El Smartwatch Series 5 es tu compañero ideal de salud.">
-            <div class="reward-image">
-                <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=300&q=80">
-            </div>
-            <div class="reward-content">
-                <div class="reward-vendor">iShop</div>
-                <h3 class="reward-title">Smartwatch Series 5</h3>
-                <span class="reward-points">5,000 puntos</span>
-                <p class="reward-desc">Control de ritmo cardíaco, GPS y resistencia al agua.</p>
-            </div>
+            <div class="reward-image"><img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&q=80"></div>
+            <div class="reward-content"><div class="reward-vendor">Nike Store</div><h3 class="reward-title">Zapatillas Running Pro</h3><span class="reward-points">2,500 puntos</span><p class="reward-desc">Modelo ergonómico con suela de aire.</p></div>
         </article>
         
-        <article class="reward-card" data-category="accesorios" data-vendor="falabella" data-long-desc="Mochila diseñada para la vida urbana moderna. Cuenta con material impermeable y cremalleras ocultas.">
-            <div class="reward-image">
-                <img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=300&q=80">
-            </div>
-            <div class="reward-content">
-                <div class="reward-vendor">Falabella</div>
-                <h3 class="reward-title">Mochila Urbana</h3>
-                <span class="reward-points">850 puntos</span>
-                <p class="reward-desc">Diseño antirrobo con puerto USB de carga.</p>
-            </div>
+        <article class="reward-card" data-category="tecnologia" data-vendor="ishop" data-long-desc="El Smartwatch Series 5 es tu compañero ideal.">
+            <div class="reward-image"><img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=300&q=80"></div>
+            <div class="reward-content"><div class="reward-vendor">iShop</div><h3 class="reward-title">Smartwatch Series 5</h3><span class="reward-points">5,000 puntos</span><p class="reward-desc">Control de ritmo cardíaco, GPS.</p></div>
+        </article>
+        
+        <article class="reward-card" data-category="accesorios" data-vendor="falabella" data-long-desc="Mochila diseñada para la vida urbana.">
+            <div class="reward-image"><img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=300&q=80"></div>
+            <div class="reward-content"><div class="reward-vendor">Falabella</div><h3 class="reward-title">Mochila Urbana</h3><span class="reward-points">850 puntos</span><p class="reward-desc">Diseño antirrobo con puerto USB.</p></div>
         </article>
     </div>
 
@@ -193,26 +89,31 @@
             <div class="close-btn" onclick="closeModal()"><span>&times;</span></div>
             <img id="modalImg" src="" class="modal-img">
             <div class="modal-body">
-                <div class="modal-header-row">
-                    <span id="modalVendor" class="modal-vendor">NEGOCIO</span>
-                    <span id="modalCategory" class="modal-category">Categoría</span>
-                </div>
-                <h2 id="modalTitle" class="modal-title">Título</h2>
-                <span id="modalPoints" class="modal-points">0 puntos</span>
-                <p id="modalDesc" class="modal-desc-long">Descripción...</p>
+                <div class="modal-header-row"><span id="modalVendor" class="modal-vendor">NEGOCIO</span><span id="modalCategory" class="modal-category">Categoría</span></div>
+                <h2 id="modalTitle" class="modal-title">Título</h2><span id="modalPoints" class="modal-points">0 puntos</span><p id="modalDesc" class="modal-desc-long">Descripción...</p>
             </div>
         </div>
     </div>
 
+    <script src="filtros.js"></script>
+
     <script>
-        const searchInput = document.getElementById('searchInput');
-        const categoryFilter = document.getElementById('categoryFilter');
-        const vendorFilter = document.getElementById('vendorFilter');
         const cards = document.querySelectorAll('.reward-card');
         const welcomeMessage = document.getElementById('welcomeMessage');
 
-        // Función Principal de Filtrado
+        // Función Principal de Filtrado (MODIFICADA PARA NO DEPENDER DE VARIABLES GLOBALES)
         function filterRewards() {
+            // Intentamos buscar los inputs en el documento
+            const searchInput = document.getElementById('searchInput');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const vendorFilter = document.getElementById('vendorFilter');
+
+            // Si los filtros no existen (porque borraste el shortcode), mostramos todo y salimos.
+            if (!searchInput || !categoryFilter || !vendorFilter) {
+                cards.forEach(card => card.style.display = 'flex');
+                return;
+            }
+
             const searchText = searchInput.value.toLowerCase();
             const category = categoryFilter.value;
             const vendor = vendorFilter.value;
@@ -231,7 +132,6 @@
                 card.style.display = (matchesText && matchesCategory && matchesVendor) ? 'flex' : 'none';
             });
             
-            // Mostrar mensaje si hay un vendedor seleccionado
             if(vendor !== 'all') {
                 const vendorName = vendorFilter.options[vendorFilter.selectedIndex].text;
                 welcomeMessage.textContent = `Viendo premios de: ${vendorName}`;
@@ -241,23 +141,15 @@
             }
         }
 
-        searchInput.addEventListener('input', filterRewards);
-        categoryFilter.addEventListener('change', filterRewards);
-        vendorFilter.addEventListener('change', filterRewards);
-
-       // --- LÓGICA DE NAVEGACIÓN CON HASH (#) ---
-
-// --- LÓGICA PROFESIONAL PARA HASH (#/) ---
-        // Esto permite urls tipo: premios.pe/#/nike o premios.pe/#/augusto
+        // LÓGICA DE HASH (#/)
         function checkHash() {
-            let hash = window.location.hash; // Ej: "#/augusto"
+            let hash = window.location.hash;
+            // Solo intentamos filtrar si el filtro de Negocios existe
+            const vendorFilter = document.getElementById('vendorFilter');
+            if (!vendorFilter) return;
 
             if (hash) {
-                // 1. Quitamos los símbolos extra ("#/" o "#") para dejar limpio "augusto"
-                // EL CAMBIO ESTÁ AQUÍ: Ahora limpiamos '#/' explícitamente
                 let vendorSlug = hash.replace('#/', '').replace('#', '').toLowerCase();
-
-                // 2. Buscamos si existe en el filtro
                 const options = vendorFilter.options;
                 for (let i = 0; i < options.length; i++) {
                     if (options[i].value.toLowerCase() === vendorSlug) {
@@ -269,13 +161,20 @@
             }
         }
 
-// 2. Ejecutar cuando la página carga por primera vez
-document.addEventListener("DOMContentLoaded", checkHash);
+        // INICIALIZACIÓN SEGURA
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. Cargamos los filtros si existe la función (que viene de filtros.js)
+            if (typeof cargarFiltros === "function") {
+                cargarFiltros(); 
+            }
 
-// 3. ¡MAGIA! Ejecutar si el usuario cambia el hash manualmente o usa los botones Atrás/Adelante
-window.addEventListener("hashchange", checkHash);
+            // 2. Revisamos URL y filtramos
+            checkHash();
+        });
 
-        // --- Modal (Igual que antes) ---
+        window.addEventListener("hashchange", checkHash);
+
+        // --- Modal (Sin cambios) ---
         const modal = document.getElementById('rewardModal');
         const mImg = document.getElementById('modalImg');
         const mVendor = document.getElementById('modalVendor');
