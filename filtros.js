@@ -1,35 +1,28 @@
-// filtros.js - SOLO ESTRUCTURA VACÍA
+// filtros.js - MODO GOOGLE
 
 function cargarFiltros() {
     const contenedor = document.getElementById('shortcode-filtros');
     if (!contenedor) return;
 
+    // Solo el título y el input grande
     const html = `
     <div class="filters-container">
-        <input type="text" id="searchInput" class="search-box" placeholder="Buscar negocio, distrito o provincia...">
+        <h1 class="brand-title">Premios<span style="color:#4f46e5">.pe</span></h1>
         
-        <select id="categoryFilter" class="filter-select">
-            <option value="all">Todas las Categorías</option>
-            </select>
-
-        <select id="depaFilter" class="filter-select">
-            <option value="all">Todos los Departamentos</option>
-            <option value="Lima">Lima</option>
-            <option value="Arequipa">Arequipa</option>
-            </select>
+        <input type="text" id="searchInput" 
+               class="search-box" 
+               placeholder="Busca un negocio..." 
+               autocomplete="off" 
+               autofocus>
+               
+        <select id="categoryFilter" style="display:none;"><option value="all"></option></select>
     </div>`;
 
     contenedor.innerHTML = html;
 
-    // Activamos los escuchadores
+    // Conectamos el buscador
     const searchInput = document.getElementById('searchInput');
-    const categoryFilter = document.getElementById('categoryFilter');
-    const depaFilter = document.getElementById('depaFilter');
-
-    // Verificamos que la función de filtrado exista antes de conectar
     if (typeof filtrarNegocios === 'function') {
         searchInput.addEventListener('input', filtrarNegocios);
-        categoryFilter.addEventListener('change', filtrarNegocios);
-        depaFilter.addEventListener('change', filtrarNegocios);
     }
 }
