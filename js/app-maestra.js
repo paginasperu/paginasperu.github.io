@@ -1,38 +1,41 @@
 /**
  * APP MAESTRA - OFICIAL.PE
- * Versión: 1.0
+ * Versión: 1.1 (Fix de Carga Asíncrona)
  * Descripción: Construye todo el sitio web dinámicamente.
  */
 
 (function() {
     // ==========================================
-    // A. CARGAR DEPENDENCIAS (Librerías externas)
+    // A. FUNCIÓN AUXILIAR PARA CARGAR SCRIPTS
+    // ==========================================
+    function loadScript(src) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = () => resolve(src);
+            script.onerror = () => reject(new Error(`Error cargando ${src}`));
+            document.head.appendChild(script);
+        });
+    }
+
+    // ==========================================
+    // B. INYECTAR ESTILOS Y FUENTES (No bloqueantes)
     // ==========================================
     const head = document.head;
 
-    // 1. Tailwind CSS
-    const tailwindScript = document.createElement('script');
-    tailwindScript.src = "https://cdn.tailwindcss.com";
-    head.appendChild(tailwindScript);
-
-    // 2. PapaParse
-    const papaScript = document.createElement('script');
-    papaScript.src = "https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js";
-    head.appendChild(papaScript);
-
-    // 3. Google Fonts (Inter)
+    // 1. Google Fonts (Inter)
     const fontLink = document.createElement('link');
     fontLink.rel = "stylesheet";
     fontLink.href = "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap";
     head.appendChild(fontLink);
 
-    // 4. Favicon Dinámico (Punto negro)
+    // 2. Favicon Dinámico (Punto negro)
     const favicon = document.createElement('link');
     favicon.rel = 'icon';
     favicon.href = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%23111111%22/></svg>';
     head.appendChild(favicon);
 
-    // 5. Estilos CSS Globales (Inyectados)
+    // 3. Estilos CSS Globales
     const style = document.createElement('style');
     style.innerHTML = `
         body { font-family: 'Inter', sans-serif; background-color: #F8F9FA; opacity: 0; transition: opacity 0.5s ease; }
@@ -44,29 +47,39 @@
     `;
     head.appendChild(style);
 
+    // ==========================================
+    // C. CARGAR LIBRERÍAS CRÍTICAS Y ARRANCAR
+    // ==========================================
+    
+    // Usamos Promise.all para esperar a que AMBAS librerías estén listas
+    // sin importar cuál termine primero.
+    Promise.all([
+        loadScript("https://cdn.tailwindcss.com"),
+        loadScript("https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js")
+    ])
+    .then(() => {
+        // Ambas librerías cargaron correctamente. Iniciamos.
+        console.log("Librerías cargadas. Iniciando sistema...");
+        iniciarSistema();
+    })
+    .catch(error => {
+        console.error("Error crítico cargando librerías:", error);
+        document.body.innerHTML = '<h1 style="text-align:center; margin-top:50px;">Error de conexión. Por favor recarga la página.</h1>';
+    });
+
 
     // ==========================================
-    // B. INICIAR SISTEMA (Cuando carguen las librerías)
-    // ==========================================
-    tailwindScript.onload = () => {
-        papaScript.onload = () => {
-            iniciarSistema();
-        };
-    };
-
-
-    // ==========================================
-    // C. CONSTRUCCIÓN DEL HTML (LA ESTRUCTURA)
+    // D. CONSTRUCCIÓN DEL HTML
     // ==========================================
     function construirHTML() {
         
-        // 1. ELIMINAR EL LOADER INICIAL DEL HTML (Aquí está lo que me pediste)
+        // 1. ELIMINAR EL LOADER INICIAL
         const manualLoader = document.getElementById('initial-loader');
         if(manualLoader) manualLoader.remove();
 
         // 2. Validar Configuración
         const config = window.CLIENT_CONFIG;
-        if (!config) { document.body.innerHTML = "Error: Falta configuración"; return; }
+        if (!config) { document.body.innerHTML = "Error: Falta configuración CLIENT_CONFIG"; return; }
 
         document.title = config.nombreNegocio;
         
@@ -109,34 +122,36 @@
         `;
 
         document.body.innerHTML = htmlEstructura;
-        document.body.style.opacity = "1"; // Mostrar sitio suavemente
+        document.body.style.opacity = "1"; 
     }
 
 
     // ==========================================
-    // D. LÓGICA DE NEGOCIO (Google Sheets)
+    // E. LÓGICA DE NEGOCIO (Google Sheets)
     // ==========================================
     let allProducts = [];
     let activeCategory = 'all';
 
     function iniciarSistema() {
+        // Construimos el HTML primero
         construirHTML();
         
-        // Event Listeners
-        document.getElementById('searchInput').addEventListener('input', (e) => filterProducts(e.target.value, activeCategory));
+        // Ahora activamos los eventos
+        const searchInput = document.getElementById('searchInput');
+        if(searchInput) {
+            searchInput.addEventListener('input', (e) => filterProducts(e.target.value, activeCategory));
+        }
 
         // Carga de Datos
         const config = window.CLIENT_CONFIG;
-        // Extraer ID si es URL completa, o usar directo si ya es ID
         let sheetId = config.sheetUrl;
         const match = config.sheetUrl.match(/\/d\/(.*?)(\/|$)/);
         if (match) sheetId = match[1];
 
         const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(config.nombrePestana)}`;
-        
-        // CONFIGURACIÓN DE LÍMITE
         const MAX_PRODUCTS = 50;
 
+        // Como ya estamos dentro del .then() de Promise.all, sabemos que PapaParse existe seguro.
         Papa.parse(url, {
             download: true, header: true, skipEmptyLines: true,
             complete: function(results) {
@@ -149,20 +164,26 @@
                 if(allProducts.length > 0) {
                     generateCategories(allProducts);
                     renderProducts(allProducts);
-                    document.getElementById('loader').classList.add('hidden');
-                    document.getElementById('productGrid').classList.remove('hidden');
+                    
+                    const loader = document.getElementById('loader');
+                    if(loader) loader.classList.add('hidden');
+                    
+                    const grid = document.getElementById('productGrid');
+                    if(grid) grid.classList.remove('hidden');
                 } else {
-                    document.getElementById('loader').innerHTML = '<p class="col-span-3 text-center text-red-500">Hoja vacía o nombre incorrecto.</p>';
+                    const loader = document.getElementById('loader');
+                    if(loader) loader.innerHTML = '<p class="col-span-3 text-center text-red-500">Hoja vacía o nombre incorrecto.</p>';
                 }
             },
             error: (err) => {
                 console.error(err);
-                document.getElementById('loader').innerHTML = '<p class="col-span-3 text-center text-red-500">Error conectando con Google Sheets.</p>';
+                const loader = document.getElementById('loader');
+                if(loader) loader.innerHTML = '<p class="col-span-3 text-center text-red-500">Error conectando con Google Sheets.</p>';
             }
         });
     }
 
-    // Funciones Auxiliares (Renderizado)
+    // Funciones Auxiliares
     function renderProducts(products) {
         const grid = document.getElementById('productGrid');
         const noRes = document.getElementById('noResults');
@@ -227,7 +248,6 @@
         });
     }
 
-    // Funciones Globales para botones HTML
     window.filterProducts = function(term, cat) {
         const t = term.toLowerCase();
         const f = allProducts.filter(p => {
