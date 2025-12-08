@@ -3,516 +3,370 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Academia Teorema 21 - Preparación preuniversitaria de alto nivel. Asegura tu ingreso a San Marcos, UNI y Católica.">
-    <title>Academia Teorema 21 | Asegura tu Ingreso</title>
+    <title>Libro de Reclamaciones Virtual - Tu Empresa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
     <style>
         /* =========================================
-           1. CONFIGURACIÓN BASE Y VARIABLES
+           ESTILOS (CSS)
            ========================================= */
         :root {
-            --primary: #0f172a;      /* Azul Oscuro (Autoridad) */
-            --accent: #f97316;       /* Naranja Vibrante (Acción/Energía) */
-            --text-dark: #1e293b;
-            --text-light: #64748b;
-            --bg-light: #f8fafc;
-            --white: #ffffff;
-            --radius: 12px;
-            --shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+            --primary: #b91c1c; /* Rojo Indecopi/Libro */
+            --dark: #1e293b;
+            --light: #f1f5f9;
+            --border: #cbd5e1;
+            --text: #334155;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            color: var(--text-dark);
-            background-color: var(--white);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Roboto', sans-serif; background-color: #f8fafc; color: var(--text); padding: 20px; }
 
-        a { text-decoration: none; color: inherit; transition: 0.3s; }
-        ul { list-style: none; }
-        img { max-width: 100%; display: block; }
-
-        /* Botones Globales */
-        .btn {
-            display: inline-block;
-            padding: 12px 32px;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-        .btn-primary { background: var(--accent); color: white; border: 2px solid var(--accent); }
-        .btn-primary:hover { background: #ea580c; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(249, 115, 22, 0.3); }
-        .btn-outline { background: transparent; color: var(--white); border: 2px solid var(--white); }
-        .btn-outline:hover { background: var(--white); color: var(--primary); }
-
-        /* Contenedor estándar */
         .container {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* =========================================
-           2. HEADER & NAVEGACIÓN
-           ========================================= */
-        header {
-            position: fixed;
-            top: 0; left: 0; width: 100%;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            padding: 15px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .nav-flex {
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem; font-weight: 800; color: white; letter-spacing: -1px;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .logo i { color: var(--accent); }
-
-        .nav-links { display: flex; gap: 30px; }
-        .nav-links a { color: #cbd5e1; font-weight: 500; font-size: 0.95rem; }
-        .nav-links a:hover { color: var(--accent); }
-
-        /* Menú Móvil */
-        .hamburger { display: none; color: white; font-size: 1.5rem; cursor: pointer; }
-
-        /* =========================================
-           3. HERO SECTION (PORTADA)
-           ========================================= */
-        .hero {
-            position: relative;
-            height: 100vh;
-            min-height: 600px;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.7)), 
-                        url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-            text-align: center;
-            color: white;
-        }
-
-        .hero-content { max-width: 800px; margin: 0 auto; padding-top: 60px; }
-        
-        .tagline {
-            display: inline-block;
-            background: rgba(249, 115, 22, 0.2);
-            color: var(--accent);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            border: 1px solid rgba(249, 115, 22, 0.5);
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            line-height: 1.2;
-            margin-bottom: 20px;
-        }
-        
-        .hero h1 span { color: var(--accent); }
-
-        .hero p {
-            font-size: 1.2rem;
-            color: #cbd5e1;
-            margin-bottom: 40px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .hero-btns { display: flex; gap: 15px; justify-content: center; }
-
-        /* =========================================
-           4. METODOLOGÍA (FEATURES)
-           ========================================= */
-        .section { padding: 100px 0; }
-        .bg-light { background-color: var(--bg-light); }
-
-        .section-header { text-align: center; margin-bottom: 60px; }
-        .section-header h2 { font-size: 2.5rem; font-weight: 700; color: var(--primary); margin-bottom: 10px; }
-        .section-header p { color: var(--text-light); max-width: 600px; margin: 0 auto; }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .feature-card {
             background: white;
-            padding: 40px 30px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            transition: 0.3s;
-            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-radius: 8px;
             overflow: hidden;
-            border-top: 4px solid transparent;
-        }
-
-        .feature-card:hover { 
-            transform: translateY(-10px); 
-            border-top-color: var(--accent);
-        }
-
-        .icon-box {
-            width: 60px; height: 60px;
-            background: #fff7ed;
-            color: var(--accent);
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 12px;
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-        }
-
-        .feature-card h3 { font-size: 1.25rem; margin-bottom: 10px; }
-        .feature-card p { color: var(--text-light); font-size: 0.95rem; }
-
-        /* =========================================
-           5. CICLOS (PRODUCTOS)
-           ========================================= */
-        .cycles-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
-        }
-
-        .cycle-card {
-            background: white;
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow);
             border: 1px solid #e2e8f0;
-            display: flex;
-            flex-direction: column;
         }
 
-        .cycle-header {
-            background: var(--primary);
+        /* HEADER */
+        header {
+            background: var(--dark);
             color: white;
             padding: 20px;
             text-align: center;
+            border-bottom: 4px solid var(--primary);
         }
-        
-        .cycle-header h3 { font-size: 1.5rem; margin-bottom: 5px; }
-        .cycle-header span { font-size: 0.9rem; opacity: 0.8; }
+        .header-title { font-size: 1.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .header-legal { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; }
+        .empresa-info { background: #f8fafc; padding: 15px; border-bottom: 1px solid var(--border); text-align: center; color: var(--dark); }
+        .empresa-info h3 { font-size: 1.2rem; margin-bottom: 5px; }
+        .fecha-info { font-weight: bold; color: var(--primary); margin-top: 10px; }
 
-        .cycle-body { padding: 30px; flex-grow: 1; display: flex; flex-direction: column; }
-        .cycle-price { font-size: 2.5rem; font-weight: 800; color: var(--text-dark); margin-bottom: 20px; text-align: center; }
-        .cycle-price span { font-size: 1rem; color: var(--text-light); font-weight: 400; }
+        /* FORMULARIO */
+        form { padding: 30px; }
 
-        .cycle-features { list-style: none; margin-bottom: 30px; flex-grow: 1; }
-        .cycle-features li { margin-bottom: 12px; color: var(--text-light); display: flex; gap: 10px; align-items: center; }
-        .cycle-features li i { color: var(--accent); }
+        fieldset {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 25px;
+            background-color: #fff;
+        }
 
-        /* =========================================
-           6. RESULTADOS (SOCIAL PROOF)
-           ========================================= */
-        .stats-section {
-            background: var(--primary);
+        legend {
+            font-weight: 700;
+            color: var(--primary);
+            padding: 0 10px;
+            font-size: 1.1rem;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .row { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 15px; }
+        .col { flex: 1; min-width: 250px; }
+        .col-full { flex: 100%; }
+
+        label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.9rem; color: var(--dark); }
+        label span { color: var(--primary); } /* Asterisco rojo */
+
+        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.1);
+        }
+
+        /* RADIOS BIEN/SERVICIO */
+        .radio-group { display: flex; gap: 20px; align-items: center; padding: 10px 0; }
+        .radio-item { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+
+        /* DEFINICIONES */
+        .info-box {
+            background-color: #fff7ed;
+            border-left: 4px solid #f97316;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: #7c2d12;
+        }
+        .info-box strong { display: block; margin-bottom: 4px; }
+
+        /* CHECKBOX LEGAL */
+        .checkbox-legal { display: flex; align-items: flex-start; gap: 10px; margin: 20px 0; font-size: 0.9rem; }
+        .checkbox-legal input { margin-top: 4px; }
+
+        /* BOTONES */
+        .btn-submit {
+            background-color: var(--primary);
             color: white;
-            padding: 60px 0;
-            text-align: center;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+            text-transform: uppercase;
         }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-        }
-        .stat-item h3 { font-size: 3rem; font-weight: 800; color: var(--accent); margin-bottom: 5px; }
-        .stat-item p { font-size: 1.1rem; opacity: 0.9; }
+        .btn-submit:hover { background-color: #991b1b; }
 
-        /* =========================================
-           7. CALL TO ACTION & FOOTER
-           ========================================= */
-        .cta-section {
-            text-align: center;
-            background: linear-gradient(to right, #fff7ed, #ffffff);
+        /* MODAL ÉXITO */
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;
         }
-
-        footer {
-            background: #0f172a;
-            color: #94a3b8;
-            padding: 50px 0 20px;
-            font-size: 0.9rem;
+        .modal-content {
+            background-color: white; padding: 40px; border-radius: 10px; text-align: center;
+            max-width: 500px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-        .footer-col h4 { color: white; margin-bottom: 20px; font-size: 1.1rem; }
-        .footer-col ul li { margin-bottom: 10px; }
-        .footer-col ul li a:hover { color: var(--accent); }
-        .copyright { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .icon-check { color: #16a34a; font-size: 4rem; margin-bottom: 20px; }
+        .modal h2 { margin-bottom: 10px; color: var(--dark); }
+        .modal p { color: var(--text); margin-bottom: 20px; }
+        .btn-close { background: var(--dark); color: white; border: none; padding: 10px 25px; border-radius: 4px; cursor: pointer; }
 
-        /* Botón Flotante WhatsApp */
-        .float-wa {
-            position: fixed;
-            bottom: 30px; right: 30px;
-            background: #25d366;
-            color: white;
-            width: 60px; height: 60px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 30px;
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
-            z-index: 999;
-            transition: transform 0.3s;
-        }
-        .float-wa:hover { transform: scale(1.1); }
-
-        /* Animaciones Fade In */
-        .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
-        .fade-in.visible { opacity: 1; transform: translateY(0); }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2.5rem; }
-            .nav-links { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: var(--primary); flex-direction: column; padding: 20px; text-align: center; }
-            .nav-links.active { display: flex; }
-            .hamburger { display: block; }
-            .hero-btns { flex-direction: column; }
+        @media (max-width: 600px) {
+            .row { flex-direction: column; gap: 15px; }
+            form { padding: 20px; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="container nav-flex">
-            <a href="#" class="logo">
-                <i class="fa-solid fa-shapes"></i> TEOREMA 21
-            </a>
-            <nav>
-                <ul class="nav-links" id="navLinks">
-                    <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="#metodo">Metodología</a></li>
-                    <li><a href="#ciclos">Ciclos</a></li>
-                    <li><a href="#contacto">Contacto</a></li>
-                    <li><a href="#" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.9rem;">Aula Virtual</a></li>
-                </ul>
-            </nav>
-            <div class="hamburger" onclick="toggleMenu()">
-                <i class="fa-solid fa-bars"></i>
+    <div class="container">
+        <header>
+            <div class="header-title">Libro de Reclamaciones</div>
+            <div class="header-legal">Conforme al Código de Protección y Defensa del Consumidor</div>
+        </header>
+
+        <div class="empresa-info">
+            <h3 id="nombreEmpresa">MI EMPRESA S.A.C.</h3>
+            <p>RUC: <span id="rucEmpresa">20123456789</span></p>
+            <p>Dirección: Av. Ejemplo 123, Lima, Perú</p>
+            
+            <div class="fecha-info">
+                Hoja de Reclamación N°: <span id="numeroHoja">000001-2025</span> | Fecha: <span id="fechaActual">--/--/----</span>
             </div>
         </div>
-    </header>
 
-    <section id="inicio" class="hero">
-        <div class="hero-content fade-in">
-            <span class="tagline">🔥 Nuevos Inicios: 15 de Enero</span>
-            <h1>Preparación de Alto Nivel para asegurar tu <span class="highlight">Ingreso</span></h1>
-            <p>La metodología Teorema 21 combina exigencia académica, tutores personalizados y simulacros tipo examen de admisión. Tu vacante te espera.</p>
-            <div class="hero-btns">
-                <a href="#ciclos" class="btn btn-primary">Ver Ciclos Disponibles</a>
-                <a href="https://wa.me/51999999999" class="btn btn-outline"><i class="fa-brands fa-whatsapp"></i> Hablar con Asesor</a>
-            </div>
-        </div>
-    </section>
-
-    <section class="stats-section">
-        <div class="container stats-grid">
-            <div class="stat-item fade-in">
-                <h3>+1,500</h3>
-                <p>Ingresantes</p>
-            </div>
-            <div class="stat-item fade-in">
-                <h3>12</h3>
-                <p>Años de Experiencia</p>
-            </div>
-            <div class="stat-item fade-in">
-                <h3>98%</h3>
-                <p>Ratio de Ingreso</p>
-            </div>
-            <div class="stat-item fade-in">
-                <h3>100%</h3>
-                <p>Clases en Vivo</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="metodo" class="section bg-light">
-        <div class="container">
-            <div class="section-header fade-in">
-                <h2>¿Por qué elegir Teorema 21?</h2>
-                <p>No somos una academia más. Somos un sistema de entrenamiento diseñado para superar los exámenes más difíciles del país.</p>
-            </div>
-            <div class="features-grid">
-                <div class="feature-card fade-in">
-                    <div class="icon-box"><i class="fa-solid fa-chalkboard-user"></i></div>
-                    <h3>Docentes Especialistas</h3>
-                    <p>Profesores con amplia experiencia en exámenes UNI, San Marcos y Católica. Enseñan trucos y métodos directos.</p>
-                </div>
-                <div class="feature-card fade-in">
-                    <div class="icon-box"><i class="fa-solid fa-file-pen"></i></div>
-                    <h3>Simulacros Diarios</h3>
-                    <p>Evaluaciones constantes con el mismo nivel de dificultad y tiempo que el examen real. Mide tu progreso.</p>
-                </div>
-                <div class="feature-card fade-in">
-                    <div class="icon-box"><i class="fa-solid fa-video"></i></div>
-                    <h3>Plataforma HD</h3>
-                    <p>Clases grabadas en alta definición disponibles 24/7 para que repases los temas más complejos.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="ciclos" class="section">
-        <div class="container">
-            <div class="section-header fade-in">
-                <h2>Elige tu Camino</h2>
-                <p>Ciclos especializados según la universidad a la que postulas.</p>
-            </div>
-            <div class="cycles-grid">
+        <form id="libroReclamaciones" onsubmit="enviarReclamo(event)">
+            
+            <fieldset>
+                <legend>1. Identificación del Consumidor Reclamante</legend>
                 
-                <div class="cycle-card fade-in">
-                    <div class="cycle-header">
-                        <h3>Ciclo San Marcos</h3>
-                        <span>Áreas A, B, C, D y E</span>
+                <div class="row">
+                    <div class="col">
+                        <label>Tipo de Documento <span>*</span></label>
+                        <select name="tipo_doc" required>
+                            <option value="DNI">DNI</option>
+                            <option value="CE">Carnet Extranjería</option>
+                            <option value="RUC">RUC</option>
+                            <option value="Pasaporte">Pasaporte</option>
+                        </select>
                     </div>
-                    <div class="cycle-body">
-                        <div class="cycle-price">S/ 250 <span>/mes</span></div>
-                        <ul class="cycle-features">
-                            <li><i class="fa-solid fa-check"></i> Lunes a Sábado (Mañana/Tarde)</li>
-                            <li><i class="fa-solid fa-check"></i> Libros Teóricos incluidos</li>
-                            <li><i class="fa-solid fa-check"></i> Simulacros DECO</li>
-                            <li><i class="fa-solid fa-check"></i> Asesoría Psicológica</li>
-                        </ul>
-                        <a href="https://wa.me/51999999999?text=Hola,%20info%20Ciclo%20San%20Marcos" class="btn btn-primary">Matricularme</a>
-                    </div>
-                </div>
-
-                <div class="cycle-card fade-in">
-                    <div class="cycle-header" style="background:#b91c1c">
-                        <h3>Ciclo UNI</h3>
-                        <span>Ingeniería y Arquitectura</span>
-                    </div>
-                    <div class="cycle-body">
-                        <div class="cycle-price">S/ 280 <span>/mes</span></div>
-                        <ul class="cycle-features">
-                            <li><i class="fa-solid fa-check"></i> Full Matemáticas y Ciencias</li>
-                            <li><i class="fa-solid fa-check"></i> Nivelación desde cero</li>
-                            <li><i class="fa-solid fa-check"></i> Seminarios Nocturnos</li>
-                            <li><i class="fa-solid fa-check"></i> Material exclusivo UNI</li>
-                        </ul>
-                        <a href="https://wa.me/51999999999?text=Hola,%20info%20Ciclo%20UNI" class="btn btn-primary">Matricularme</a>
+                    <div class="col">
+                        <label>N° Documento <span>*</span></label>
+                        <input type="text" name="numero_doc" required pattern="[0-9A-Za-z]{8,15}" title="Ingrese un número válido">
                     </div>
                 </div>
 
-                <div class="cycle-card fade-in">
-                    <div class="cycle-header" style="background:#0284c7">
-                        <h3>Ciclo Católica</h3>
-                        <span>Talento y Primera Opción</span>
-                    </div>
-                    <div class="cycle-body">
-                        <div class="cycle-price">S/ 300 <span>/mes</span></div>
-                        <ul class="cycle-features">
-                            <li><i class="fa-solid fa-check"></i> Lectura Crítica y Redacción</li>
-                            <li><i class="fa-solid fa-check"></i> Matemática PUCP</li>
-                            <li><i class="fa-solid fa-check"></i> Simulacros presenciales</li>
-                            <li><i class="fa-solid fa-check"></i> Acceso a biblioteca</li>
-                        </ul>
-                        <a href="https://wa.me/51999999999?text=Hola,%20info%20Ciclo%20Católica" class="btn btn-primary">Matricularme</a>
+                <div class="row">
+                    <div class="col-full">
+                        <label>Nombres y Apellidos / Razón Social <span>*</span></label>
+                        <input type="text" name="nombre" required>
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col-full">
+                        <label>Domicilio <span>*</span></label>
+                        <input type="text" name="direccion" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Teléfono / Celular <span>*</span></label>
+                        <input type="tel" name="telefono" required>
+                    </div>
+                    <div class="col">
+                        <label>Email <span>*</span></label>
+                        <input type="email" name="email" required>
+                    </div>
+                </div>
+
+                <div class="checkbox-legal" style="margin-bottom: 10px;">
+                    <input type="checkbox" id="esMenor" onchange="toggleApoderado()">
+                    <label for="esMenor" style="display:inline; font-weight:400;">Soy menor de edad</label>
+                </div>
+
+                <div class="row" id="campoApoderado" style="display:none;">
+                    <div class="col-full">
+                        <label>Nombre del Padre o Apoderado</label>
+                        <input type="text" name="apoderado">
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>2. Identificación del Bien Contratado</legend>
+                
+                <div class="row">
+                    <div class="col">
+                        <label>Tipo de Bien <span>*</span></label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="tipo_bien" value="Producto" required> Producto
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="tipo_bien" value="Servicio"> Servicio
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <label>Monto Reclamado (S/)</label>
+                        <input type="number" step="0.01" name="monto">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-full">
+                        <label>Descripción del Producto o Servicio <span>*</span></label>
+                        <textarea name="descripcion_bien" rows="2" placeholder="Ej: Zapatillas Nike talla 42 / Servicio de delivery..." required></textarea>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>3. Detalle de la Reclamación y Pedido</legend>
+
+                <div class="info-box">
+                    <strong>RECLAMO:</strong> Disconformidad relacionada a los productos o servicios.
+                    <br>
+                    <strong>QUEJA:</strong> Disconformidad no relacionada a los productos o servicios; o malestar o descontento respecto a la atención al público.
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Tipo de Reclamación <span>*</span></label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="tipo_reclamacion" value="Reclamo" required> Reclamo
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="tipo_reclamacion" value="Queja"> Queja
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-full">
+                        <label>Detalle del Reclamo o Queja <span>*</span></label>
+                        <textarea name="detalle_reclamacion" rows="4" placeholder="Describa los hechos..." required></textarea>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-full">
+                        <label>Pedido del Consumidor <span>*</span></label>
+                        <textarea name="pedido" rows="3" placeholder="¿Qué solución espera? (Ej: Cambio de producto, devolución, etc.)" required></textarea>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="checkbox-legal">
+                <input type="checkbox" id="declaracion" required>
+                <label for="declaracion" style="display:inline; font-weight:400; cursor:pointer;">
+                    Declaro ser el consumidor y que los datos consignados son verdaderos. Acepto que la respuesta a mi reclamo o queja sea enviada al correo electrónico proporcionado.
+                </label>
             </div>
-        </div>
-    </section>
 
-    <section id="contacto" class="section cta-section">
-        <div class="container fade-in">
-            <h2>¿Listo para ser Cachimbo?</h2>
-            <p style="margin-bottom:30px; font-size:1.1rem; color:var(--text-light);">Las vacantes son limitadas. Reserva tu matrícula hoy y obtén un 10% de descuento en tu primer mes.</p>
-            <a href="https://wa.me/51999999999" class="btn btn-primary" style="padding: 15px 40px; font-size: 1.1rem;">
-                <i class="fa-brands fa-whatsapp"></i> Inscribirme por WhatsApp
-            </a>
-        </div>
-    </section>
+            <button type="submit" class="btn-submit">Enviar Hoja de Reclamación</button>
 
-    <footer>
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <div class="logo" style="margin-bottom:15px;"><i class="fa-solid fa-shapes"></i> TEOREMA 21</div>
-                    <p>La academia líder en preparación preuniversitaria. Comprometidos con tu educación y tu futuro profesional.</p>
-                </div>
-                <div class="footer-col">
-                    <h4>Enlaces Rápidos</h4>
-                    <ul>
-                        <li><a href="#inicio">Inicio</a></li>
-                        <li><a href="#ciclos">Ciclos</a></li>
-                        <li><a href="#">Intranet Alumnos</a></li>
-                        <li><a href="#">Blog Educativo</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Contáctanos</h4>
-                    <ul>
-                        <li><i class="fa-solid fa-location-dot"></i> Av. Universitaria 1234, Lima</li>
-                        <li><i class="fa-solid fa-phone"></i> (01) 555-1234</li>
-                        <li><i class="fa-solid fa-envelope"></i> informes@teorema21.edu.pe</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="copyright">
-                &copy; 2025 Academia Teorema 21. Todos los derechos reservados.
-            </div>
-        </div>
-    </footer>
+        </form>
+    </div>
 
-    <a href="https://wa.me/51999999999" class="float-wa" target="_blank">
-        <i class="fa-brands fa-whatsapp"></i>
-    </a>
+    <div id="modalExito" class="modal">
+        <div class="modal-content">
+            <div class="icon-check">✓</div>
+            <h2>¡Reclamo Registrado!</h2>
+            <p>Se ha enviado una copia a tu correo electrónico.</p>
+            <p><strong>N° de Hoja: <span id="modalNumero">000001-2025</span></strong></p>
+            <p style="font-size: 0.8rem; color:#666;">La empresa tiene un plazo legal de hasta 15 días hábiles para responder.</p>
+            <button class="btn-close" onclick="cerrarModal()">Cerrar</button>
+        </div>
+    </div>
 
     <script>
-        // 1. Menú Móvil
-        function toggleMenu() {
-            const nav = document.getElementById('navLinks');
-            nav.classList.toggle('active');
+        // 1. FECHA AUTOMÁTICA
+        document.addEventListener('DOMContentLoaded', () => {
+            const fecha = new Date();
+            const opciones = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            document.getElementById('fechaActual').textContent = fecha.toLocaleDateString('es-PE', opciones);
+            
+            // Generar número aleatorio para simular folio
+            const randomId = Math.floor(100000 + Math.random() * 900000);
+            const folio = `${randomId}-${fecha.getFullYear()}`;
+            document.getElementById('numeroHoja').textContent = folio;
+            document.getElementById('modalNumero').textContent = folio;
+        });
+
+        // 2. TOGGLE APODERADO
+        function toggleApoderado() {
+            const check = document.getElementById('esMenor');
+            const campo = document.getElementById('campoApoderado');
+            if (check.checked) {
+                campo.style.display = 'flex';
+                campo.querySelector('input').required = true;
+            } else {
+                campo.style.display = 'none';
+                campo.querySelector('input').required = false;
+            }
         }
 
-        // 2. Animación al hacer Scroll (Intersection Observer)
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.1
-        };
+        // 3. ENVÍO DEL FORMULARIO
+        function enviarReclamo(e) {
+            e.preventDefault(); // Evita que la página se recargue
 
-        const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observer.unobserve(entry.target); // Solo animar una vez
-                }
-            });
-        }, observerOptions);
+            // Aquí normalmente conectarías con un Backend o EmailService
+            // Ejemplo: Formspree, EmailJS, o tu base de datos PHP/Node.
+            
+            // Simulamos tiempo de carga
+            const btn = document.querySelector('.btn-submit');
+            const textoOriginal = btn.textContent;
+            btn.textContent = "Enviando...";
+            btn.disabled = true;
 
-        document.querySelectorAll('.fade-in').forEach((el) => {
-            observer.observe(el);
-        });
+            setTimeout(() => {
+                // Mostrar Modal de éxito
+                document.getElementById('modalExito').style.display = 'flex';
+                
+                // Resetear botón
+                btn.textContent = textoOriginal;
+                btn.disabled = false;
+                
+                // Limpiar formulario (Opcional)
+                document.getElementById('libroReclamaciones').reset();
+            }, 1500);
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalExito').style.display = 'none';
+        }
     </script>
 
 </body>
