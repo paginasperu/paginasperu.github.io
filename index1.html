@@ -1,1 +1,404 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Academia Teorema 21 — Preparación universitaria de alto nivel</title>
+  <meta name="description" content="Academia Teorema 21 — Preparación intensiva y personalizada para asegurar tu ingreso a la universidad. Cursos presenciales y online, clases por módulos, simulacros y seguimiento personalizado." />
+  <meta name="theme-color" content="#0b76ef" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%230b76ef'/><text x='50' y='58' font-size='46' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>" />
+
+  <!-- Minimal, self-contained styles (no frameworks) -->
+  <style>
+    :root{
+      --blue:#0b76ef;
+      --muted:#6b7280;
+      --bg:#f7f8fb;
+      --card:#ffffff;
+      --glass: rgba(255,255,255,0.6);
+      --radius:12px;
+      --maxw:1100px;
+      --accent:#06b6d4;
+      --shadow: 0 6px 18px rgba(11,118,239,0.08);
+      color-scheme: light;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:linear-gradient(180deg,#fbfdff 0%, var(--bg) 100%); color:#0f1724;}
+    a{color:var(--blue);text-decoration:none}
+    .container{max-width:var(--maxw);margin:0 auto;padding:28px 18px;}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:58px;height:58px;border-radius:12px;display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--blue),#0666d0);box-shadow:0 6px 18px rgba(11,118,239,0.12);
+      color:white;font-weight:700;font-size:20px;
+    }
+    h1{font-size:22px;margin:0}
+    header nav{display:flex;gap:12px;align-items:center}
+    .btn{background:var(--blue);color:white;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:600;box-shadow:var(--shadow)}
+    .ghost{background:transparent;border:1px solid rgba(11,118,239,0.12);color:var(--blue);padding:8px 12px;border-radius:10px}
+    /* Hero */
+    .hero{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:center;margin-top:22px}
+    .card{background:var(--card);border-radius:18px;padding:22px;box-shadow:var(--shadow)}
+    .kicker{display:inline-block;background:linear-gradient(90deg,#e6f3ff,#eef9ff);color:var(--blue);padding:6px 10px;border-radius:999px;font-weight:600;font-size:13px;margin-bottom:14px}
+    h2{font-size:30px;margin:6px 0 12px;line-height:1.06}
+    p.lead{color:var(--muted);margin:0 0 18px}
+    .features{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+    .feature{display:flex;gap:10px;align-items:flex-start}
+    .icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#0b76ef);display:grid;place-items:center;color:white;font-weight:700}
+    /* right column */
+    .panel-cta{padding:18px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#fbfdff);border:1px solid rgba(11,118,239,0.04)}
+    .small{font-size:13px;color:var(--muted)}
+    .input{width:100%;padding:12px;border-radius:10px;border:1px solid #e6eef8;font-size:15px}
+    .row{display:flex;gap:8px}
+    .price{font-size:20px;font-weight:700;color:var(--blue)}
+    /* cards area */
+    .grid-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:22px}
+    .stat{display:flex;flex-direction:column;gap:6px}
+    .stat .num{font-weight:700;font-size:22px;color:var(--blue)}
+    footer{margin-top:34px;padding:22px 0;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;align-items:center}
+    /* responsive */
+    @media (max-width:920px){
+      .hero{grid-template-columns:1fr; padding-bottom:6px}
+      .panel-cta{order:2}
+    }
+    /* testimonial */
+    .testi{background:linear-gradient(180deg,#fff,#f8fcff);padding:14px;border-radius:12px;border:1px solid rgba(11,118,239,0.04)}
+    /* faq */
+    details{background:var(--card);padding:12px;border-radius:10px;border:1px solid rgba(15,23,36,0.04)}
+    /* subtle link button */
+    .link-btn{background:transparent;border:none;color:var(--blue);font-weight:600;padding:6px 8px;cursor:pointer}
+  </style>
+
+  <!-- JSON-LD (SEO básico) -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"EducationalOrganization",
+    "name":"Academia Teorema 21",
+    "url":"https://premios.pe/",
+    "logo":"https://premios.pe/favicon.png",
+    "description":"Preparación de alto nivel para asegurar tu ingreso a la universidad. Cursos presenciales y online, simulacros y seguimiento personalizado.",
+    "sameAs": []
+  }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">T21</div>
+        <div>
+          <h1>Academia Teorema 21</h1>
+          <div style="font-size:13px;color:var(--muted)">Preparación universitaria · Presencial &amp; Online</div>
+        </div>
+      </div>
+
+      <nav aria-label="Navegación principal">
+        <a class="ghost" href="#cursos">Cursos</a>
+        <a class="ghost" href="#metodo">Método</a>
+        <a class="ghost" href="#precios">Precios</a>
+        <a class="ghost" href="#contacto">Contacto</a>
+        <a class="btn" href="tel:+51950141414" title="Llamar">Reservar</a>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <span class="kicker">Admisión 2026</span>
+        <h2 id="hero-title">Preparación de alto nivel para asegurar tu ingreso a la universidad</h2>
+        <p class="lead">Clases intensivas por módulos, enfoque en técnicas de examen y simulacros reales. Profesores con experiencia en universidades públicas y privadas y seguimiento personalizado para cada alumno.</p>
+
+        <div class="card" aria-hidden="false" style="margin-top:16px">
+          <div style="display:flex;gap:12px;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-weight:700">Próximo ciclo</div>
+              <div class="small">Inicio: 12 de enero · Duración: 10 semanas · Horario: Sábados 8:30 - 12:30</div>
+            </div>
+            <div style="text-align:right">
+              <div class="price">S/ 299</div>
+              <div class="small">Plazas limitadas</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+            <button class="btn" onclick="openSignup()">Inscribirme</button>
+            <a class="link-btn" href="#contacto">Solicitar llamada</a>
+          </div>
+
+          <div class="features" style="margin-top:18px">
+            <div class="feature">
+              <div class="icon">S</div>
+              <div>
+                <div style="font-weight:700">Simulacros reales</div>
+                <div class="small">Evaluaciones con formato oficial</div>
+              </div>
+            </div>
+            <div class="feature">
+              <div class="icon">P</div>
+              <div>
+                <div style="font-weight:700">Plan personalizado</div>
+                <div class="small">Seguimiento y ajuste por rendimiento</div>
+              </div>
+            </div>
+            <div class="feature">
+              <div class="icon">G</div>
+              <div>
+                <div style="font-weight:700">Grupo reducido</div>
+                <div class="small">Atención individual y feedback</div>
+              </div>
+            </div>
+            <div class="feature">
+              <div class="icon">O</div>
+              <div>
+                <div style="font-weight:700">Modalidad híbrida</div>
+                <div class="small">Clases presenciales y acceso a la plataforma</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- quick stats -->
+        <div class="grid-cards" style="margin-top:16px">
+          <div class="card stat">
+            <div class="num">+1,200</div>
+            <div class="small">Estudiantes formados</div>
+          </div>
+          <div class="card stat">
+            <div class="num">82%</div>
+            <div class="small">Tasa de ingreso en últimos 2 años</div>
+          </div>
+          <div class="card stat">
+            <div class="num">12</div>
+            <div class="small">Aulas y simulacros mensuales</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL: signup / consult points concept -->
+      <aside class="panel-cta card" aria-labelledby="cta-title">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div>
+            <div id="cta-title" style="font-weight:700">Reserva tu plaza</div>
+            <div class="small">Rellena tus datos y te llamamos</div>
+          </div>
+          <div class="small">Contacto: <strong>+51 950 141 414</strong></div>
+        </div>
+
+        <form id="signupForm" onsubmit="event.preventDefault(); submitForm()">
+          <label class="small" for="name">Nombre</label>
+          <input id="name" class="input" placeholder="Ej. Ana Pérez" required>
+
+          <label class="small" for="phone" style="margin-top:8px">Teléfono (WhatsApp)</label>
+          <input id="phone" class="input" placeholder="+51 9xxxxxxxx" required style="margin-bottom:8px">
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn" type="submit">Solicitar llamada</button>
+            <a class="ghost" href="https://wa.me/51950141414" target="_blank" rel="noopener">Chatear por WhatsApp</a>
+          </div>
+        </form>
+
+        <hr style="border:none;height:1px;background:#eef6ff;margin:14px 0;border-radius:2px">
+
+        <div style="font-size:13px;color:var(--muted)">
+          Modalidades: <strong>Presencial</strong> · <strong>Online</strong><br>
+          Nivel: <strong>Preuniversitario intensivo</strong>
+        </div>
+      </aside>
+    </section>
+
+    <!-- MÉTODO -->
+    <section id="metodo" style="margin-top:26px">
+      <h3 style="margin:0 0 8px">Nuestro método</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="card">
+          <h4 style="margin:0 0 8px">Diagnóstico inicial</h4>
+          <p class="small">Evaluación para identificar fortalezas y debilidades. Plan de estudio personalizado.</p>
+        </div>
+        <div class="card">
+          <h4 style="margin:0 0 8px">Práctica guiada</h4>
+          <p class="small">Clases enfocadas en resolución de problemas, estrategias de tiempo y gestión del examen.</p>
+        </div>
+        <div class="card">
+          <h4 style="margin:0 0 8px">Simulacros oficiales</h4>
+          <p class="small">Simulacros periódicos corregidos por profesores con retroalimentación detallada.</p>
+        </div>
+        <div class="card">
+          <h4 style="margin:0 0 8px">Seguimiento</h4>
+          <p class="small">Revisión de avances, tutorías personalizadas y recursos digitales a tu ritmo.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CURSOS / TEMARIOS -->
+    <section id="cursos" style="margin-top:22px">
+      <h3 style="margin:0 0 6px">Cursos destacados</h3>
+      <div class="grid-cards">
+        <div class="card">
+          <strong>Curso Intensivo - Matemáticas</strong>
+          <div class="small" style="margin-top:8px">Álgebra, Geometría, Análisis de problemas y estrategias de examen. 30 horas.</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+            <div class="small">Precio: S/ 199</div>
+            <a class="link-btn" href="#precios">Inscribirme</a>
+          </div>
+        </div>
+        <div class="card">
+          <strong>Comunicación y Razonamiento Verbal</strong>
+          <div class="small" style="margin-top:8px">Comprensión lectora, redacción y análisis crítico. 24 horas.</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+            <div class="small">Precio: S/ 169</div>
+            <a class="link-btn" href="#precios">Inscribirme</a>
+          </div>
+        </div>
+        <div class="card">
+          <strong>Simulacro Completo + Corrección</strong>
+          <div class="small" style="margin-top:8px">Prueba completa, reporte de desempeño y tutoría posterior.</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+            <div class="small">Precio: S/ 80</div>
+            <a class="link-btn" href="#precios">Reservar</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIOS -->
+    <section style="margin-top:22px">
+      <h3 style="margin:0 0 8px">Testimonios</h3>
+      <div class="grid-cards">
+        <div class="testi">
+          <strong>María L. — Ingresó a Medicina</strong>
+          <div class="small" style="margin-top:8px">"Las clases intensivas y los simulacros cambiaron mi forma de estudiar. Logré el puntaje que necesitaba."</div>
+        </div>
+        <div class="testi">
+          <strong>Carlos R. — Ingresó a Ingeniería</strong>
+          <div class="small" style="margin-top:8px">"Profesores con mucha experiencia y mucha práctica enfocada a preguntas reales."</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRECIOS -->
+    <section id="precios" style="margin-top:22px">
+      <h3 style="margin:0 0 8px">Planes y precios</h3>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div class="card" style="flex:1;min-width:220px">
+          <div style="font-weight:700">Plan Básico</div>
+          <div class="small">Acceso a clases en vivo + material digital</div>
+          <div style="margin-top:10px;font-size:20px;color:var(--blue)">S/ 199</div>
+        </div>
+        <div class="card" style="flex:1;min-width:220px">
+          <div style="font-weight:700">Plan Premium</div>
+          <div class="small">Incluye tutoría personalizada y 2 simulacros</div>
+          <div style="margin-top:10px;font-size:20px;color:var(--blue)">S/ 299</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section style="margin-top:22px">
+      <h3 style="margin:0 0 8px">Preguntas frecuentes</h3>
+      <div style="display:grid;gap:10px">
+        <details>
+          <summary style="font-weight:700">¿Cómo me inscribo?</summary>
+          <div class="small" style="margin-top:8px">Completa el formulario arriba o escríbenos por WhatsApp al <strong>+51 950 141 414</strong>. Te confirmamos disponibilidad y te indicamos formas de pago.</div>
+        </details>
+        <details>
+          <summary style="font-weight:700">¿Hay clases grabadas?</summary>
+          <div class="small" style="margin-top:8px">Sí. Todas las clases quedan grabadas y están disponibles en la plataforma por 90 días para los inscritos.</div>
+        </details>
+        <details>
+          <summary style="font-weight:700">¿Ofrecen facilidades de pago?</summary>
+          <div class="small" style="margin-top:8px">Sí. Consultar modalidades en la inscripción. Aceptamos pago efectivo, transferencia y pagos por Yape/Plin.</div>
+        </details>
+      </div>
+    </section>
+
+    <!-- CONTACTO -->
+    <section id="contacto" style="margin-top:22px">
+      <h3 style="margin:0 0 8px">Contacto</h3>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div class="card" style="flex:1;min-width:260px">
+          <strong>Dirección</strong>
+          <div class="small" style="margin-top:6px">Av. Principal 123, San Miguel, Lima</div>
+
+          <div style="margin-top:10px">
+            <strong>Teléfono / WhatsApp</strong>
+            <div class="small" style="margin-top:6px">+51 950 141 414</div>
+            <div style="margin-top:8px">
+              <a class="btn" href="https://wa.me/51950141414" target="_blank" rel="noopener">Chatear por WhatsApp</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="flex:1;min-width:260px">
+          <strong>Escríbenos</strong>
+          <form onsubmit="event.preventDefault(); submitContact()" id="contactForm">
+            <div style="margin-top:8px">
+              <input id="cname" class="input" placeholder="Nombre" required>
+            </div>
+            <div style="margin-top:8px">
+              <input id="cemail" class="input" placeholder="Correo (opcional)">
+            </div>
+            <div style="margin-top:8px">
+              <textarea id="cmsg" class="input" placeholder="Mensaje" rows="3" style="resize:vertical"></textarea>
+            </div>
+            <div style="margin-top:8px;display:flex;gap:8px">
+              <button class="btn" type="submit">Enviar mensaje</button>
+              <a class="ghost" href="mailto:info@teorema21.pe">Email</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>© <strong>Academia Teorema 21</strong> · Todos los derechos reservados</div>
+      <div style="display:flex;gap:12px;align-items:center">
+        <a href="#" aria-label="Instagram">Instagram</a>
+        <a href="#" aria-label="Facebook">Facebook</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Simple client-side scripts (no backend): form mock and helpers -->
+  <script>
+    function openSignup(){
+      document.getElementById('name').focus();
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    function submitForm(){
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      if(!name || !phone) return alert('Por favor completa nombre y teléfono.');
+      // Mock: open WhatsApp with prefilled message
+      const text = encodeURIComponent(`Hola, soy ${name}. Quiero información sobre el ciclo 2026.`);
+      const wa = 'https://wa.me/51950141414?text=' + text;
+      window.open(wa,'_blank');
+    }
+
+    function submitContact(){
+      const name = document.getElementById('cname').value.trim();
+      const email = document.getElementById('cemail').value.trim();
+      const msg = document.getElementById('cmsg').value.trim();
+      if(!name || !msg) return alert('Por favor ingresa tu nombre y mensaje.');
+      // Simula envío: abrir mailto con contenido (user-friendly)
+      const subject = encodeURIComponent('Contacto desde web - Teorema 21');
+      const body = encodeURIComponent(`Nombre: ${name}\nCorreo: ${email}\n\n${msg}`);
+      window.location.href = `mailto:info@teorema21.pe?subject=${subject}&body=${body}`;
+    }
+
+    // Accessibility: focus outline visible on keyboard
+    (function(){
+      function handleFirstTab(e){
+        if(e.key === 'Tab'){
+          document.documentElement.classList.add('user-is-tabbing');
+          window.removeEventListener('keydown', handleFirstTab);
+        }
+      }
+      window.addEventListener('keydown', handleFirstTab);
+    })();
+  </script>
+</body>
+</html>
 
