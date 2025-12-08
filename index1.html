@@ -3,584 +3,400 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Programa de Puntos — Demo profesional y simple</title>
-<meta name="description" content="Programa de puntos simple y profesional. Busca por DNI, consulta saldo, suma/resta puntos, historial opcional, exporta/importa CSV. Listo para presentar a un cliente." />
-<meta name="theme-color" content="#0b76ef" />
+<title>Generador de Catálogo · Exportar PDF (Demo)</title>
+<meta name="description" content="Generador rápido de catálogos profesionales. Añade productos, elige plantilla y exporta PDF de alta calidad." />
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#f6f8fb; --card:#fff; --accent:#0b76ef; --muted:#6b7280; --radius:12px;
-    --maxw:980px;
+    --bg:#f6f8fb; --card:#fff; --accent:#0b76ef; --muted:#6b7280;
+    --radius:12px; --maxw:1100px;
+    --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    --font-serif: "Playfair Display", Georgia, serif;
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:linear-gradient(180deg,#ffffff,#f3f7fb);color:#0b1220}
+  body{margin:0;font-family:var(--font-sans);background:linear-gradient(180deg,#fff,#f3f7fb);color:#0b1220;}
   .wrap{max-width:var(--maxw);margin:18px auto;padding:18px}
-  header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px}
   .brand{display:flex;align-items:center;gap:12px}
   .logo{width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#0666d0);color:#fff;display:grid;place-items:center;font-weight:700}
   h1{margin:0;font-size:18px}
-  p.lead{margin:2px 0 0;color:var(--muted);font-size:13px}
+  p.lead{margin:0;color:var(--muted);font-size:13px}
 
-  .card{background:var(--card);padding:14px;border-radius:14px;box-shadow:0 6px 18px rgba(11,118,239,0.06);margin-top:14px}
-  .row{display:flex;gap:12px;align-items:center}
-  .col{flex:1;min-width:0}
-  label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-  input[type="text"], input[type="tel"], select, textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef8;font-size:14px;background:#fff}
-  textarea{resize:vertical;min-height:80px}
-  button{cursor:pointer;border:0;padding:10px 12px;border-radius:10px;font-weight:700}
+  .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 8px 26px rgba(11,118,239,0.06);margin-top:14px}
+  .grid{display:grid;grid-template-columns:320px 1fr;gap:14px}
+  @media (max-width:960px){ .grid{grid-template-columns:1fr} }
+
+  label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+  input[type="text"], input[type="url"], input[type="number"], select, textarea{
+    width:100%;padding:10px;border-radius:8px;border:1px solid #e8eef8;font-size:14px;background:#fff;
+  }
+  textarea{min-height:70px;resize:vertical}
+  button{cursor:pointer;padding:10px 12px;border-radius:10px;border:0;font-weight:700}
   .btn{background:var(--accent);color:white}
   .ghost{background:transparent;border:1px solid rgba(11,118,239,0.12);color:var(--accent)}
   .muted{color:var(--muted);font-size:13px}
-
-  .grid{display:grid;grid-template-columns:1fr 320px;gap:14px}
-  @media (max-width:920px){ .grid{grid-template-columns:1fr} }
-
-  .list{max-height:360px;overflow:auto;margin-top:10px;border-radius:8px;border:1px solid #eef4fb}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:8px;border-bottom:1px solid #f4f7fb;font-size:13px;text-align:left}
-  th{background:#fbfdff;font-weight:700}
-  .center{display:flex;align-items:center;gap:8px}
   .small{font-size:13px;color:var(--muted)}
-  .stat{font-weight:700;color:var(--accent);font-size:20px}
-  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-  .hint{font-size:12px;color:#8b98a8}
+  .list{max-height:420px;overflow:auto;margin-top:8px;border-radius:8px;border:1px solid #eef4fb;padding:8px}
 
-  /* tiny helpers */
-  .chip{display:inline-block;padding:6px 8px;border-radius:999px;background:#eef7ff;color:var(--accent);font-weight:700}
-  .danger{background:#fff0f0;color:#b00000;border:1px solid #ffd6d6}
+  /* PREVIEW (templates) */
+  .previewWrap{background:#fff;padding:18px;border-radius:10px;box-shadow:0 4px 16px rgba(11,118,239,0.04)}
+  .catalog{
+    width:210mm; /* for A4 width guidance in px at 96dpi ~ 794px but css uses mm for print friendliness */
+    margin:0 auto;
+    padding:18px;
+    background:white;
+  }
+  .catalog .header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+  .catalog .title{font-family:var(--font-serif);font-size:28px;color:#0b1220}
+  .catalog .subtitle{font-size:13px;color:var(--muted)}
+
+  /* Template: Moderna */
+  .tpl-moderna .grid-items{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .tpl-moderna .card-prod{display:flex;gap:12px;background:#fafcff;border-radius:10px;padding:12px;align-items:center}
+  .tpl-moderna .card-prod img{width:140px;height:100px;object-fit:cover;border-radius:8px}
+  .tpl-moderna .prod-info h3{margin:0;font-size:16px;font-weight:700}
+  .tpl-moderna .prod-info p{margin:6px 0 0;color:var(--muted);font-size:13px}
+  .tpl-moderna .price{font-weight:700;color:var(--accent);margin-top:6px}
+
+  /* Template: Elegante (big imagery) */
+  .tpl-elegante .grid-items{display:grid;grid-template-columns:repeat(1,1fr);gap:18px}
+  .tpl-elegante .card-prod{position:relative;border-radius:12px;overflow:hidden}
+  .tpl-elegante .card-prod img{width:100%;height:240px;object-fit:cover;display:block}
+  .tpl-elegante .overlay{position:absolute;left:18px;bottom:18px;color:white;text-shadow:0 6px 16px rgba(0,0,0,0.4)}
+  .tpl-elegante .overlay h3{font-family:var(--font-serif);font-size:22px;margin:0}
+  .tpl-elegante .overlay .price{font-weight:700;margin-top:6px}
+
+  /* Template: Minimal (grid cards) */
+  .tpl-minimal .grid-items{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .tpl-minimal .card-prod{border-radius:10px;padding:12px;border:1px solid #f2f6fb;text-align:center}
+  .tpl-minimal .card-prod img{width:100%;height:120px;object-fit:cover;border-radius:8px}
+  .tpl-minimal .card-prod h3{margin:8px 0 6px;font-size:15px}
+  .tpl-minimal .card-prod p{font-size:13px;color:var(--muted);min-height:36px}
+
+  /* PDF note */
+  .pdf-note{font-size:12px;color:var(--muted);margin-top:8px}
+  /* small helper */
+  .meta-row{display:flex;justify-content:space-between;gap:8px;align-items:center}
 </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <div class="brand">
-        <div class="logo" aria-hidden="true">P</div>
+        <div class="logo">C</div>
         <div>
-          <h1>Programa de Puntos — Demo</h1>
-          <p class="lead">Simple, profesional y listo para mostrar a tu cliente. Busca por DNI, consulta saldo y administra puntos.</p>
+          <h1>Generador de Catálogo — Exportar PDF</h1>
+          <p class="lead">Crea catálogos profesionales en segundos. Exporta PDF de alta calidad para imprimir o compartir.</p>
         </div>
       </div>
 
-      <div style="text-align:right">
-        <div class="small">Versión demo · Local (sin backend)</div>
-        <div class="muted" style="font-size:12px">Admin PIN: <strong>1234</strong></div>
+      <div class="controls">
+        <select id="templateSelect" class="small">
+          <option value="moderna">Moderna — tarjetas con imagen derecha</option>
+          <option value="elegante">Elegante — imágenes grandes y overlay</option>
+          <option value="minimal">Minimal — grid limpio</option>
+        </select>
+        <select id="orient" class="small">
+          <option value="portrait">A4 — Vertical</option>
+          <option value="landscape">A4 — Horizontal</option>
+        </select>
+        <button class="btn" id="btnExportPdf">Exportar PDF</button>
+        <button class="ghost" id="btnClear">Limpiar</button>
       </div>
     </header>
 
-    <section class="card">
-      <div class="row" style="justify-content:space-between">
-        <div style="min-width:260px">
-          <label>Negocio (selecciona o crea uno)</label>
-          <div class="row">
-            <select id="businessSelect" style="flex:1"></select>
-            <button class="ghost" id="btnNewBiz">+ Nuevo</button>
-          </div>
-        </div>
-
-        <div style="width:220px">
-          <label>Clientes totales</label>
-          <div class="stat" id="totalClients">—</div>
-        </div>
-
-        <div style="width:180px">
-          <label>Sumatoria puntos</label>
-          <div class="stat" id="totalPoints">—</div>
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:12px;align-items:flex-end">
-        <div class="col">
-          <label>Buscar por DNI</label>
-          <div style="display:flex;gap:8px">
-            <input id="searchDni" placeholder="Ej. 41235678" />
-            <button class="btn" id="btnSearch">Buscar</button>
-            <button class="ghost" id="btnQR">QR</button>
-          </div>
-          <div class="hint" style="margin-top:6px">Muestra saldo inmediato; también puedes registrar puntos rápidos desde la ficha del cliente.</div>
-        </div>
-
-        <div style="width:220px">
-          <label>Filtrar / acciones</label>
-          <div class="row">
-            <select id="quickAction" style="flex:1">
-              <option value="">Acciones rápidas</option>
-              <option value="export">Exportar CSV</option>
-              <option value="import">Importar CSV</option>
-              <option value="clear">Borrar todo</option>
-            </select>
-            <button class="ghost" id="btnDoAction">Ir</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <div class="grid">
-      <!-- LEFT: resultados y lista -->
-      <div>
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>
-              <strong>Resultado</strong>
-              <div class="small">Ficha rápida del cliente</div>
-            </div>
-            <div class="small">Editable con PIN admin</div>
-          </div>
-
-          <div id="resultArea" style="margin-top:12px">
-            <div class="small muted">Busca un DNI y aparecerá aquí la ficha con saldo y acciones.</div>
-          </div>
-
-          <div class="actions" style="margin-top:12px">
-            <button class="btn" id="btnAddManual">+ Sumar puntos</button>
-            <button class="ghost" id="btnSubManual">- Restar puntos</button>
-            <button class="ghost" id="btnOpenList">Ver lista de clientes</button>
-            <button class="ghost" id="btnAdminToggle">Admin</button>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:12px">
-          <strong>Lista de clientes</strong>
-          <div class="small">DNI y puntos — ordenable y exportable</div>
-          <div class="list" id="clientsList">
-            <!-- tabla generada -->
-          </div>
-        </div>
-      </div>
-
-      <!-- RIGHT: panel de administración / nuevo cliente -->
+      <!-- LEFT: editor -->
       <aside>
         <div class="card">
-          <strong>Nuevo cliente</strong>
-          <div class="small">Agrega rápido un cliente con puntos</div>
-          <div style="margin-top:10px">
-            <label>DNI</label>
-            <input id="newDni" placeholder="DNI (solo números)" />
-            <label style="margin-top:8px">Puntos</label>
-            <input id="newPoints" type="number" value="0" />
-            <div style="display:flex;gap:8px;margin-top:10px">
-              <button class="btn" id="btnCreate">Agregar</button>
-              <button class="ghost" id="btnCreateAndOpen">Agregar y ver</button>
-            </div>
+          <strong>Información del catálogo</strong>
+          <div style="margin-top:8px">
+            <label>Título del catálogo</label>
+            <input id="catalogTitle" type="text" placeholder="Catálogo Primavera · 2026" value="Catálogo de Productos"/>
+            <label style="margin-top:8px">Subtítulo / Nota</label>
+            <input id="catalogSubtitle" type="text" placeholder="Mejores ofertas" value="Selección destacada de la temporada" />
+            <label style="margin-top:8px">Marca / Footer</label>
+            <input id="catalogBrand" type="text" placeholder="Tu marca S.A." value="MiNegocio S.A." />
           </div>
         </div>
 
         <div class="card" style="margin-top:12px">
-          <strong>Panel Admin</strong>
-          <div class="small">Protegido por PIN (local)</div>
+          <strong>Agregar producto / servicio</strong>
           <div style="margin-top:8px">
-            <label>PIN</label>
-            <input id="adminPin" type="password" placeholder="PIN" />
+            <label>Imagen (URL)</label>
+            <input id="prodImg" type="url" placeholder="https://...jpg" />
+            <label style="margin-top:8px">Nombre</label>
+            <input id="prodName" type="text" placeholder="Nombre del producto" />
+            <label style="margin-top:8px">Precio</label>
+            <input id="prodPrice" type="text" placeholder="S/ 49.90" />
+            <label style="margin-top:8px">Descripción corta</label>
+            <textarea id="prodDesc" placeholder="Descripción breve..."></textarea>
             <div style="display:flex;gap:8px;margin-top:8px">
-              <button class="ghost" id="btnUnlock">Abrir</button>
-              <button class="ghost" id="btnChangePin">Cambiar PIN</button>
+              <button class="btn" id="btnAddProd">Agregar</button>
+              <button class="ghost" id="btnAddSample">Cargar muestra</button>
             </div>
-            <div class="small muted" style="margin-top:8px">PIN por defecto: <strong>1234</strong> — se guarda en localStorage.</div>
-          </div>
-
-          <div id="adminArea" style="display:none;margin-top:12px">
-            <div class="small">Opciones disponibles:</div>
-            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-              <button class="ghost" id="btnExportCSV">Exportar CSV</button>
-              <button class="ghost" id="btnImportCSV">Importar CSV</button>
-              <button class="ghost" id="btnClearBiz">Borrar clientes (negocio)</button>
-              <button class="ghost" id="btnDeleteBiz">Eliminar negocio</button>
-            </div>
-            <div style="margin-top:10px" class="small muted">Sugerencia: usa exportar antes de limpiar o eliminar.</div>
+            <div class="pdf-note">Usa imágenes grandes y de alta resolución para mejor calidad en el PDF.</div>
           </div>
         </div>
-      </aside>
-    </div>
 
-    <footer class="muted small" style="margin-top:14px">
-      <div>Demo local · No requiere backend. Ideal para presentar al cliente y validar precio y adopción.</div>
-    </footer>
+        <div class="card" style="margin-top:12px">
+          <strong>Productos añadidos</strong>
+          <div class="list" id="productsList"></div>
+        </div>
+      </aside>
+
+      <!-- RIGHT: preview -->
+      <main>
+        <div class="card previewWrap">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div class="small">Vista previa</div>
+              <div class="meta-row" style="margin-top:6px">
+                <div style="font-weight:700" id="pvTitle">Catálogo de Productos</div>
+                <div class="small" id="pvBrand">MiNegocio S.A.</div>
+              </div>
+            </div>
+            <div class="small muted">Plantilla: <span id="pvTpl">Moderna</span></div>
+          </div>
+
+          <div style="margin-top:12px" id="previewArea">
+            <!-- Catalog content injected here -->
+          </div>
+
+          <div class="pdf-note">Consejo: para calidad tipo "Canva", usa imágenes ≥1200px, fuente serif para títulos y revisa márgenes antes de exportar.</div>
+        </div>
+      </main>
+    </div>
   </div>
 
-<script>
-/* -------------------------
-  Programa de Puntos - Single file (localStorage)
-  Keys: 'pp_businesses' (array), 'pp_data_<slug>' (clients array), 'pp_pin'
-  Cliente: { dni: '12345678', puntos: 120, history: [{at, delta, note}] }
--------------------------*/
+  <!-- html2pdf library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-const BUS_KEY = 'pp_businesses';
-const PIN_KEY = 'pp_pin';
-const DEFAULT_PIN = '1234';
-
-// helpers
-const qs = id => document.getElementById(id);
-const sanitizeDNI = v => String(v||'').replace(/\D/g,'').trim();
-const slugify = s => String(s||'').toLowerCase().trim().replace(/\s+/g,'-').replace(/[^a-z0-9-_]/g,'');
-const fmt = n => Number(n||0);
-const nowISO = ()=> new Date().toISOString();
-
-function loadBusinesses(){
-  try{ return JSON.parse(localStorage.getItem(BUS_KEY) || '[]'); } catch(e){ return []; }
-}
-function saveBusinesses(arr){ localStorage.setItem(BUS_KEY, JSON.stringify(arr)); }
-
-function bizDataKey(slug){ return 'pp_data_' + slug; }
-function loadBizData(slug){
-  try{ return JSON.parse(localStorage.getItem(bizDataKey(slug)) || '[]'); } catch(e){ return []; }
-}
-function saveBizData(slug, arr){ localStorage.setItem(bizDataKey(slug), JSON.stringify(arr)); }
-
-function ensureDefaults(){
-  if(!localStorage.getItem(PIN_KEY)) localStorage.setItem(PIN_KEY, DEFAULT_PIN);
-  let bs = loadBusinesses();
-  if(bs.length===0){
-    // create demo business
-    const demo = { name:'Bodega Anita', slug:'bodega-anita', info:'Abarrotes - La Perla' };
-    bs.push(demo);
-    saveBusinesses(bs);
-    // demo clients
-    const demoClients = [
-      { dni:'41235678', puntos:120, history:[{at:nowISO(),delta:+120,note:'Saldo inicial'}] },
-      { dni:'48912354', puntos:350, history:[{at:nowISO(),delta:+350,note:'Saldo inicial'}] },
-      { dni:'50381245', puntos:80, history:[{at:nowISO(),delta:+80,note:'Saldo inicial'}] }
+  <script>
+    /* ======= Generador de Catálogo (client-side) ======= */
+    const products = [];
+    const sampleImgs = [
+      'https://images.unsplash.com/photo-1606813903304-1c6e2e8b5a3b?w=1600&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1600&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1600&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1543168256-4188115761b2?w=1600&q=80&auto=format&fit=crop'
     ];
-    saveBizData(demo.slug, demoClients);
-  }
-}
-ensureDefaults();
 
-/* UI init */
-function populateBizSelect(){
-  const sel = qs('businessSelect');
-  sel.innerHTML = '';
-  const bs = loadBusinesses();
-  bs.forEach(b=>{
-    const opt = document.createElement('option');
-    opt.value = b.slug; opt.textContent = b.name + (b.info ? ' · ' + b.info : '');
-    sel.appendChild(opt);
-  });
-  if(bs.length>0) sel.value = bs[0].slug;
-  onBizChange();
-}
-populateBizSelect();
+    // DOM
+    const tplSelect = document.getElementById('templateSelect');
+    const previewArea = document.getElementById('previewArea');
+    const productsList = document.getElementById('productsList');
+    const pvTitle = document.getElementById('pvTitle');
+    const pvBrand = document.getElementById('pvBrand');
+    const pvTpl = document.getElementById('pvTpl');
 
-qs('btnNewBiz').addEventListener('click', ()=>{
-  const name = prompt('Nombre del negocio (ej: Bodega Anita)') || '';
-  if(!name.trim()) return;
-  const info = prompt('Info corta (ej: Abarrotes · La Perla)') || '';
-  const slug = slugify(name);
-  let bs = loadBusinesses();
-  if(bs.find(b=>b.slug===slug)){
-    alert('Ya existe un negocio con ese slug. Cambia el nombre o edita el existente.');
-    return;
-  }
-  bs.push({ name:name.trim(), slug, info:info.trim() });
-  saveBusinesses(bs);
-  saveBizData(slug, []); // empty clients
-  populateBizSelect();
-  qs('businessSelect').value = slug;
-  onBizChange();
-});
+    // form inputs
+    const inpImg = document.getElementById('prodImg');
+    const inpName = document.getElementById('prodName');
+    const inpPrice = document.getElementById('prodPrice');
+    const inpDesc = document.getElementById('prodDesc');
 
-/* when business changes */
-function onBizChange(){
-  const slug = qs('businessSelect').value;
-  renderSummary(slug);
-  renderClientsList(slug);
-}
-qs('businessSelect').addEventListener('change', onBizChange);
+    document.getElementById('btnAddProd').addEventListener('click', ()=>{
+      const img = inpImg.value.trim();
+      const name = inpName.value.trim();
+      const price = inpPrice.value.trim();
+      const desc = inpDesc.value.trim();
+      if(!name){ alert('Ingresa nombre del producto'); return; }
+      products.unshift({ id: Date.now().toString(36), img: img || sampleImgs[Math.floor(Math.random()*sampleImgs.length)], name, price, desc });
+      inpImg.value=''; inpName.value=''; inpPrice.value=''; inpDesc.value='';
+      renderProductsList();
+      renderPreview();
+    });
 
-/* render summary */
-function renderSummary(slug){
-  const arr = loadBizData(slug);
-  qs('totalClients').textContent = arr.length;
-  const sum = arr.reduce((s,c)=>s+fmt(c.puntos),0);
-  qs('totalPoints').textContent = sum;
-}
+    document.getElementById('btnAddSample').addEventListener('click', ()=>{
+      // add 6 sample items
+      const samples = [
+        {name:'Pack Ahorro - 3 unidades', price:'S/ 49.90', desc:'Paquete promocional con 3 artículos seleccionados.'},
+        {name:'Camiseta Premium', price:'S/ 79.00', desc:'Algodón pima, ajuste moderno.'},
+        {name:'Curso Online: Marketing', price:'S/ 199.00', desc:'Acceso 3 meses + material descargable.'},
+        {name:'Set Cocina Pro', price:'S/ 129.00', desc:'Incluye 5 piezas de acero inoxidable.'},
+        {name:'Taza Edición Especial', price:'S/ 29.90', desc:'Diseño exclusivo de la temporada.'},
+        {name:'Servicio: Instalación', price:'S/ 79.00', desc:'Visita técnica y puesta en marcha.'}
+      ];
+      samples.forEach(s => products.unshift({ id: Date.now().toString(36)+Math.random().toString(36).slice(2,6), img: sampleImgs[Math.floor(Math.random()*sampleImgs.length)], name:s.name, price:s.price, desc:s.desc }));
+      renderProductsList(); renderPreview();
+    });
 
-/* render clients list */
-function renderClientsList(slug){
-  const arr = loadBizData(slug).slice().sort((a,b)=>b.puntos-a.puntos);
-  const wrap = qs('clientsList');
-  if(arr.length===0){ wrap.innerHTML = '<div class="muted small" style="padding:12px">No hay clientes.</div>'; return; }
-  let html = '<table><thead><tr><th>DNI</th><th>Puntos</th><th>Acciones</th></tr></thead><tbody>';
-  arr.forEach(c=>{
-    html += `<tr><td>${c.dni}</td><td>${c.puntos}</td><td><button class="ghost" onclick="openClient('${slug}','${c.dni}')">Ver</button></td></tr>`;
-  });
-  html += '</tbody></table>';
-  wrap.innerHTML = html;
-}
-
-/* open client */
-window.openClient = function(slug,dni){
-  const arr = loadBizData(slug);
-  const client = arr.find(x=>x.dni===dni);
-  if(!client){ alert('Cliente no encontrado.'); return; }
-  showClient(cardFromClient(client, slug));
-  scrollTo(0,0);
-}
-
-/* create new client */
-qs('btnCreate').addEventListener('click', ()=>{
-  const slug = qs('businessSelect').value;
-  const dni = sanitizeDNI(qs('newDni').value);
-  const pts = fmt(qs('newPoints').value);
-  if(!dni){ alert('Ingresa DNI válido.'); return; }
-  let arr = loadBizData(slug);
-  if(arr.find(c=>c.dni===dni)){ alert('Cliente ya existe. Usa la lista para editar.'); return; }
-  const client = { dni, puntos: pts, history:[{at:nowISO(),delta:+pts,note:'Registro manual'}] };
-  arr.push(client); saveBizData(slug, arr); renderClientsList(slug); renderSummary(slug);
-  qs('newDni').value=''; qs('newPoints').value='0';
-  alert('Cliente agregado.');
-});
-qs('btnCreateAndOpen').addEventListener('click', ()=>{
-  qs('btnCreate').click();
-  const slug = qs('businessSelect').value;
-  const dni = sanitizeDNI(qs('newDni').value || '');
-  if(dni) openClient(slug,dni);
-});
-
-/* search */
-qs('btnSearch').addEventListener('click', ()=> doSearch());
-qs('searchDni').addEventListener('keypress', e=>{ if(e.key==='Enter') doSearch(); });
-
-function doSearch(){
-  const slug = qs('businessSelect').value;
-  const dni = sanitizeDNI(qs('searchDni').value);
-  if(!dni){ alert('Ingresa DNI para buscar.'); return; }
-  const arr = loadBizData(slug);
-  const client = arr.find(c=>c.dni===dni);
-  if(!client){
-    if(confirm('Cliente no existe. ¿Deseas crear uno con 0 puntos?')){
-      const newC = { dni, puntos:0, history:[{at:nowISO(),delta:0,note:'Creado desde búsqueda'}] };
-      arr.push(newC); saveBizData(slug, arr); renderClientsList(slug); renderSummary(slug);
-      showClient(cardFromClient(newC, slug));
-    } else {
-      return;
+    function renderProductsList(){
+      if(products.length===0){ productsList.innerHTML = '<div class="small muted">No hay productos. Añade uno para ver la vista previa.</div>'; return; }
+      let html='';
+      products.forEach(p=>{
+        html += `<div style="display:flex;gap:8px;align-items:center;padding:8px;border-bottom:1px dashed #f2f6fb">
+          <img src="${p.img}" style="width:64px;height:48px;object-fit:cover;border-radius:6px" />
+          <div style="flex:1">
+            <div style="font-weight:700">${p.name}</div>
+            <div class="small muted">${p.price || ''}</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="ghost" onclick="moveUp('${p.id}')">↑</button>
+            <button class="ghost" onclick="moveDown('${p.id}')">↓</button>
+            <button class="ghost" onclick="editProd('${p.id}')">✎</button>
+            <button class="ghost" onclick="deleteProd('${p.id}')">🗑</button>
+          </div>
+        </div>`;
+      });
+      productsList.innerHTML = html;
     }
-  } else showClient(cardFromClient(client, slug));
-}
 
-/* render client card in result area */
-function cardFromClient(client, slug){
-  const html = document.createElement('div');
-  html.innerHTML = `
-    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center">
-      <div>
-        <div style="font-weight:700">DNI: ${client.dni}</div>
-        <div class="small muted">Negocio: ${slug}</div>
-        <div style="margin-top:8px">Puntos: <span style="font-weight:800;color:var(--accent)">${client.puntos}</span></div>
-        <div class="small muted" style="margin-top:8px">Historial reciente:</div>
-        <div class="small" id="hist_${client.dni}" style="margin-top:6px">${(client.history||[]).slice(-4).reverse().map(h=>`${new Date(h.at).toLocaleString()} — ${h.delta>0?'+':''}${h.delta} — ${h.note}`).join('<br>')}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <button class="btn" onclick="adjustPoints('${slug}','${client.dni}',+10)">+10</button>
-        <button class="ghost" onclick="adjustPoints('${slug}','${client.dni}',-10)">-10</button>
-        <button class="ghost" onclick="openAdjustModal('${slug}','${client.dni}')">Editar</button>
-      </div>
-    </div>
-  `;
-  return html;
-}
-
-function showClient(el){
-  const area = qs('resultArea');
-  area.innerHTML = ''; area.appendChild(el);
-}
-
-/* quick manual adjustments via prompt */
-qs('btnAddManual').addEventListener('click', ()=> {
-  const slug = qs('businessSelect').value;
-  const dni = sanitizeDNI(qs('searchDni').value);
-  if(!dni){ alert('Busca o ingresa DNI primero.'); return; }
-  adjustPointsPrompt(slug,dni,true);
-});
-qs('btnSubManual').addEventListener('click', ()=> {
-  const slug = qs('businessSelect').value;
-  const dni = sanitizeDNI(qs('searchDni').value);
-  if(!dni){ alert('Busca o ingresa DNI primero.'); return; }
-  adjustPointsPrompt(slug,dni,false);
-});
-
-function adjustPointsPrompt(slug,dni,add=true){
-  const val = prompt((add ? '¿Cuántos puntos sumar?' : '¿Cuántos puntos restar?'), add? '10':'10');
-  if(val===null) return;
-  const delta = Math.round(Number(val) || 0) * (add?1:-1);
-  if(delta===0){ alert('Valor inválido'); return; }
-  adjustPoints(slug,dni,delta, prompt('Nota (opcional):','Ajuste manual') || (add? 'Suma manual' : 'Resta manual'));
-}
-
-function adjustPoints(slug,dni,delta,note){
-  const arr = loadBizData(slug);
-  const client = arr.find(c=>c.dni===dni);
-  if(!client){ alert('Cliente no existe. Busca y crea antes.'); return; }
-  client.puntos = fmt(client.puntos) + Number(delta);
-  client.history = client.history || [];
-  client.history.push({ at: nowISO(), delta: Number(delta), note: note || 'Ajuste' });
-  saveBizData(slug, arr);
-  renderClientsList(slug); renderSummary(slug);
-  showClient(cardFromClient(client, slug));
-}
-
-/* open custom adjust modal (simple prompt flow) */
-function openAdjustModal(slug,dni){
-  const amount = prompt('Ingresa puntos (ej: +50 o -20)', '+0');
-  if(amount===null) return;
-  const delta = Number(String(amount).replace(/\+/g,'')) || 0;
-  if(delta===0){ alert('Valor inválido'); return; }
-  const note = prompt('Nota (opcional)','Ajuste administrativo') || '';
-  adjustPoints(slug,dni,delta,note);
-}
-
-/* open list */
-qs('btnOpenList').addEventListener('click', ()=> {
-  const el = qs('clientsList');
-  el.scrollIntoView({behavior:'smooth'});
-});
-
-/* QR placeholder - just shows a prompt for DNI (could be used to capture from phone) */
-qs('btnQR').addEventListener('click', ()=> {
-  const dni = prompt('Escanear / ingresar DNI (simulación QR):');
-  if(dni) { qs('searchDni').value = dni; doSearch(); }
-});
-
-/* quick action select */
-qs('btnDoAction').addEventListener('click', ()=>{
-  const op = qs('quickAction').value;
-  const slug = qs('businessSelect').value;
-  if(op==='export'){ exportCSV(slug); }
-  else if(op==='import'){ qs('btnImportCSV').click(); }
-  else if(op==='clear'){
-    if(confirm('Borrar todos los clientes de este negocio?')){ saveBizData(slug, []); renderClientsList(slug); renderSummary(slug); alert('Borrado.'); }
-  } else alert('Selecciona una acción válida.');
-});
-
-/* ADMIN: unlock */
-qs('btnUnlock').addEventListener('click', ()=>{
-  const pin = qs('adminPin').value || '';
-  const saved = localStorage.getItem(PIN_KEY) || DEFAULT_PIN;
-  if(pin === saved){ qs('adminArea').style.display = 'block'; alert('Panel admin abierto'); } else alert('PIN incorrecto');
-});
-
-/* change pin */
-qs('btnChangePin').addEventListener('click', ()=>{
-  const oldp = qs('adminPin').value || '';
-  const saved = localStorage.getItem(PIN_KEY) || DEFAULT_PIN;
-  if(oldp !== saved){ alert('Ingresa PIN actual para cambiarlo'); return; }
-  const np = prompt('Nuevo PIN (mínimo 4 caracteres):');
-  if(np && np.length>=4){ localStorage.setItem(PIN_KEY, np); alert('PIN cambiado'); } else alert('PIN inválido o operación cancelada');
-});
-
-/* export CSV */
-function exportCSV(slug){
-  const arr = loadBizData(slug);
-  if(arr.length===0){ alert('No hay clientes para exportar'); return; }
-  const cols = ['dni','puntos','history'];
-  const esc = v => '"' + String(v===null||v===undefined ? '' : v).replace(/"/g,'""') + '"';
-  let csv = cols.join(',') + '\n';
-  arr.forEach(r=>{
-    csv += esc(r.dni) + ',' + esc(r.puntos) + ',' + esc(JSON.stringify(r.history||[])) + '\n';
-  });
-  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = `clientes_${slug}_${new Date().toISOString().slice(0,10)}.csv`; a.click();
-  URL.revokeObjectURL(url);
-}
-qs('btnExportCSV').addEventListener('click', ()=> exportCSV(qs('businessSelect').value));
-
-/* import CSV (simple parser) */
-qs('btnImportCSV').addEventListener('click', ()=>{
-  const input = document.createElement('input'); input.type='file'; input.accept='.csv,text/csv';
-  input.onchange = e=>{
-    const f = e.target.files[0]; if(!f) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const text = reader.result;
-      try{
-        const lines = text.split(/\r?\n/).filter(Boolean);
-        const header = lines.shift().split(',').map(h=>h.trim().toLowerCase());
-        const idxD = header.indexOf('dni'); const idxP = header.indexOf('puntos');
-        if(idxD<0 || idxP<0) { alert('CSV debe tener columnas "dni" y "puntos"'); return; }
-        const slug = qs('businessSelect').value;
-        const arr = loadBizData(slug);
-        lines.forEach(line=>{
-          const cols = parseCSVLine(line);
-          const dni = sanitizeDNI(cols[idxD]||''); const pts = Number(cols[idxP]||0);
-          if(!dni) return;
-          const found = arr.find(x=>x.dni===dni);
-          if(found) { found.puntos = pts; found.history = found.history || []; found.history.push({at:nowISO(),delta:0,note:'Import update'}); }
-          else arr.push({ dni, puntos: pts, history:[{at:nowISO(),delta:pts,note:'Importado'}] });
-        });
-        saveBizData(slug, arr); renderClientsList(slug); renderSummary(slug);
-        alert('Importación completada');
-      }catch(err){ console.error(err); alert('Error importando CSV'); }
+    window.moveUp = id => {
+      const i = products.findIndex(p=>p.id===id); if(i>0){ products.splice(i-1,0,products.splice(i,1)[0]); renderProductsList(); renderPreview(); }
     };
-    reader.readAsText(f);
-  };
-  input.click();
-});
-function parseCSVLine(line){
-  // naive split respecting quoted values
-  const out = []; let cur='', inQ=false;
-  for(let i=0;i<line.length;i++){ const ch=line[i];
-    if(ch === '"' ){ inQ = !inQ; continue; }
-    if(ch===',' && !inQ){ out.push(cur); cur=''; continue; }
-    cur += ch;
-  }
-  out.push(cur);
-  return out.map(s=>s.trim());
-}
+    window.moveDown = id => {
+      const i = products.findIndex(p=>p.id===id); if(i>=0 && i<products.length-1){ products.splice(i+1,0,products.splice(i,1)[0]); renderProductsList(); renderPreview(); }
+    };
+    window.editProd = id => {
+      const p = products.find(x=>x.id===id); if(!p) return;
+      const name = prompt('Editar nombre', p.name); if(name===null) return;
+      const price = prompt('Editar precio', p.price||''); if(price===null) return;
+      const desc = prompt('Editar descripción', p.desc||''); if(desc===null) return;
+      p.name = name; p.price = price; p.desc = desc;
+      renderProductsList(); renderPreview();
+    };
+    window.deleteProd = id => { if(confirm('Eliminar producto?')){ const i = products.findIndex(p=>p.id===id); if(i>=0) products.splice(i,1); renderProductsList(); renderPreview(); } };
 
-/* import via quick-action */
-qs('btnImportCSV').addEventListener('click', ()=> qs('btnImportCSV').click());
+    tplSelect.addEventListener('change', renderPreview);
+    document.getElementById('catalogTitle').addEventListener('input', renderPreview);
+    document.getElementById('catalogSubtitle').addEventListener('input', renderPreview);
+    document.getElementById('catalogBrand').addEventListener('input', renderPreview);
 
-/* delete business */
-qs('btnDeleteBiz').addEventListener('click', ()=>{
-  const slug = qs('businessSelect').value;
-  if(!confirm('Eliminar negocio y todos sus datos localmente?')) return;
-  let bs = loadBusinesses();
-  bs = bs.filter(b=>b.slug !== slug);
-  saveBusinesses(bs);
-  localStorage.removeItem(bizDataKey(slug));
-  populateBizSelect();
-  alert('Negocio eliminado (local).');
-});
+    function renderPreview(){
+      const tpl = tplSelect.value;
+      pvTpl.textContent = tpl.charAt(0).toUpperCase() + tpl.slice(1);
+      pvTitle.textContent = document.getElementById('catalogTitle').value || 'Catálogo';
+      pvBrand.textContent = document.getElementById('catalogBrand').value || '';
+      // Build HTML
+      let html = `<div class="catalog tpl-${tpl}" id="catalogRoot">`;
+      html += `<div class="header"><div><div class="title">${escapeHtml(document.getElementById('catalogTitle').value||'Catálogo')}</div><div class="subtitle">${escapeHtml(document.getElementById('catalogSubtitle').value||'')}</div></div><div class="small">${escapeHtml(document.getElementById('catalogBrand').value||'')}</div></div>`;
+      html += `<div class="grid-items">`;
+      if(products.length===0){
+        html += `<div style="padding:40px;text-align:center;color:#9aa6b2">No hay productos. Agrega productos para ver la vista previa.</div>`;
+      } else {
+        if(tpl === 'moderna'){
+          products.forEach(p=>{
+            html += `<div class="card-prod">
+              <img src="${p.img}" alt="${escapeHtml(p.name)}" />
+              <div class="prod-info">
+                <h3>${escapeHtml(p.name)}</h3>
+                <p>${escapeHtml(p.desc||'')}</p>
+                <div class="price">${escapeHtml(p.price||'')}</div>
+              </div>
+            </div>`;
+          });
+        } else if(tpl === 'elegante'){
+          products.forEach(p=>{
+            html += `<div class="card-prod">
+              <img src="${p.img}" alt="${escapeHtml(p.name)}" />
+              <div class="overlay">
+                <h3>${escapeHtml(p.name)}</h3>
+                <div class="price">${escapeHtml(p.price||'')}</div>
+                <div style="font-size:12px;margin-top:6px;max-width:60%">${escapeHtml(p.desc||'')}</div>
+              </div>
+            </div>`;
+          });
+        } else { // minimal
+          products.forEach(p=>{
+            html += `<div class="card-prod">
+              <img src="${p.img}" alt="${escapeHtml(p.name)}" />
+              <h3>${escapeHtml(p.name)}</h3>
+              <p>${escapeHtml(p.desc||'')}</p>
+              <div class="price">${escapeHtml(p.price||'')}</div>
+            </div>`;
+          });
+        }
+      }
+      html += `</div></div>`; // grid-items + catalog
+      previewArea.innerHTML = html;
+      // Preload images for crisper PDF (attempt)
+      document.querySelectorAll('#previewArea img').forEach(img=>{
+        img.setAttribute('crossorigin','anonymous');
+      });
+    }
 
-/* clear biz clients */
-qs('btnClearBiz').addEventListener('click', ()=>{
-  const slug = qs('businessSelect').value;
-  if(confirm('Borrar TODOS los clientes de este negocio?')){ saveBizData(slug, []); renderClientsList(slug); renderSummary(slug); alert('Clientes borrados'); }
-});
+    function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-/* delete single record (used in list) */
-window.deleteClient = function(slug,dni){
-  if(!confirm('Eliminar cliente?')) return;
-  let arr = loadBizData(slug); arr = arr.filter(x=>x.dni !== dni); saveBizData(slug, arr); renderClientsList(slug); renderSummary(slug);
-};
+    // initial render
+    renderPreview();
 
-/* helper show client card with edit button in list row */
-function rowActions(slug, dni){
-  return `<button class="ghost" onclick="openClient('${slug}','${dni}')">Ver</button> <button class="ghost" onclick="deleteClient('${slug}','${dni}')">Eliminar</button>`;
-}
+    // clear
+    document.getElementById('btnClear').addEventListener('click', ()=> {
+      if(!confirm('Limpiar todo (productos y campos)?')) return;
+      products.length = 0;
+      document.getElementById('catalogTitle').value = 'Catálogo de Productos';
+      document.getElementById('catalogSubtitle').value = 'Selección destacada de la temporada';
+      document.getElementById('catalogBrand').value = 'MiNegocio S.A.';
+      renderProductsList(); renderPreview();
+    });
 
-/* utility: CSV export from top quick action */
-qs('btnExport').addEventListener && qs('btnExport').addEventListener('click', ()=>{
-  exportCSV(qs('businessSelect').value);
-});
+    /* ===== EXPORT PDF =====
+      Using html2pdf (wrapper over html2canvas + jsPDF).
+      We'll set high quality options: image type jpeg quality 0.98, html2canvas scale 2 (or 3 for very high).
+      For A4 we use 'a4' with orientation from select. Margin flexible.
+    */
+    document.getElementById('btnExportPdf').addEventListener('click', async ()=>{
+      const catalogRoot = document.getElementById('catalogRoot');
+      if(!catalogRoot){ alert('No hay contenido para exportar.'); return; }
+      // force re-render to ensure images have crossorigin attr
+      renderPreview();
 
-/* initial render */
-renderClientsList(qs('businessSelect').value);
-renderSummary(qs('businessSelect').value);
+      const orientation = document.getElementById('orient').value === 'landscape' ? 'landscape' : 'portrait';
+      // Options tuning: increase scale for better vector-like crispness. Beware of memory/time if too high.
+      const opt = {
+        margin: [10,10,10,10],
+        filename: (document.getElementById('catalogTitle').value || 'catalogo').replace(/\s+/g,'_').toLowerCase() + '.pdf',
+        image: { type: 'jpeg', quality: 0.96 },
+        html2canvas: { scale: 2, useCORS: true, logging: false, allowTaint: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: orientation }
+      };
 
-/* small UX: allow pressing Enter to search in searchDni */
-qs('searchDni').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ doSearch(); } });
+      // Before export: show a friendly message for large exports
+      const approxItems = products.length;
+      if(approxItems > 30 && !confirm('Estás exportando muchos productos (más de 30). El PDF puede tardar o consumir memoria. ¿Continuar?')) return;
 
-/* simple helper to show result on page load if url has ?dni= */
-(function loadFromURL(){
-  const params = new URLSearchParams(location.search);
-  const dni = params.get('dni'); const biz = params.get('biz');
-  if(biz){
-    const bs = loadBusinesses();
-    if(bs.find(b=>b.slug===biz)){ qs('businessSelect').value = biz; onBizChange(); }
-  }
-  if(dni){ qs('searchDni').value = dni; doSearch(); }
-})();
+      // Wrap with a promise to wait for images to load
+      await ensureImagesLoaded(document.querySelectorAll('#previewArea img'));
 
-</script>
+      // Use html2pdf
+      try{
+        // Create a temporary element cloned to better control width for pdf (avoid site chrome)
+        const clone = catalogRoot.cloneNode(true);
+        // Force A4 width in px for html2canvas to render consistent size. Using 210mm at 96dpi ~ 794px; but retina scale handled by html2canvas.scale
+        clone.style.width = orientation === 'landscape' ? '297mm' : '210mm';
+        clone.style.boxSizing = 'border-box';
+        const wrapper = document.createElement('div');
+        wrapper.style.background = '#ffffff';
+        wrapper.appendChild(clone);
+        document.body.appendChild(wrapper);
+
+        await html2pdf().set(opt).from(clone).save();
+        // cleanup
+        document.body.removeChild(wrapper);
+      }catch(err){
+        console.error(err);
+        alert('Error al generar PDF. Prueba reducir la cantidad de imágenes o usar menor escala (scale en opciones).');
+      }
+    });
+
+    // ensure images loaded (returns a Promise)
+    function ensureImagesLoaded(imgs){
+      const arr = Array.from(imgs || []);
+      return Promise.all(arr.map(img=>{
+        return new Promise(resolve=>{
+          if(!img.src) return resolve();
+          if(img.complete) return resolve();
+          img.onload = img.onerror = ()=> resolve();
+        });
+      }));
+    }
+
+    // small UX: allow dragging images? skip for simplicity
+    // end of script
+  </script>
 </body>
 </html>
