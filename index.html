@@ -3,258 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galería de Talentos | Muro de Honor</title>
+    <meta name="description" content="Plataforma de Validación Digital para Marcas Líderes. Hub central de portafolios verificados.">
+    <title>OFICIAL.PE | Plataforma de Validación Digital</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Merriweather:wght@700&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
     <style>
-        /* =========================================
-           DISEÑO ACADÉMICO / PRESTIGIO
-           ========================================= */
-        :root {
-            /* PERSONALIZACIÓN DEL COLEGIO */
-            --primary: #1e3a8a;       /* Azul Académico (Navy) */
-            --accent: #d97706;        /* Dorado/Bronce (Logros) */
-            --bg: #f1f5f9;            /* Gris muy claro */
-            --surface: #ffffff;
-            --text-main: #1e293b;
-            --text-light: #64748b;
+        /* RESET BÁSICO */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
+        /* ESTILO GENERAL */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex; flex-direction: column; align-items: center;
-        }
-
-        /* --- HEADER --- */
-        header {
-            background: var(--surface);
-            width: 100%;
-            padding: 40px 20px;
+            font-family: 'Inter', sans-serif; /* Tipografía limpia y moderna */
+            background-color: #F9F9F7; /* Color crema/off-white elegante */
+            color: #1a1a1a; /* Gris muy oscuro, no negro puro */
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            box-shadow: 0 4px 20px -5px rgba(0,0,0,0.05);
+            padding: 20px;
+            overflow: hidden; /* Evita scroll innecesario */
+        }
+
+        /* CONTENEDOR CENTRAL */
+        .container {
+            max-width: 800px;
+            width: 100%;
+            opacity: 0; /* Para la animación de entrada */
+            animation: fadeIn 1.5s ease-out forwards; /* Animación suave al cargar */
+        }
+
+        /* MARCA / LOGO DE TEXTO */
+        .brand {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 3px; /* Espaciado entre letras elegante */
+            color: #666;
             margin-bottom: 40px;
-            border-bottom: 4px solid var(--primary);
+            font-weight: 500;
+            display: inline-block;
+            border-bottom: 1px solid transparent;
         }
 
+        /* TITULAR PRINCIPAL (H1) */
         h1 {
-            font-family: 'Merriweather', serif;
-            color: var(--primary);
-            font-size: 2.2rem;
-            margin-bottom: 10px;
+            font-size: 3.5rem; /* Grande e impactante */
+            font-weight: 300; /* Letra fina (Light) */
+            line-height: 1.1;
+            margin-bottom: 25px;
+            color: #111;
+            letter-spacing: -1px; /* Hace que se vea más compacto y moderno */
         }
 
-        p.subtitle { color: var(--text-light); font-size: 1.1rem; max-width: 600px; margin: 0 auto 25px; }
-
-        /* --- BUSCADOR --- */
-        .search-container { position: relative; max-width: 500px; margin: 0 auto; }
-        
-        .search-box {
-            width: 100%; padding: 15px 25px; padding-left: 50px;
-            border: 2px solid #e2e8f0; border-radius: 50px;
-            font-size: 1rem; outline: none; transition: 0.3s;
-            background: #f8fafc;
-        }
-        .search-box:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.1); }
-        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
-
-        /* --- GRILLA DE ALUMNOS --- */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 25px;
-            width: 100%; max-width: 1100px;
-            padding: 0 20px 60px;
+        /* SUBTÍTULO */
+        p.subhead {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: #555;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto 50px auto; /* Centrado horizontalmente */
         }
 
-        /* --- TARJETA DE ESTUDIANTE --- */
-        .card {
-            background: var(--surface);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            transition: transform 0.3s, box-shadow 0.3s;
+        /* NAVEGACIÓN (ENLACES) */
+        .nav-links {
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
             position: relative;
-            border: 1px solid #e2e8f0;
-            display: flex; flex-direction: column;
-            animation: fadeIn 0.5s ease-out forwards;
-            opacity: 0;
+            padding-bottom: 2px;
+            border-bottom: 1px solid #ddd; /* Línea sutil por defecto */
         }
 
-        .card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(30, 58, 138, 0.15); border-color: var(--primary); }
-
-        /* Badge / Etiqueta (Ej: Cómputo General) */
-        .badge {
-            position: absolute; top: 15px; right: 15px;
-            background: var(--accent); color: white;
-            padding: 5px 12px; border-radius: 20px;
-            font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            z-index: 10;
+        .nav-links a:hover {
+            color: #000;
+            border-bottom: 1px solid #000; /* Línea oscura al pasar el mouse */
         }
 
-        .card-img-container {
-            width: 100%; height: 260px; overflow: hidden;
-            background: #cbd5e1; position: relative;
+        .separator {
+            margin: 0 15px;
+            color: #ccc;
         }
 
-        .card-img {
-            width: 100%; height: 100%; object-fit: cover;
-            transition: transform 0.5s;
-        }
-        .card:hover .card-img { transform: scale(1.05); }
-
-        .card-body { padding: 20px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; }
-
-        .student-name {
-            font-family: 'Merriweather', serif;
-            font-size: 1.1rem; color: var(--text-main);
-            margin: 0 0 8px 0; font-weight: 700;
+        /* ANIMACIÓN DE ENTRADA */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .student-achievement {
-            color: var(--primary); font-weight: 600; font-size: 0.95rem;
-            margin-bottom: 10px;
-        }
+        /* RESPONSIVE (CELULARES) */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem; /* Texto más pequeño en celular */
+            }
+            
+            p.subhead {
+                font-size: 1rem;
+                padding: 0 10px;
+            }
 
-        .btn-link {
-            margin-top: auto; /* Empuja al fondo */
-            display: inline-block; text-decoration: none;
-            color: var(--text-light); font-size: 0.85rem; font-weight: 500;
-            padding: 8px 15px; border-radius: 6px; background: #f1f5f9;
-            transition: 0.2s; align-self: center;
-        }
-        .btn-link:hover { background: var(--primary); color: white; }
+            .nav-links {
+                display: flex;
+                flex-direction: column; /* Enlaces uno debajo del otro en celular */
+                gap: 20px;
+            }
 
-        /* Loader */
-        .loader {
-            border: 4px solid #e2e8f0; border-top: 4px solid var(--primary);
-            border-radius: 50%; width: 50px; height: 50px;
-            animation: spin 1s linear infinite; margin: 50px auto;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Responsive */
-        @media (max-width: 600px) {
-            h1 { font-size: 1.8rem; }
-            .grid { grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); }
-            .card-img-container { height: 300px; } /* Fotos más grandes en móvil */
+            .separator {
+                display: none; /* Oculta los puntos separadores en celular */
+            }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1 id="tituloColegio">Academia Excelencia</h1>
-        <p class="subtitle">Nuestros Ingresantes y Orgullos Académicos 2025</p>
-        
-        <div class="search-container">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" class="search-box" placeholder="Buscar alumno o universidad...">
-        </div>
-    </header>
+    <main class="container">
+        <div class="brand">OFICIAL.PE</div>
 
-    <div id="galeria" class="grid">
-        <div class="loader"></div>
-    </div>
+        <h1>Plataforma de Validación Digital para Marcas Líderes.</h1>
 
-    <script>
-        /* =========================================
-           CONFIGURACIÓN (SOLO CAMBIAS ESTO)
-           ========================================= */
-        const CONFIG = {
-            titulo: "Colegio San Patricio", // Nombre del Colegio
-            sheetID: "1p2y7bJSTrBZkWLNDtxL2WrZ2SHsx0xhoxCnCQNKfx8E", // ID del Sheet
-            pestana: "alumnos" // Nombre de la pestaña en el Sheet
-        };
+        <p class="subhead">
+            El hub central donde convergen los portafolios y experiencias auténticas de nuestros aliados estratégicos.
+        </p>
 
-        // Aplicar título
-        document.getElementById('tituloColegio').innerText = CONFIG.titulo;
+        <nav class="nav-links">
+            <a href="#">Ver Portafolio Maestro</a>
+            
+            <span class="separator">·</span>
+            
+            <a href="#">Servicios de Producción</a>
+            
+            <span class="separator">·</span>
+            
+            <a href="#">Contacto Corporativo</a>
+        </nav>
+    </main>
 
-        /* =========================================
-           LÓGICA DEL SISTEMA
-           ========================================= */
-        const API = `https://opensheet.elk.sh/${CONFIG.sheetID}/${CONFIG.pestana}`;
-        const contenedor = document.getElementById('galeria');
-        const buscador = document.getElementById('searchInput');
-        let alumnosData = [];
-
-        async function cargarDatos() {
-            try {
-                const res = await fetch(API);
-                alumnosData = await res.json();
-                
-                renderizar(alumnosData);
-
-            } catch (error) {
-                console.error(error);
-                contenedor.innerHTML = '<p style="text-align:center; width:100%; color:red">Error cargando los datos. Verifique el ID.</p>';
-            }
-        }
-
-        function renderizar(lista) {
-            contenedor.innerHTML = '';
-
-            if (lista.length === 0) {
-                contenedor.innerHTML = '<p style="text-align:center; width:100%; color:#666">No se encontraron resultados.</p>';
-                return;
-            }
-
-            lista.forEach((alumno, index) => {
-                // Generar Avatar si no hay foto
-                const avatar = `https://ui-avatars.com/api/?name=${alumno.nombre}&background=1e3a8a&color=fff&size=400`;
-                const imagenFinal = (alumno.imagen && alumno.imagen.trim() !== '') ? alumno.imagen : avatar;
-
-                // Etiqueta (Badge)
-                const htmlBadge = alumno.etiqueta 
-                    ? `<div class="badge">${alumno.etiqueta}</div>` 
-                    : '';
-
-                // Botón opcional (Testimonio / Video)
-                const htmlBoton = alumno.enlace 
-                    ? `<a href="${alumno.enlace}" target="_blank" class="btn-link">▶ Ver Testimonio</a>` 
-                    : '';
-
-                // Delay para animación cascada
-                const delay = index * 0.1; 
-
-                const cardHTML = `
-                    <div class="card" style="animation-delay: ${delay}s">
-                        ${htmlBadge}
-                        <div class="card-img-container">
-                            <img src="${imagenFinal}" class="card-img" alt="${alumno.nombre}" onerror="this.src='${avatar}'">
-                        </div>
-                        <div class="card-body">
-                            <div class="student-name">${alumno.nombre}</div>
-                            <div class="student-achievement">${alumno.subtitulo}</div>
-                            ${htmlBoton}
-                        </div>
-                    </div>
-                `;
-                contenedor.innerHTML += cardHTML;
-            });
-        }
-
-        // Buscador en tiempo real
-        buscador.addEventListener('input', (e) => {
-            const texto = e.target.value.toLowerCase();
-            const filtrados = alumnosData.filter(alumno => 
-                (alumno.nombre && alumno.nombre.toLowerCase().includes(texto)) || 
-                (alumno.subtitulo && alumno.subtitulo.toLowerCase().includes(texto))
-            );
-            renderizar(filtrados);
-        });
-
-        // Iniciar
-        document.addEventListener('DOMContentLoaded', cargarDatos);
-
-    </script>
 </body>
 </html>
