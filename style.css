@@ -1,151 +1,329 @@
 /* =========================================
-   STYLE.CSS - MINIMALISTA & PRO
+
+   1. RESET Y VARIABLES
+
    ========================================= */
 
-/* 1. CONFIGURACIÓN BASE */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+
+
 :root { 
-    --primary: #4f46e5;       /* Azul índigo moderno */
-    --bg: #f8fafc;            /* Fondo gris muy claro */
-    --surface: #ffffff;       /* Blanco puro */
-    --text-main: #1e293b;     /* Negro suave */
-    --text-light: #64748b;    /* Gris texto */
-    --radius: 12px;           /* Bordes redondeados estándar */
-    --shadow: 0 4px 12px rgba(0,0,0,0.05); /* Sombra suave premium */
+
+    --bg-color: #f8fafc; 
+
+    --card-bg: #ffffff; 
+
+    --text-dark: #334155; 
+
+    --text-gray: #64748b; 
+
+    --primary: #4f46e5; 
+
+    --border-color: #cbd5e1; 
+
+    --img-size-desktop: 140px; 
+
+    --img-size-mobile: 110px; 
+
 }
+
+
 
 body { 
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-    background-color: var(--bg); 
-    color: var(--text-main);
+
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+
+    background-color: var(--bg-color); 
+
     min-height: 100vh; 
+
     padding: 20px; 
-    display: flex; flex-direction: column; align-items: center; 
+
+    display: flex; 
+
+    flex-direction: column; 
+
+    align-items: center; 
+
+    -webkit-font-smoothing: antialiased; 
+
 }
+
+
 
 /* =========================================
-   2. INPUTS Y FILTROS (Agrupados)
+
+   2. CONTROLES (Filtros y Buscador)
+
    ========================================= */
-.filters-container { 
-    width: 100%; max-width: 600px; margin-bottom: 24px; 
-    display: flex; gap: 10px; flex-wrap: wrap; 
-}
 
-/* Estilo unificado para Buscador y Select */
-.search-box, .filter-select { 
-    flex: 1; min-width: 150px;
-    padding: 12px 16px; 
-    border: 1px solid #e2e8f0; 
-    border-radius: var(--radius); 
-    font-size: 0.95rem; 
-    outline: none; 
-    background: var(--surface);
-    transition: 0.2s;
-}
+.filters-container { width: 100%; max-width: 600px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 12px; }
 
-.search-box:focus, .filter-select:focus { 
-    border-color: var(--primary); 
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); 
-}
+.search-box { width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 1rem; outline: none; background-color: white; transition: border-color 0.2s, box-shadow 0.2s; }
 
-#welcomeMessage { 
-    width: 100%; max-width: 600px; margin-bottom: 15px; text-align: center; 
-    font-weight: 600; color: var(--primary); 
-}
+.search-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+
+.filter-select { flex: 1; min-width: 0; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.95rem; background-color: white; color: var(--text-dark); cursor: pointer; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 30px; }
+
+
+
+/* Mensaje bienvenida */
+
+#welcomeMessage { width: 100%; max-width: 600px; margin-bottom: 15px; padding: 10px 15px; background-color: #e0e7ff; color: var(--primary); border-radius: 8px; font-weight: 600; font-size: 0.95rem; display: none; text-align: center; border: 1px solid #c7d2fe; }
+
+
 
 /* =========================================
-   3. TARJETAS (Diseño Unificado)
+
+   3. TARJETAS (Listado)
+
    ========================================= */
+
 .rewards-container { 
-    width: 100%; max-width: 600px; 
-    display: flex; flex-direction: column; gap: 16px;
-    min-height: 50vh; position: relative;
+
+    width: 100%; 
+
+    max-width: 600px; 
+
+    display: flex; 
+
+    flex-direction: column; 
+
+    gap: 16px;
+
+    
+
+    /* MEJORA DE CARGA: Evita saltos de altura y permite centrar el loader */
+
+    min-height: 60vh;
+
+    position: relative; 
+
 }
+
+
 
 .reward-card { 
-    background: var(--surface); 
-    border-radius: var(--radius); 
-    padding: 16px; 
-    display: flex; gap: 16px; 
-    box-shadow: var(--shadow); 
+
+    background-color: var(--card-bg); 
+
+    border-radius: 12px; 
+
+    display: flex; 
+
+    align-items: center; 
+
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
+
+    overflow: hidden; 
+
     cursor: pointer; 
-    transition: transform 0.2s; 
-    animation: fadeUp 0.5s ease-out forwards;
+
+    transition: transform 0.2s, box-shadow 0.2s; 
+
+    /* Quitamos height fijo para que se adapte al contenido */
+
+    min-height: var(--img-size-desktop); 
+
+    
+
+    /* ANIMACIÓN DE ENTRADA (Fade In) */
+
+    opacity: 0; /* Empieza invisible */
+
+    animation: aparecerSuave 0.6s ease-out forwards;
+
 }
 
-.reward-card:hover { transform: translateY(-3px); }
 
-.reward-image { 
-    width: 100px; height: 100px; flex-shrink: 0; 
-    border-radius: 8px; overflow: hidden; background: #f1f5f9; 
-}
 
-.reward-image img { width: 100%; height: 100%; object-fit: cover; }
+.reward-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
 
-.reward-content { 
-    flex-grow: 1; display: flex; flex-direction: column; justify-content: center; 
-}
 
-/* Tipografía de la tarjeta */
-.reward-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; line-height: 1.2; }
-.reward-vendor { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); margin-bottom: 4px; font-weight: 600; }
-.reward-desc { font-size: 0.9rem; color: var(--text-light); line-height: 1.4; }
 
-/* Botón/Puntos */
-.reward-points { 
-    display: inline-block; 
-    margin-top: 8px; 
-    padding: 6px 12px; 
-    background: #eef2ff; color: var(--primary); 
-    border-radius: 6px; font-size: 0.9rem; font-weight: 600; 
-    align-self: flex-start;
-}
+.reward-image { width: var(--img-size-desktop); height: var(--img-size-desktop); flex-shrink: 0; }
 
-/* Override para modo negocio (Botón grande) */
-.business-card .reward-points {
-    background: var(--primary); color: white; width: 100%; text-align: center;
-}
+.reward-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+
+
+.reward-content { flex-grow: 1; padding: 0 20px; display: flex; flex-direction: column; justify-content: center; min-width: 0; height: 100%; }
+
+
+
+.reward-vendor { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-gray); margin-bottom: 4px; font-weight: 600; }
+
+.reward-title { margin: 0 0 6px 0; font-size: 1.1rem; font-weight: 600; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.reward-points { display: inline-block; background-color: #e0e7ff; color: var(--primary); font-size: 0.9rem; font-weight: 600; padding: 4px 10px; border-radius: 50px; margin-bottom: 6px; align-self: flex-start; }
+
+.reward-desc { font-size: 0.9rem; color: var(--text-gray); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-weight: 400; }
+
+
 
 /* =========================================
-   4. MODAL (Limpio)
+
+   4. ESTILOS ESPECÍFICOS: TARJETA DE NEGOCIO
+
+   (Convierte el texto en botón y ajusta espacios)
+
    ========================================= */
-.modal-backdrop { 
-    position: fixed; inset: 0; /* Ocupa toda la pantalla */
-    background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
-    display: none; place-items: center; z-index: 999; padding: 20px;
-    opacity: 0; transition: opacity 0.3s;
+
+.business-card .reward-content {
+
+    justify-content: space-between; 
+
+    align-items: flex-start;
+
+    padding-top: 15px;
+
+    padding-bottom: 15px;
+
 }
+
+
+
+.business-card .reward-points {
+
+    align-self: stretch; /* Ocupar todo el ancho */
+
+    text-align: center;
+
+    background-color: var(--primary); /* Fondo azul */
+
+    color: white; /* Texto blanco */
+
+    padding: 10px;
+
+    margin-top: 10px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 1rem;
+
+    transition: background 0.2s;
+
+}
+
+
+
+.business-card .reward-points:hover {
+
+    background-color: #4338ca; /* Azul más oscuro */
+
+}
+
+
+
+/* =========================================
+
+   5. MODAL
+
+   ========================================= */
+
+.modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; opacity: 0; transition: opacity 0.3s ease; }
+
 .modal-backdrop.show { opacity: 1; }
 
-.modal-content { 
-    background: var(--surface); width: 100%; max-width: 450px; 
-    border-radius: 16px; padding: 24px; position: relative; 
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2); 
-    transform: scale(0.95); transition: transform 0.3s;
-}
+.modal-content { background: white; width: 100%; max-width: 500px; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); position: relative; transform: scale(0.95); transition: transform 0.3s ease; max-height: 90vh; overflow-y: auto; }
+
 .modal-backdrop.show .modal-content { transform: scale(1); }
 
-.close-btn { 
-    position: absolute; top: 16px; right: 16px; 
-    width: 32px; height: 32px; border-radius: 50%; 
-    background: #f1f5f9; display: flex; align-items: center; justify-content: center; 
-    cursor: pointer; font-weight: bold; color: var(--text-main);
-}
+.close-btn { position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background-color: rgba(255, 255, 255, 0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 10; transition: transform 0.2s; }
 
-.modal-img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 16px; }
-.modal-header-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: var(--text-light); text-transform: uppercase; font-weight: 600; }
-.modal-title { font-size: 1.5rem; margin-bottom: 8px; }
-.modal-points { font-size: 1.25rem; color: var(--primary); font-weight: 700; display: block; margin-bottom: 16px; }
+.close-btn:hover { transform: scale(1.1); }
+
+.close-btn span { font-size: 1.5rem; line-height: 1; color: #333; font-weight: 700; margin-top: -2px; }
+
+.modal-img { width: 100%; height: 250px; object-fit: cover; display: block;}
+
+.modal-body { padding: 24px; }
+
+.modal-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+
+.modal-vendor { font-size: 0.85rem; font-weight: 700; color: var(--text-gray); text-transform: uppercase; }
+
+.modal-category { font-size: 0.75rem; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; color: var(--text-dark); }
+
+.modal-title { margin: 5px 0 15px 0; font-size: 1.5rem; color: var(--text-dark); }
+
+.modal-points { font-size: 1.2rem; color: var(--primary); font-weight: 700; margin-bottom: 20px; display: block; }
+
+.modal-desc-long { font-size: 1rem; line-height: 1.6; color: var(--text-dark); margin-bottom: 10px; }
+
+
 
 /* =========================================
-   5. LOADER Y ANIMACIONES
+
+   6. LOADER Y ANIMACIONES
+
    ========================================= */
-.mi-loader { 
-    width: 40px; height: 40px; border: 3px solid #e2e8f0; 
-    border-top-color: var(--primary); border-radius: 50%; 
-    margin: 40px auto; animation: spin 0.8s linear infinite; 
+
+
+
+/* Círculo de Carga (Spinner) */
+
+.mi-loader {
+
+    border: 4px solid #f3f3f3;
+
+    border-top: 4px solid var(--primary);
+
+    border-radius: 50%;
+
+    width: 40px;
+
+    height: 40px;
+
+    animation: girar 1s linear infinite;
+
+    margin: 50px auto;
+
+    display: block;
+
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+
+@keyframes girar {
+
+    0% { transform: rotate(0deg); }
+
+    100% { transform: rotate(360deg); }
+
+}
+
+
+
+/* Animación Fade In */
+
+@keyframes aparecerSuave {
+
+    from { opacity: 0; transform: translateY(15px); }
+
+    to { opacity: 1; transform: translateY(0); }
+
+}
+
+
+
+/* =========================================
+
+   7. MEDIA QUERIES (Móvil)
+
+   ========================================= */
+
+@media (max-width: 480px) {
+
+    .reward-card { min-height: var(--img-size-mobile); }
+
+    .reward-image { width: var(--img-size-mobile); height: var(--img-size-mobile); }
+
+    .reward-content { padding: 0 14px; }
+
+    .modal-content { width: 100%; }
+
+}
