@@ -1,115 +1,17 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página no encontrada - Premios.pe</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: #f8fafc;
-            color: #334155;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 400px;
-            background: white;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            font-size: 4rem;
-            margin: 0;
-            color: #4f46e5; /* Tu color primario */
-        }
-        h2 {
-            margin: 10px 0 20px 0;
-            font-size: 1.5rem;
-        }
-        p {
-            color: #64748b;
-            margin-bottom: 20px;
-        }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #4f46e5;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .btn {
-            display: inline-block;
-            background-color: #4f46e5;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            margin-top: 20px;
-        }
-    </style>
+    <meta charset="utf-8">
+    <title>Redirigiendo...</title>
+    <script>
+        // 1. Guardamos la ruta a la que el usuario quería ir (ej: /nike)
+        // Usamos sessionStorage para pasar el dato al index.html
+        sessionStorage.setItem('ruta_destino', window.location.pathname);
+        
+        // 2. Redirigimos al index inmediatamente
+        window.location.href = window.location.origin; 
+    </script>
 </head>
 <body>
-
-    <div class="container">
-        <h1>404</h1>
-        <h2>Página no encontrada</h2>
-        <p id="mensaje">Analizando la ruta...</p>
-        
-        <div id="loader" class="loader"></div>
-        
-        <a href="/" class="btn" style="display:none;" id="btnVolver">Ir al Directorio</a>
-    </div>
-
-    <script>
-        // LÓGICA DE REDIRECCIÓN INTELIGENTE
-        (function() {
-            // 1. Obtenemos la ruta que causó el error (ej: /nike)
-            // GitHub Pages suele mantener la ruta en la barra de direcciones
-            var path = window.location.pathname; 
-            
-            // Limpiamos la barra inicial '/' -> queda "nike"
-            var segmento = path.replace(/^\//, '').replace(/\/$/, '');
-
-            // 2. Si hay algo escrito (ej: "nike"), intentamos redirigir al formato Hash
-            if (segmento && segmento !== '404.html') {
-                document.getElementById('mensaje').innerText = `Buscando "${segmento}"...`;
-                
-                // Redirigir a: premios.pe/#/nike
-                setTimeout(function() {
-                    window.location.replace('/#/' + segmento);
-                }, 1000); // Esperamos 1 seg para que el usuario vea qué pasa
-            
-            } else {
-                // 3. Si no hay ruta clara, mandamos al inicio
-                document.getElementById('mensaje').innerText = "Te estamos redirigiendo al inicio...";
-                
-                setTimeout(function() {
-                    window.location.replace('/');
-                }, 2500);
-            }
-
-            // Botón de seguridad por si el script falla
-            setTimeout(() => {
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('btnVolver').style.display = 'inline-block';
-            }, 3000);
-        })();
-    </script>
-
 </body>
 </html>
