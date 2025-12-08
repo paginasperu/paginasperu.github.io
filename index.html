@@ -3,126 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Plataforma de Validación Digital para Marcas Líderes. Hub central de portafolios verificados.">
-    <title>OFICIAL.PE | Plataforma de Validación Digital</title>
+    <meta name="description" content="Plataforma de validación digital para marcas líderes.">
+    <title>OFICIAL.PE</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 
     <style>
-        /* RESET BÁSICO */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* RESET */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* ESTILO GENERAL */
+        /* CUERPO */
         body {
-            font-family: 'Inter', sans-serif; /* Tipografía limpia y moderna */
-            background-color: #F9F9F7; /* Color crema/off-white elegante */
-            color: #1a1a1a; /* Gris muy oscuro, no negro puro */
+            font-family: 'Inter', sans-serif;
+            background-color: #F9F9F7; /* Crema suave elegante */
+            color: #1a1a1a;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             padding: 20px;
-            overflow: hidden; /* Evita scroll innecesario */
         }
 
-        /* CONTENEDOR CENTRAL */
+        /* CONTENEDOR */
         .container {
-            max-width: 800px;
+            max-width: 700px;
             width: 100%;
-            opacity: 0; /* Para la animación de entrada */
-            animation: fadeIn 1.5s ease-out forwards; /* Animación suave al cargar */
+            animation: fadeIn 1.5s ease-out forwards;
+            opacity: 0;
         }
 
-        /* MARCA / LOGO DE TEXTO */
+        /* MARCA SUPERIOR */
         .brand {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 3px; /* Espaciado entre letras elegante */
-            color: #666;
+            letter-spacing: 3px;
+            color: #888;
             margin-bottom: 40px;
             font-weight: 500;
-            display: inline-block;
-            border-bottom: 1px solid transparent;
         }
 
-        /* TITULAR PRINCIPAL (H1) */
+        /* TÍTULO PRINCIPAL (H1) */
         h1 {
-            font-size: 3.5rem; /* Grande e impactante */
-            font-weight: 300; /* Letra fina (Light) */
-            line-height: 1.1;
-            margin-bottom: 25px;
+            font-size: 3rem; /* Tamaño grande */
+            font-weight: 300; /* Letra fina */
+            line-height: 1.2;
+            margin-bottom: 30px;
             color: #111;
-            letter-spacing: -1px; /* Hace que se vea más compacto y moderno */
+            letter-spacing: -0.5px;
         }
 
-        /* SUBTÍTULO */
+        /* SUBTÍTULO (LA FRASE FUERTE) */
         p.subhead {
-            font-size: 1.1rem;
+            font-size: 1.25rem;
             font-weight: 400;
-            color: #555;
-            line-height: 1.6;
-            max-width: 600px;
-            margin: 0 auto 50px auto; /* Centrado horizontalmente */
+            color: #444;
+            line-height: 1.5;
+            margin-bottom: 50px;
         }
-
-        /* NAVEGACIÓN (ENLACES) */
-        .nav-links {
-            font-size: 0.95rem;
-            font-weight: 400;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: #333;
-            transition: all 0.3s ease;
-            position: relative;
-            padding-bottom: 2px;
-            border-bottom: 1px solid #ddd; /* Línea sutil por defecto */
-        }
-
-        .nav-links a:hover {
+        
+        /* ESTILO PARA ".oficial.pe" DENTRO DEL TEXTO */
+        .highlight {
+            font-weight: 500;
             color: #000;
-            border-bottom: 1px solid #000; /* Línea oscura al pasar el mouse */
         }
 
-        .separator {
-            margin: 0 15px;
-            color: #ccc;
+        /* BOTÓN DE WHATSAPP ÚNICO */
+        .cta-button {
+            display: inline-block;
+            text-decoration: none;
+            font-size: 1rem;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 12px 25px;
+            border-radius: 50px; /* Bordes redondeados */
+            transition: all 0.3s ease;
         }
 
-        /* ANIMACIÓN DE ENTRADA */
+        .cta-button:hover {
+            background-color: #111;
+            color: #fff; /* Cambio a negro con texto blanco al pasar el mouse */
+            border-color: #111;
+        }
+
+        /* ANIMACIÓN */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* RESPONSIVE (CELULARES) */
+        /* MÓVIL */
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2.2rem; /* Texto más pequeño en celular */
-            }
-            
-            p.subhead {
-                font-size: 1rem;
-                padding: 0 10px;
-            }
-
-            .nav-links {
-                display: flex;
-                flex-direction: column; /* Enlaces uno debajo del otro en celular */
-                gap: 20px;
-            }
-
-            .separator {
-                display: none; /* Oculta los puntos separadores en celular */
-            }
+            h1 { font-size: 2rem; }
+            p.subhead { font-size: 1.1rem; }
         }
     </style>
 </head>
@@ -131,23 +106,15 @@
     <main class="container">
         <div class="brand">OFICIAL.PE</div>
 
-        <h1>Plataforma de Validación Digital para Marcas Líderes.</h1>
+        <h1>Plataforma de validación digital para marcas líderes.</h1>
 
         <p class="subhead">
-            El hub central donde convergen los portafolios y experiencias auténticas de nuestros aliados estratégicos.
+            "Si no es <span class="highlight">.oficial.pe</span>, no es oficial"
         </p>
 
-        <nav class="nav-links">
-            <a href="#">Ver Portafolio Maestro</a>
-            
-            <span class="separator">·</span>
-            
-            <a href="#">Servicios de Producción</a>
-            
-            <span class="separator">·</span>
-            
-            <a href="#">Contacto Corporativo</a>
-        </nav>
+        <a href="https://wa.me/51950141414" class="cta-button" target="_blank">
+            Contactar por WhatsApp
+        </a>
     </main>
 
 </body>
