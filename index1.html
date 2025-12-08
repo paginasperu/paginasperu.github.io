@@ -3,588 +3,584 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Libro de Reclamaciones · Plantilla Perú — Academia / Comercio</title>
-<meta name="description" content="Plantilla de Libro de Reclamaciones para Perú. Formulario accesible, imprimible, exportable y con panel local para gestionar respuestas. Úsalo en negocios para registrar quejas y entregar comprobante al cliente." />
+<title>Programa de Puntos — Demo profesional y simple</title>
+<meta name="description" content="Programa de puntos simple y profesional. Busca por DNI, consulta saldo, suma/resta puntos, historial opcional, exporta/importa CSV. Listo para presentar a un cliente." />
 <meta name="theme-color" content="#0b76ef" />
 <style>
   :root{
-    --bg:#f6f8fb;
-    --card:#fff;
-    --accent:#0b76ef;
-    --muted:#6b7280;
-    --radius:10px;
-    --maxw:900px;
+    --bg:#f6f8fb; --card:#fff; --accent:#0b76ef; --muted:#6b7280; --radius:12px;
+    --maxw:980px;
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;background:linear-gradient(180deg,#ffffff 0%,var(--bg) 100%);color:#0f1724}
-  .wrap{max-width:var(--maxw);margin:20px auto;padding:18px}
-  header{display:flex;align-items:center;gap:14px;justify-content:space-between}
+  body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:linear-gradient(180deg,#ffffff,#f3f7fb);color:#0b1220}
+  .wrap{max-width:var(--maxw);margin:18px auto;padding:18px}
+  header{display:flex;justify-content:space-between;align-items:center;gap:12px}
   .brand{display:flex;align-items:center;gap:12px}
-  .logo{width:56px;height:56px;border-radius:10px;background:var(--accent);display:grid;place-items:center;color:white;font-weight:700}
-  h1{margin:0;font-size:20px}
-  p.lead{margin:6px 0 0;color:var(--muted);font-size:14px}
-  .card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(11,118,239,0.06);margin-top:14px}
-  form{display:grid;gap:10px}
-  .row{display:flex;gap:10px}
+  .logo{width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#0666d0);color:#fff;display:grid;place-items:center;font-weight:700}
+  h1{margin:0;font-size:18px}
+  p.lead{margin:2px 0 0;color:var(--muted);font-size:13px}
+
+  .card{background:var(--card);padding:14px;border-radius:14px;box-shadow:0 6px 18px rgba(11,118,239,0.06);margin-top:14px}
+  .row{display:flex;gap:12px;align-items:center}
   .col{flex:1;min-width:0}
-  label{display:block;font-weight:600;font-size:13px;margin-bottom:6px}
-  input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="time"], input[type="number"], select, textarea{
-    width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef8;font-size:14px;background:#fff;
-  }
-  textarea{min-height:110px;resize:vertical}
-  .muted{color:var(--muted);font-size:13px}
-  .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
-  button{cursor:pointer;border:0;padding:10px 12px;border-radius:8px;font-weight:700}
-  .primary{background:var(--accent);color:white}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+  input[type="text"], input[type="tel"], select, textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef8;font-size:14px;background:#fff}
+  textarea{resize:vertical;min-height:80px}
+  button{cursor:pointer;border:0;padding:10px 12px;border-radius:10px;font-weight:700}
+  .btn{background:var(--accent);color:white}
   .ghost{background:transparent;border:1px solid rgba(11,118,239,0.12);color:var(--accent)}
-  .small{font-size:13px;color:var(--muted)}
-  .center{display:flex;justify-content:center;align-items:center}
-  /* table lista */
-  table{width:100%;border-collapse:collapse;margin-top:12px}
-  th,td{padding:8px;border-bottom:1px solid #f1f5f9;text-align:left;font-size:13px}
+  .muted{color:var(--muted);font-size:13px}
+
+  .grid{display:grid;grid-template-columns:1fr 320px;gap:14px}
+  @media (max-width:920px){ .grid{grid-template-columns:1fr} }
+
+  .list{max-height:360px;overflow:auto;margin-top:10px;border-radius:8px;border:1px solid #eef4fb}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:8px;border-bottom:1px solid #f4f7fb;font-size:13px;text-align:left}
   th{background:#fbfdff;font-weight:700}
-  .badge{display:inline-block;padding:6px 8px;border-radius:999px;background:#eef6ff;color:var(--accent);font-weight:700;font-size:12px}
-  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  /* panel admin */
-  .admin-panel{margin-top:12px}
-  .secret{display:flex;gap:8px;align-items:center}
-  /* printable ticket */
-  .ticket{max-width:720px;margin:0 auto;padding:14px;border-radius:8px;background:white;border:1px solid #e6eef8}
-  @media print {
-    body *:not(.printable){display:none}
-    .printable{display:block}
-    .ticket{box-shadow:none;border:none}
-  }
-  /* responsive */
-  @media (max-width:820px){
-    .row{flex-direction:column}
-    header{flex-direction:column;align-items:flex-start;gap:8px}
-  }
+  .center{display:flex;align-items:center;gap:8px}
+  .small{font-size:13px;color:var(--muted)}
+  .stat{font-weight:700;color:var(--accent);font-size:20px}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .hint{font-size:12px;color:#8b98a8}
+
+  /* tiny helpers */
+  .chip{display:inline-block;padding:6px 8px;border-radius:999px;background:#eef7ff;color:var(--accent);font-weight:700}
+  .danger{background:#fff0f0;color:#b00000;border:1px solid #ffd6d6}
 </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <div class="brand">
-        <div class="logo" aria-hidden="true">LR</div>
+        <div class="logo" aria-hidden="true">P</div>
         <div>
-          <h1>Libro de Reclamaciones (Plantilla Perú)</h1>
-          <p class="lead">Registro oficial y entregable de reclamos — imprime una copia para el cliente y guarda el registro en tu negocio.</p>
+          <h1>Programa de Puntos — Demo</h1>
+          <p class="lead">Simple, profesional y listo para mostrar a tu cliente. Busca por DNI, consulta saldo y administra puntos.</p>
         </div>
       </div>
 
-      <div class="controls">
-        <button class="ghost" id="btnList" title="Ver reclamos guardados">Ver reclamos</button>
-        <button class="ghost" id="btnExport" title="Exportar registros CSV">Exportar CSV</button>
-        <button class="ghost" id="btnClear" title="Borrar todos los registros (local)">Borrar todo</button>
-        <button class="primary" id="btnAdmin" title="Panel administrador">Panel admin</button>
+      <div style="text-align:right">
+        <div class="small">Versión demo · Local (sin backend)</div>
+        <div class="muted" style="font-size:12px">Admin PIN: <strong>1234</strong></div>
       </div>
     </header>
 
-    <!-- INSTRUCCIONES -->
-    <div class="card">
-      <strong>Instrucciones rápidas:</strong>
-      <ul class="small" style="margin:8px 0 0 18px">
-        <li>Completa el formulario con los datos del reclamante y la descripción del problema.</li>
-        <li>Al enviar, genera e imprime la <strong>Constancia de Reclamo</strong> para entregar al cliente (se abrirá una vista imprimible).</li>
-        <li>Guarda el registro para el negocio; luego podrás registrar la respuesta y descargar el CSV.</li>
-      </ul>
+    <section class="card">
+      <div class="row" style="justify-content:space-between">
+        <div style="min-width:260px">
+          <label>Negocio (selecciona o crea uno)</label>
+          <div class="row">
+            <select id="businessSelect" style="flex:1"></select>
+            <button class="ghost" id="btnNewBiz">+ Nuevo</button>
+          </div>
+        </div>
+
+        <div style="width:220px">
+          <label>Clientes totales</label>
+          <div class="stat" id="totalClients">—</div>
+        </div>
+
+        <div style="width:180px">
+          <label>Sumatoria puntos</label>
+          <div class="stat" id="totalPoints">—</div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;align-items:flex-end">
+        <div class="col">
+          <label>Buscar por DNI</label>
+          <div style="display:flex;gap:8px">
+            <input id="searchDni" placeholder="Ej. 41235678" />
+            <button class="btn" id="btnSearch">Buscar</button>
+            <button class="ghost" id="btnQR">QR</button>
+          </div>
+          <div class="hint" style="margin-top:6px">Muestra saldo inmediato; también puedes registrar puntos rápidos desde la ficha del cliente.</div>
+        </div>
+
+        <div style="width:220px">
+          <label>Filtrar / acciones</label>
+          <div class="row">
+            <select id="quickAction" style="flex:1">
+              <option value="">Acciones rápidas</option>
+              <option value="export">Exportar CSV</option>
+              <option value="import">Importar CSV</option>
+              <option value="clear">Borrar todo</option>
+            </select>
+            <button class="ghost" id="btnDoAction">Ir</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid">
+      <!-- LEFT: resultados y lista -->
+      <div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <strong>Resultado</strong>
+              <div class="small">Ficha rápida del cliente</div>
+            </div>
+            <div class="small">Editable con PIN admin</div>
+          </div>
+
+          <div id="resultArea" style="margin-top:12px">
+            <div class="small muted">Busca un DNI y aparecerá aquí la ficha con saldo y acciones.</div>
+          </div>
+
+          <div class="actions" style="margin-top:12px">
+            <button class="btn" id="btnAddManual">+ Sumar puntos</button>
+            <button class="ghost" id="btnSubManual">- Restar puntos</button>
+            <button class="ghost" id="btnOpenList">Ver lista de clientes</button>
+            <button class="ghost" id="btnAdminToggle">Admin</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <strong>Lista de clientes</strong>
+          <div class="small">DNI y puntos — ordenable y exportable</div>
+          <div class="list" id="clientsList">
+            <!-- tabla generada -->
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: panel de administración / nuevo cliente -->
+      <aside>
+        <div class="card">
+          <strong>Nuevo cliente</strong>
+          <div class="small">Agrega rápido un cliente con puntos</div>
+          <div style="margin-top:10px">
+            <label>DNI</label>
+            <input id="newDni" placeholder="DNI (solo números)" />
+            <label style="margin-top:8px">Puntos</label>
+            <input id="newPoints" type="number" value="0" />
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button class="btn" id="btnCreate">Agregar</button>
+              <button class="ghost" id="btnCreateAndOpen">Agregar y ver</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <strong>Panel Admin</strong>
+          <div class="small">Protegido por PIN (local)</div>
+          <div style="margin-top:8px">
+            <label>PIN</label>
+            <input id="adminPin" type="password" placeholder="PIN" />
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="ghost" id="btnUnlock">Abrir</button>
+              <button class="ghost" id="btnChangePin">Cambiar PIN</button>
+            </div>
+            <div class="small muted" style="margin-top:8px">PIN por defecto: <strong>1234</strong> — se guarda en localStorage.</div>
+          </div>
+
+          <div id="adminArea" style="display:none;margin-top:12px">
+            <div class="small">Opciones disponibles:</div>
+            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+              <button class="ghost" id="btnExportCSV">Exportar CSV</button>
+              <button class="ghost" id="btnImportCSV">Importar CSV</button>
+              <button class="ghost" id="btnClearBiz">Borrar clientes (negocio)</button>
+              <button class="ghost" id="btnDeleteBiz">Eliminar negocio</button>
+            </div>
+            <div style="margin-top:10px" class="small muted">Sugerencia: usa exportar antes de limpiar o eliminar.</div>
+          </div>
+        </div>
+      </aside>
     </div>
 
-    <!-- FORM -->
-    <section class="card" aria-labelledby="form-title">
-      <h2 id="form-title" style="margin:0 0 8px">Nuevo Reclamo</h2>
-
-      <form id="reclamoForm" autocomplete="off">
-        <div class="row">
-          <div class="col">
-            <label>Fecha</label>
-            <input type="date" id="fecha" required>
-          </div>
-          <div class="col">
-            <label>Hora</label>
-            <input type="time" id="hora" required>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col">
-            <label>Tipo de cliente</label>
-            <select id="tipo_cliente" required>
-              <option value="Persona Natural">Persona Natural</option>
-              <option value="Persona Jurídica">Persona Jurídica</option>
-            </select>
-          </div>
-          <div class="col">
-            <label>N° de documento (DNI / RUC)</label>
-            <input type="text" id="documento" placeholder="DNI o RUC" required pattern="[\d- ]+">
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col">
-            <label>Nombre / Razón social</label>
-            <input type="text" id="nombre" placeholder="Nombre completo o razón social" required>
-          </div>
-          <div class="col">
-            <label>Teléfono / WhatsApp</label>
-            <input type="tel" id="telefono" placeholder="+51 9xxxxxxxx">
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col">
-            <label>Correo (opcional)</label>
-            <input type="email" id="correo" placeholder="cliente@ejemplo.com">
-          </div>
-          <div class="col">
-            <label>Dirección (opcional)</label>
-            <input type="text" id="direccion" placeholder="Dirección del reclamante">
-          </div>
-        </div>
-
-        <hr style="border:none;height:1px;background:#eef6ff;margin:8px 0;border-radius:2px">
-
-        <div class="row">
-          <div class="col">
-            <label>Producto / Servicio reclamado</label>
-            <input type="text" id="producto" placeholder="Ej: Curso intensivo - Matrícula">
-          </div>
-          <div class="col">
-            <label>Fecha de compra / prestación</label>
-            <input type="date" id="fecha_compra">
-          </div>
-        </div>
-
-        <div>
-          <label>Importe (S/)</label>
-          <input type="number" id="monto" min="0" step="0.01" placeholder="0.00">
-        </div>
-
-        <div>
-          <label>Descripción del reclamo</label>
-          <textarea id="descripcion" placeholder="Explicar claramente el motivo del reclamo..." required></textarea>
-        </div>
-
-        <div class="row">
-          <div class="col">
-            <label>Resolución solicitada</label>
-            <select id="resolucion_solicitada" required>
-              <option value="Reembolso">Reembolso</option>
-              <option value="Cambio">Cambio por otro producto</option>
-              <option value="Garantía">Garantía / reparación</option>
-              <option value="Descuento">Descuento / compensación</option>
-              <option value="Otro">Otro</option>
-            </select>
-          </div>
-          <div class="col">
-            <label>Sucursal / Vendedor (opcional)</label>
-            <input type="text" id="sucursal" placeholder="Ej: Sucursal Miraflores / Vendedor: Juan">
-          </div>
-        </div>
-
-        <div class="row" style="align-items:flex-end">
-          <div style="flex:1">
-            <label>Firma del reclamante (escribe nombre como firma)</label>
-            <input type="text" id="firma" placeholder="Nombre del reclamante" required>
-            <div class="small" style="margin-top:6px">Al firmar, acepta que esta constancia es válida como registro de su reclamo.</div>
-          </div>
-
-          <div style="width:220px">
-            <label>N° de Reclamo (autogenerado)</label>
-            <input type="text" id="num_reclamo" readonly>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="primary" type="submit">Generar constancia e imprimir</button>
-          <button class="ghost" type="button" id="btnSave">Guardar sin imprimir</button>
-          <div class="small muted">Al enviar se guarda localmente en este equipo (storage local) — el negocio debe archivar una copia física.</div>
-        </div>
-      </form>
-    </section>
-
-    <!-- Lista de reclamos -->
-    <section id="lista" class="card" style="display:none">
-      <h3 style="margin:0 0 8px">Reclamos guardados</h3>
-      <div id="reclamosTableWrap"></div>
-    </section>
-
-    <!-- Admin panel modal (simple) -->
-    <section id="admin" class="card admin-panel" style="display:none">
-      <h3 style="margin:0 0 8px">Panel administrador (local)</h3>
-      <div class="secret">
-        <label style="margin-right:6px">PIN</label>
-        <input id="adminPin" type="password" placeholder="PIN (local)">
-        <button class="ghost" id="btnUnlock">Abrir</button>
-        <div class="small muted" style="margin-left:8px">PIN por defecto: <strong>1234</strong> (cámbialo en ajustes)</div>
-      </div>
-
-      <div id="adminArea" style="display:none;margin-top:12px">
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <button class="ghost" id="btnExportCSV2">Exportar CSV</button>
-          <button class="ghost" id="btnPrintAll">Imprimir todo</button>
-          <button class="ghost" id="btnClearAll">Borrar todos (local)</button>
-        </div>
-
-        <div style="margin-top:10px" id="adminList"></div>
-      </div>
-    </section>
-
-    <footer class="small muted" style="margin-top:14px">
-      <div>Recomendación: imprime la constancia y entrégala al cliente. Conserva copia física o exporta CSV para archivo digital. Esta plantilla es una herramienta práctica — adapta su uso según la normativa local vigente.</div>
+    <footer class="muted small" style="margin-top:14px">
+      <div>Demo local · No requiere backend. Ideal para presentar al cliente y validar precio y adopción.</div>
     </footer>
   </div>
 
-  <!-- PRINTABLE TICKET TEMPLATE (hidden) -->
-  <div id="printable" style="display:none">
-    <div class="ticket printable" id="ticketContent" role="document" aria-label="Constancia de reclamo">
-      <!-- Content filled by JS -->
-    </div>
-  </div>
-
 <script>
-/* === UTILIDADES === */
-const LS_KEY = 'libro_reclamaciones_local_v1';
-const LS_PIN_KEY = 'libro_reclamaciones_pin_v1';
+/* -------------------------
+  Programa de Puntos - Single file (localStorage)
+  Keys: 'pp_businesses' (array), 'pp_data_<slug>' (clients array), 'pp_pin'
+  Cliente: { dni: '12345678', puntos: 120, history: [{at, delta, note}] }
+-------------------------*/
 
-function uid(){ return 'LR-' + Date.now().toString(36); }
+const BUS_KEY = 'pp_businesses';
+const PIN_KEY = 'pp_pin';
+const DEFAULT_PIN = '1234';
 
-function today(){ 
-  const d = new Date();
-  return d.toISOString().slice(0,10);
+// helpers
+const qs = id => document.getElementById(id);
+const sanitizeDNI = v => String(v||'').replace(/\D/g,'').trim();
+const slugify = s => String(s||'').toLowerCase().trim().replace(/\s+/g,'-').replace(/[^a-z0-9-_]/g,'');
+const fmt = n => Number(n||0);
+const nowISO = ()=> new Date().toISOString();
+
+function loadBusinesses(){
+  try{ return JSON.parse(localStorage.getItem(BUS_KEY) || '[]'); } catch(e){ return []; }
 }
-function nowTime(){
-  const d = new Date();
-  return d.toTimeString().slice(0,5);
+function saveBusinesses(arr){ localStorage.setItem(BUS_KEY, JSON.stringify(arr)); }
+
+function bizDataKey(slug){ return 'pp_data_' + slug; }
+function loadBizData(slug){
+  try{ return JSON.parse(localStorage.getItem(bizDataKey(slug)) || '[]'); } catch(e){ return []; }
 }
+function saveBizData(slug, arr){ localStorage.setItem(bizDataKey(slug), JSON.stringify(arr)); }
 
-/* cargar defaults en form */
-document.getElementById('fecha').value = today();
-document.getElementById('hora').value = nowTime();
-document.getElementById('num_reclamo').value = uid();
-
-/* manejo de storage local */
-function loadRecords(){
-  try{
-    const txt = localStorage.getItem(LS_KEY);
-    return txt ? JSON.parse(txt) : [];
-  }catch(e){ return [];}
+function ensureDefaults(){
+  if(!localStorage.getItem(PIN_KEY)) localStorage.setItem(PIN_KEY, DEFAULT_PIN);
+  let bs = loadBusinesses();
+  if(bs.length===0){
+    // create demo business
+    const demo = { name:'Bodega Anita', slug:'bodega-anita', info:'Abarrotes - La Perla' };
+    bs.push(demo);
+    saveBusinesses(bs);
+    // demo clients
+    const demoClients = [
+      { dni:'41235678', puntos:120, history:[{at:nowISO(),delta:+120,note:'Saldo inicial'}] },
+      { dni:'48912354', puntos:350, history:[{at:nowISO(),delta:+350,note:'Saldo inicial'}] },
+      { dni:'50381245', puntos:80, history:[{at:nowISO(),delta:+80,note:'Saldo inicial'}] }
+    ];
+    saveBizData(demo.slug, demoClients);
+  }
 }
-function saveRecords(arr){
-  localStorage.setItem(LS_KEY, JSON.stringify(arr));
+ensureDefaults();
+
+/* UI init */
+function populateBizSelect(){
+  const sel = qs('businessSelect');
+  sel.innerHTML = '';
+  const bs = loadBusinesses();
+  bs.forEach(b=>{
+    const opt = document.createElement('option');
+    opt.value = b.slug; opt.textContent = b.name + (b.info ? ' · ' + b.info : '');
+    sel.appendChild(opt);
+  });
+  if(bs.length>0) sel.value = bs[0].slug;
+  onBizChange();
 }
+populateBizSelect();
 
-/* guardar registro desde formulario */
-function collectForm(){
-  return {
-    id: document.getElementById('num_reclamo').value || uid(),
-    fecha: document.getElementById('fecha').value,
-    hora: document.getElementById('hora').value,
-    tipo_cliente: document.getElementById('tipo_cliente').value,
-    documento: document.getElementById('documento').value.trim(),
-    nombre: document.getElementById('nombre').value.trim(),
-    telefono: document.getElementById('telefono').value.trim(),
-    correo: document.getElementById('correo').value.trim(),
-    direccion: document.getElementById('direccion').value.trim(),
-    producto: document.getElementById('producto').value.trim(),
-    fecha_compra: document.getElementById('fecha_compra').value,
-    monto: document.getElementById('monto').value,
-    descripcion: document.getElementById('descripcion').value.trim(),
-    resolucion_solicitada: document.getElementById('resolucion_solicitada').value,
-    sucursal: document.getElementById('sucursal').value.trim(),
-    firma: document.getElementById('firma').value.trim(),
-    created_at: new Date().toISOString(),
-    respuesta: null // para que admin pueda completar
-  };
-}
-
-function validateForm(){
-  const doc = document.getElementById('documento').value.trim();
-  const nombre = document.getElementById('nombre').value.trim();
-  const desc = document.getElementById('descripcion').value.trim();
-  const firma = document.getElementById('firma').value.trim();
-  if(!doc || !nombre || !desc || !firma) return false;
-  return true;
-}
-
-/* imprimir ticket */
-function renderTicket(record){
-  const el = document.getElementById('ticketContent');
-  el.innerHTML = `
-    <div style="text-align:center;margin-bottom:10px">
-      <div style="font-weight:700;font-size:18px">CONSTANCIA DE RECLAMO</div>
-      <div style="font-size:13px;color:#666;margin-top:6px">Libro de Reclamaciones · Empresa / Comercio</div>
-    </div>
-
-    <table style="width:100%;font-size:13px;border-collapse:collapse;margin-bottom:10px">
-      <tr><td style="padding:6px;border:1px solid #eee"><strong>N° Reclamo:</strong> ${escapeHtml(record.id)}</td><td style="padding:6px;border:1px solid #eee"><strong>Fecha:</strong> ${escapeHtml(record.fecha)} ${escapeHtml(record.hora)}</td></tr>
-      <tr><td style="padding:6px;border:1px solid #eee"><strong>Tipo:</strong> ${escapeHtml(record.tipo_cliente)}</td><td style="padding:6px;border:1px solid #eee"><strong>Documento:</strong> ${escapeHtml(record.documento)}</td></tr>
-      <tr><td colspan="2" style="padding:6px;border:1px solid #eee"><strong>Reclamante:</strong> ${escapeHtml(record.nombre)} — ${escapeHtml(record.telefono || '')} ${record.correo? '· ' + escapeHtml(record.correo) : ''}</td></tr>
-      <tr><td colspan="2" style="padding:6px;border:1px solid #eee"><strong>Producto / Servicio:</strong> ${escapeHtml(record.producto || '')} ${record.monto ? ' · S/ ' + escapeHtml(record.monto) : ''}</td></tr>
-    </table>
-
-    <div style="font-weight:700;margin-bottom:6px">Descripción del reclamo</div>
-    <div style="white-space:pre-wrap;border:1px dashed #e6eef8;padding:8px;border-radius:6px;margin-bottom:8px">${escapeHtml(record.descripcion)}</div>
-
-    <div style="display:flex;gap:12px;margin-top:8px">
-      <div style="flex:1">
-        <div style="font-weight:700">Resolución solicitada</div>
-        <div class="small" style="margin-top:6px">${escapeHtml(record.resolucion_solicitada)}</div>
-      </div>
-      <div style="width:260px">
-        <div style="font-weight:700">Firma</div>
-        <div style="margin-top:20px">${escapeHtml(record.firma)}</div>
-        <div class="small" style="color:#666;margin-top:6px">Firma recibida al momento del reclamo</div>
-      </div>
-    </div>
-
-    <hr style="margin:12px 0">
-
-    <div style="font-size:12px;color:#444">
-      <strong>Proceso:</strong> Su reclamo ha sido registrado. El negocio debe responder en un plazo razonable y entregarle la solución. Guarde este comprobante.
-    </div>
-
-    <div style="margin-top:12px;font-size:12px;color:#666">
-      <em>Nota: Esta constancia es una evidencia del reclamo. Se recomienda al negocio consignar la respuesta aquí y entregarle una copia al cliente.</em>
-    </div>
-  `;
-}
-
-/* escapar HTML básico */
-function escapeHtml(str){
-  if(!str && str !== 0) return '';
-  return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
-}
-
-/* evento submit */
-document.getElementById('reclamoForm').addEventListener('submit', (e)=>{
-  e.preventDefault();
-  if(!validateForm()){ alert('Por favor completa los campos obligatorios.'); return; }
-  const rec = collectForm();
-  // save
-  const arr = loadRecords();
-  arr.unshift(rec); // último arriba
-  saveRecords(arr);
-  // preparar impresión
-  renderTicket(rec);
-  // abrir en nueva ventana imprimible
-  const w = window.open('', '_blank', 'noopener');
-  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Constancia de Reclamo</title><style>body{font-family:Arial,Helvetica,sans-serif;padding:20px;color:#111} .ticket{max-width:720px;margin:0 auto}</style></head><body><div class="ticket">' + document.getElementById('ticketContent').innerHTML + '</div><script>window.onload=function(){window.print();setTimeout(()=>window.close(),500);}</script></body></html>');
-  w.document.close();
-  alert('Reclamo guardado y ventana de impresión abierta. Entrega la constancia al cliente.');
-  resetForm();
-  refreshListUI();
-});
-
-/* guardar sin imprimir */
-document.getElementById('btnSave').addEventListener('click', ()=>{
-  if(!validateForm()){ alert('Por favor completa los campos obligatorios.'); return; }
-  const rec = collectForm();
-  const arr = loadRecords();
-  arr.unshift(rec);
-  saveRecords(arr);
-  alert('Reclamo guardado localmente.');
-  resetForm();
-  refreshListUI();
-});
-
-/* reset form */
-function resetForm(){
-  document.getElementById('reclamoForm').reset();
-  document.getElementById('fecha').value = today();
-  document.getElementById('hora').value = nowTime();
-  document.getElementById('num_reclamo').value = uid();
-}
-
-/* mostrar lista */
-document.getElementById('btnList').addEventListener('click', ()=>{
-  const sec = document.getElementById('lista');
-  sec.style.display = sec.style.display === 'none' ? 'block' : 'none';
-  refreshListUI();
-});
-
-function refreshListUI(){
-  const wrap = document.getElementById('reclamosTableWrap');
-  const data = loadRecords();
-  if(data.length === 0){
-    wrap.innerHTML = '<div class="small muted">No hay reclamos guardados.</div>';
+qs('btnNewBiz').addEventListener('click', ()=>{
+  const name = prompt('Nombre del negocio (ej: Bodega Anita)') || '';
+  if(!name.trim()) return;
+  const info = prompt('Info corta (ej: Abarrotes · La Perla)') || '';
+  const slug = slugify(name);
+  let bs = loadBusinesses();
+  if(bs.find(b=>b.slug===slug)){
+    alert('Ya existe un negocio con ese slug. Cambia el nombre o edita el existente.');
     return;
   }
-  let html = '<table><thead><tr><th>N°</th><th>Fecha</th><th>Documento</th><th>Reclamante</th><th>Producto</th><th>Resolución</th><th>Acciones</th></tr></thead><tbody>';
-  data.forEach((r, i)=>{
-    html += `<tr>
-      <td><span class="badge">${escapeHtml(r.id)}</span></td>
-      <td>${escapeHtml(r.fecha)} ${escapeHtml(r.hora)}</td>
-      <td>${escapeHtml(r.documento)}</td>
-      <td>${escapeHtml(r.nombre)}</td>
-      <td>${escapeHtml(r.producto || '')}</td>
-      <td>${r.respuesta ? '<strong>Respondido</strong>' : '<span class="small muted">Pendiente</span>'}</td>
-      <td>
-        <button class="ghost" onclick="viewRecord('${r.id}')">Ver</button>
-        <button class="ghost" onclick="printRecord('${r.id}')">Imprimir</button>
-        <button class="ghost" onclick="deleteRecord('${r.id}')">Eliminar</button>
-      </td>
-    </tr>`;
+  bs.push({ name:name.trim(), slug, info:info.trim() });
+  saveBusinesses(bs);
+  saveBizData(slug, []); // empty clients
+  populateBizSelect();
+  qs('businessSelect').value = slug;
+  onBizChange();
+});
+
+/* when business changes */
+function onBizChange(){
+  const slug = qs('businessSelect').value;
+  renderSummary(slug);
+  renderClientsList(slug);
+}
+qs('businessSelect').addEventListener('change', onBizChange);
+
+/* render summary */
+function renderSummary(slug){
+  const arr = loadBizData(slug);
+  qs('totalClients').textContent = arr.length;
+  const sum = arr.reduce((s,c)=>s+fmt(c.puntos),0);
+  qs('totalPoints').textContent = sum;
+}
+
+/* render clients list */
+function renderClientsList(slug){
+  const arr = loadBizData(slug).slice().sort((a,b)=>b.puntos-a.puntos);
+  const wrap = qs('clientsList');
+  if(arr.length===0){ wrap.innerHTML = '<div class="muted small" style="padding:12px">No hay clientes.</div>'; return; }
+  let html = '<table><thead><tr><th>DNI</th><th>Puntos</th><th>Acciones</th></tr></thead><tbody>';
+  arr.forEach(c=>{
+    html += `<tr><td>${c.dni}</td><td>${c.puntos}</td><td><button class="ghost" onclick="openClient('${slug}','${c.dni}')">Ver</button></td></tr>`;
   });
   html += '</tbody></table>';
   wrap.innerHTML = html;
 }
 
-/* ver registro en modal (usa impresión popup) */
-function viewRecord(id){
-  const rec = loadRecords().find(r=>r.id===id);
-  if(!rec){ alert('Registro no encontrado'); return; }
-  renderTicket(rec);
-  const w = window.open('', '_blank', 'noopener');
-  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Ver Reclamo</title><style>body{font-family:Arial,Helvetica,sans-serif;padding:20px;color:#111}</style></head><body>' + document.getElementById('ticketContent').innerHTML + '</body></html>');
-  w.document.close();
+/* open client */
+window.openClient = function(slug,dni){
+  const arr = loadBizData(slug);
+  const client = arr.find(x=>x.dni===dni);
+  if(!client){ alert('Cliente no encontrado.'); return; }
+  showClient(cardFromClient(client, slug));
+  scrollTo(0,0);
 }
 
-/* imprimir un registro */
-function printRecord(id){
-  const rec = loadRecords().find(r=>r.id===id);
-  if(!rec){ alert('Registro no encontrado'); return; }
-  renderTicket(rec);
-  const w = window.open('', '_blank', 'noopener');
-  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Imprimir Reclamo</title><style>body{font-family:Arial,Helvetica,sans-serif;padding:20px;color:#111}</style></head><body>' + document.getElementById('ticketContent').innerHTML + '<script>window.onload=function(){window.print();setTimeout(()=>window.close(),500);}</script></body></html>');
-  w.document.close();
+/* create new client */
+qs('btnCreate').addEventListener('click', ()=>{
+  const slug = qs('businessSelect').value;
+  const dni = sanitizeDNI(qs('newDni').value);
+  const pts = fmt(qs('newPoints').value);
+  if(!dni){ alert('Ingresa DNI válido.'); return; }
+  let arr = loadBizData(slug);
+  if(arr.find(c=>c.dni===dni)){ alert('Cliente ya existe. Usa la lista para editar.'); return; }
+  const client = { dni, puntos: pts, history:[{at:nowISO(),delta:+pts,note:'Registro manual'}] };
+  arr.push(client); saveBizData(slug, arr); renderClientsList(slug); renderSummary(slug);
+  qs('newDni').value=''; qs('newPoints').value='0';
+  alert('Cliente agregado.');
+});
+qs('btnCreateAndOpen').addEventListener('click', ()=>{
+  qs('btnCreate').click();
+  const slug = qs('businessSelect').value;
+  const dni = sanitizeDNI(qs('newDni').value || '');
+  if(dni) openClient(slug,dni);
+});
+
+/* search */
+qs('btnSearch').addEventListener('click', ()=> doSearch());
+qs('searchDni').addEventListener('keypress', e=>{ if(e.key==='Enter') doSearch(); });
+
+function doSearch(){
+  const slug = qs('businessSelect').value;
+  const dni = sanitizeDNI(qs('searchDni').value);
+  if(!dni){ alert('Ingresa DNI para buscar.'); return; }
+  const arr = loadBizData(slug);
+  const client = arr.find(c=>c.dni===dni);
+  if(!client){
+    if(confirm('Cliente no existe. ¿Deseas crear uno con 0 puntos?')){
+      const newC = { dni, puntos:0, history:[{at:nowISO(),delta:0,note:'Creado desde búsqueda'}] };
+      arr.push(newC); saveBizData(slug, arr); renderClientsList(slug); renderSummary(slug);
+      showClient(cardFromClient(newC, slug));
+    } else {
+      return;
+    }
+  } else showClient(cardFromClient(client, slug));
 }
 
-/* eliminar registro */
-function deleteRecord(id){
-  if(!confirm('¿Eliminar este reclamo? Esta acción no se puede deshacer.')) return;
-  let arr = loadRecords();
-  arr = arr.filter(r=>r.id!==id);
-  saveRecords(arr);
-  refreshListUI();
+/* render client card in result area */
+function cardFromClient(client, slug){
+  const html = document.createElement('div');
+  html.innerHTML = `
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+      <div>
+        <div style="font-weight:700">DNI: ${client.dni}</div>
+        <div class="small muted">Negocio: ${slug}</div>
+        <div style="margin-top:8px">Puntos: <span style="font-weight:800;color:var(--accent)">${client.puntos}</span></div>
+        <div class="small muted" style="margin-top:8px">Historial reciente:</div>
+        <div class="small" id="hist_${client.dni}" style="margin-top:6px">${(client.history||[]).slice(-4).reverse().map(h=>`${new Date(h.at).toLocaleString()} — ${h.delta>0?'+':''}${h.delta} — ${h.note}`).join('<br>')}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn" onclick="adjustPoints('${slug}','${client.dni}',+10)">+10</button>
+        <button class="ghost" onclick="adjustPoints('${slug}','${client.dni}',-10)">-10</button>
+        <button class="ghost" onclick="openAdjustModal('${slug}','${client.dni}')">Editar</button>
+      </div>
+    </div>
+  `;
+  return html;
 }
+
+function showClient(el){
+  const area = qs('resultArea');
+  area.innerHTML = ''; area.appendChild(el);
+}
+
+/* quick manual adjustments via prompt */
+qs('btnAddManual').addEventListener('click', ()=> {
+  const slug = qs('businessSelect').value;
+  const dni = sanitizeDNI(qs('searchDni').value);
+  if(!dni){ alert('Busca o ingresa DNI primero.'); return; }
+  adjustPointsPrompt(slug,dni,true);
+});
+qs('btnSubManual').addEventListener('click', ()=> {
+  const slug = qs('businessSelect').value;
+  const dni = sanitizeDNI(qs('searchDni').value);
+  if(!dni){ alert('Busca o ingresa DNI primero.'); return; }
+  adjustPointsPrompt(slug,dni,false);
+});
+
+function adjustPointsPrompt(slug,dni,add=true){
+  const val = prompt((add ? '¿Cuántos puntos sumar?' : '¿Cuántos puntos restar?'), add? '10':'10');
+  if(val===null) return;
+  const delta = Math.round(Number(val) || 0) * (add?1:-1);
+  if(delta===0){ alert('Valor inválido'); return; }
+  adjustPoints(slug,dni,delta, prompt('Nota (opcional):','Ajuste manual') || (add? 'Suma manual' : 'Resta manual'));
+}
+
+function adjustPoints(slug,dni,delta,note){
+  const arr = loadBizData(slug);
+  const client = arr.find(c=>c.dni===dni);
+  if(!client){ alert('Cliente no existe. Busca y crea antes.'); return; }
+  client.puntos = fmt(client.puntos) + Number(delta);
+  client.history = client.history || [];
+  client.history.push({ at: nowISO(), delta: Number(delta), note: note || 'Ajuste' });
+  saveBizData(slug, arr);
+  renderClientsList(slug); renderSummary(slug);
+  showClient(cardFromClient(client, slug));
+}
+
+/* open custom adjust modal (simple prompt flow) */
+function openAdjustModal(slug,dni){
+  const amount = prompt('Ingresa puntos (ej: +50 o -20)', '+0');
+  if(amount===null) return;
+  const delta = Number(String(amount).replace(/\+/g,'')) || 0;
+  if(delta===0){ alert('Valor inválido'); return; }
+  const note = prompt('Nota (opcional)','Ajuste administrativo') || '';
+  adjustPoints(slug,dni,delta,note);
+}
+
+/* open list */
+qs('btnOpenList').addEventListener('click', ()=> {
+  const el = qs('clientsList');
+  el.scrollIntoView({behavior:'smooth'});
+});
+
+/* QR placeholder - just shows a prompt for DNI (could be used to capture from phone) */
+qs('btnQR').addEventListener('click', ()=> {
+  const dni = prompt('Escanear / ingresar DNI (simulación QR):');
+  if(dni) { qs('searchDni').value = dni; doSearch(); }
+});
+
+/* quick action select */
+qs('btnDoAction').addEventListener('click', ()=>{
+  const op = qs('quickAction').value;
+  const slug = qs('businessSelect').value;
+  if(op==='export'){ exportCSV(slug); }
+  else if(op==='import'){ qs('btnImportCSV').click(); }
+  else if(op==='clear'){
+    if(confirm('Borrar todos los clientes de este negocio?')){ saveBizData(slug, []); renderClientsList(slug); renderSummary(slug); alert('Borrado.'); }
+  } else alert('Selecciona una acción válida.');
+});
+
+/* ADMIN: unlock */
+qs('btnUnlock').addEventListener('click', ()=>{
+  const pin = qs('adminPin').value || '';
+  const saved = localStorage.getItem(PIN_KEY) || DEFAULT_PIN;
+  if(pin === saved){ qs('adminArea').style.display = 'block'; alert('Panel admin abierto'); } else alert('PIN incorrecto');
+});
+
+/* change pin */
+qs('btnChangePin').addEventListener('click', ()=>{
+  const oldp = qs('adminPin').value || '';
+  const saved = localStorage.getItem(PIN_KEY) || DEFAULT_PIN;
+  if(oldp !== saved){ alert('Ingresa PIN actual para cambiarlo'); return; }
+  const np = prompt('Nuevo PIN (mínimo 4 caracteres):');
+  if(np && np.length>=4){ localStorage.setItem(PIN_KEY, np); alert('PIN cambiado'); } else alert('PIN inválido o operación cancelada');
+});
 
 /* export CSV */
-function toCSV(arr){
-  if(!arr || arr.length===0) return '';
-  const cols = ['id','fecha','hora','tipo_cliente','documento','nombre','telefono','correo','direccion','producto','fecha_compra','monto','descripcion','resolucion_solicitada','sucursal','firma','created_at','respuesta'];
+function exportCSV(slug){
+  const arr = loadBizData(slug);
+  if(arr.length===0){ alert('No hay clientes para exportar'); return; }
+  const cols = ['dni','puntos','history'];
   const esc = v => '"' + String(v===null||v===undefined ? '' : v).replace(/"/g,'""') + '"';
   let csv = cols.join(',') + '\n';
   arr.forEach(r=>{
-    csv += cols.map(c => esc(r[c])).join(',') + '\n';
+    csv += esc(r.dni) + ',' + esc(r.puntos) + ',' + esc(JSON.stringify(r.history||[])) + '\n';
   });
-  return csv;
-}
-
-document.getElementById('btnExport').addEventListener('click', ()=>{
-  const arr = loadRecords();
-  if(arr.length===0){ alert('No hay datos para exportar.'); return; }
-  const csv = toCSV(arr);
   const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = 'reclamos_export_' + new Date().toISOString().slice(0,10) + '.csv';
-  a.click();
+  a.href = url; a.download = `clientes_${slug}_${new Date().toISOString().slice(0,10)}.csv`; a.click();
   URL.revokeObjectURL(url);
-});
+}
+qs('btnExportCSV').addEventListener('click', ()=> exportCSV(qs('businessSelect').value));
 
-/* clear all */
-document.getElementById('btnClear').addEventListener('click', ()=>{
-  if(confirm('Borrar todos los registros locales?')){ localStorage.removeItem(LS_KEY); refreshListUI(); alert('Registros eliminados.'); }
+/* import CSV (simple parser) */
+qs('btnImportCSV').addEventListener('click', ()=>{
+  const input = document.createElement('input'); input.type='file'; input.accept='.csv,text/csv';
+  input.onchange = e=>{
+    const f = e.target.files[0]; if(!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = reader.result;
+      try{
+        const lines = text.split(/\r?\n/).filter(Boolean);
+        const header = lines.shift().split(',').map(h=>h.trim().toLowerCase());
+        const idxD = header.indexOf('dni'); const idxP = header.indexOf('puntos');
+        if(idxD<0 || idxP<0) { alert('CSV debe tener columnas "dni" y "puntos"'); return; }
+        const slug = qs('businessSelect').value;
+        const arr = loadBizData(slug);
+        lines.forEach(line=>{
+          const cols = parseCSVLine(line);
+          const dni = sanitizeDNI(cols[idxD]||''); const pts = Number(cols[idxP]||0);
+          if(!dni) return;
+          const found = arr.find(x=>x.dni===dni);
+          if(found) { found.puntos = pts; found.history = found.history || []; found.history.push({at:nowISO(),delta:0,note:'Import update'}); }
+          else arr.push({ dni, puntos: pts, history:[{at:nowISO(),delta:pts,note:'Importado'}] });
+        });
+        saveBizData(slug, arr); renderClientsList(slug); renderSummary(slug);
+        alert('Importación completada');
+      }catch(err){ console.error(err); alert('Error importando CSV'); }
+    };
+    reader.readAsText(f);
+  };
+  input.click();
 });
-
-/* ADMIN PANEL */
-document.getElementById('btnAdmin').addEventListener('click', ()=>{
-  const sec = document.getElementById('admin');
-  sec.style.display = sec.style.display === 'none' ? 'block' : 'none';
-});
-
-document.getElementById('btnUnlock').addEventListener('click', ()=>{
-  const entered = document.getElementById('adminPin').value;
-  const saved = localStorage.getItem(LS_PIN_KEY) || '1234';
-  if(entered === saved){
-    document.getElementById('adminArea').style.display = 'block';
-    loadAdminList();
-  } else {
-    alert('PIN incorrecto.');
+function parseCSVLine(line){
+  // naive split respecting quoted values
+  const out = []; let cur='', inQ=false;
+  for(let i=0;i<line.length;i++){ const ch=line[i];
+    if(ch === '"' ){ inQ = !inQ; continue; }
+    if(ch===',' && !inQ){ out.push(cur); cur=''; continue; }
+    cur += ch;
   }
-});
-
-function loadAdminList(){
-  const wrap = document.getElementById('adminList');
-  const arr = loadRecords();
-  if(arr.length===0){ wrap.innerHTML = '<div class="small muted">No hay reclamos.</div>'; return; }
-  let html = '<table><thead><tr><th>N°</th><th>Fecha</th><th>Cliente</th><th>Documento</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>';
-  arr.forEach(r=>{
-    html += `<tr>
-      <td>${escapeHtml(r.id)}</td>
-      <td>${escapeHtml(r.fecha)} ${escapeHtml(r.hora)}</td>
-      <td>${escapeHtml(r.nombre)}</td>
-      <td>${escapeHtml(r.documento)}</td>
-      <td>${r.respuesta ? 'Respondido' : 'Pendiente'}</td>
-      <td>
-        <button class="ghost" onclick="openResponder('${r.id}')">Responder</button>
-      </td>
-    </tr>`;
-  });
-  html += '</tbody></table>';
-  wrap.innerHTML = html;
+  out.push(cur);
+  return out.map(s=>s.trim());
 }
 
-/* responder reclamo: abre prompt simple para registrar respuesta y fecha */
-window.openResponder = function(id){
-  const arr = loadRecords();
-  const rec = arr.find(r=>r.id===id);
-  if(!rec) return alert('Registro no encontrado.');
-  const respuesta = prompt('Escribe la respuesta o resolución para el reclamo (incluye fecha y responsable):', rec.respuesta || '');
-  if(respuesta === null) return;
-  rec.respuesta = respuesta;
-  rec.respuesta_at = new Date().toISOString();
-  saveRecords(arr);
-  alert('Respuesta guardada. Puedes imprimir la ficha con la respuesta desde la lista.');
-  loadAdminList();
-  refreshListUI();
+/* import via quick-action */
+qs('btnImportCSV').addEventListener('click', ()=> qs('btnImportCSV').click());
+
+/* delete business */
+qs('btnDeleteBiz').addEventListener('click', ()=>{
+  const slug = qs('businessSelect').value;
+  if(!confirm('Eliminar negocio y todos sus datos localmente?')) return;
+  let bs = loadBusinesses();
+  bs = bs.filter(b=>b.slug !== slug);
+  saveBusinesses(bs);
+  localStorage.removeItem(bizDataKey(slug));
+  populateBizSelect();
+  alert('Negocio eliminado (local).');
+});
+
+/* clear biz clients */
+qs('btnClearBiz').addEventListener('click', ()=>{
+  const slug = qs('businessSelect').value;
+  if(confirm('Borrar TODOS los clientes de este negocio?')){ saveBizData(slug, []); renderClientsList(slug); renderSummary(slug); alert('Clientes borrados'); }
+});
+
+/* delete single record (used in list) */
+window.deleteClient = function(slug,dni){
+  if(!confirm('Eliminar cliente?')) return;
+  let arr = loadBizData(slug); arr = arr.filter(x=>x.dni !== dni); saveBizData(slug, arr); renderClientsList(slug); renderSummary(slug);
 };
 
-/* export CSV desde admin */
-document.getElementById('btnExportCSV2').addEventListener('click', ()=>{
-  const arr = loadRecords();
-  if(arr.length===0){ alert('No hay datos para exportar.'); return; }
-  const csv = toCSV(arr);
-  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'reclamos_export_' + new Date().toISOString().slice(0,10) + '.csv';
-  a.click();
-  URL.revokeObjectURL(url);
+/* helper show client card with edit button in list row */
+function rowActions(slug, dni){
+  return `<button class="ghost" onclick="openClient('${slug}','${dni}')">Ver</button> <button class="ghost" onclick="deleteClient('${slug}','${dni}')">Eliminar</button>`;
+}
+
+/* utility: CSV export from top quick action */
+qs('btnExport').addEventListener && qs('btnExport').addEventListener('click', ()=>{
+  exportCSV(qs('businessSelect').value);
 });
 
-/* print all */
-document.getElementById('btnPrintAll').addEventListener('click', ()=>{
-  const arr = loadRecords();
-  if(arr.length===0){ alert('No hay registros para imprimir.'); return; }
-  const w = window.open('', '_blank', 'noopener');
-  let body = '<!doctype html><html><head><meta charset="utf-8"><title>Reclamos</title><style>body{font-family:Arial;padding:20px;color:#111} .rec{border-bottom:1px solid #eee;padding:10px 0;margin-bottom:8px}</style></head><body>';
-  arr.forEach(r=>{
-    body += `<div class="rec"><h3>N° ${escapeHtml(r.id)}</h3><div><strong>Fecha:</strong> ${escapeHtml(r.fecha)} ${escapeHtml(r.hora)}</div><div><strong>Cliente:</strong> ${escapeHtml(r.nombre)} — ${escapeHtml(r.documento)}</div><div style="margin-top:6px"><strong>Descripción:</strong><div style="white-space:pre-wrap">${escapeHtml(r.descripcion)}</div></div><div style="margin-top:6px"><strong>Respuesta:</strong> ${escapeHtml(r.respuesta || '')}</div></div>`;
-  });
-  body += '<script>window.onload=function(){window.print();}</script></body></html>';
-  w.document.write(body);
-  w.document.close();
-});
+/* initial render */
+renderClientsList(qs('businessSelect').value);
+renderSummary(qs('businessSelect').value);
 
-/* borrar todo desde admin */
-document.getElementById('btnClearAll').addEventListener('click', ()=>{
-  if(confirm('Borrar todos los reclamos (local)?')){ localStorage.removeItem(LS_KEY); loadAdminList(); refreshListUI(); alert('Eliminado.'); }
-});
+/* small UX: allow pressing Enter to search in searchDni */
+qs('searchDni').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ doSearch(); } });
 
-/* util: set default PIN (si no hay) */
-if(!localStorage.getItem(LS_PIN_KEY)) localStorage.setItem(LS_PIN_KEY, '1234');
+/* simple helper to show result on page load if url has ?dni= */
+(function loadFromURL(){
+  const params = new URLSearchParams(location.search);
+  const dni = params.get('dni'); const biz = params.get('biz');
+  if(biz){
+    const bs = loadBusinesses();
+    if(bs.find(b=>b.slug===biz)){ qs('businessSelect').value = biz; onBizChange(); }
+  }
+  if(dni){ qs('searchDni').value = dni; doSearch(); }
+})();
 
-/* inicializar lista si visible */
-refreshListUI();
-
-/* helper: delete all (button top) implemented above */
-
-/* FIN */
 </script>
 </body>
 </html>
