@@ -3,348 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Catálogos PRO</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
-
+    <title>Galería de Talentos | Muro de Honor</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Merriweather:wght@700&display=swap" rel="stylesheet">
+    
     <style>
         /* =========================================
-           1. ESTILOS DE LA INTERFAZ (EDITOR)
+           DISEÑO ACADÉMICO / PRESTIGIO
            ========================================= */
         :root {
-            --sidebar-width: 400px;
-            --primary: #2563eb;
-            --bg-editor: #f1f5f9;
+            /* PERSONALIZACIÓN DEL COLEGIO */
+            --primary: #1e3a8a;       /* Azul Académico (Navy) */
+            --accent: #d97706;        /* Dorado/Bronce (Logros) */
+            --bg: #f1f5f9;            /* Gris muy claro */
+            --surface: #ffffff;
+            --text-main: #1e293b;
+            --text-light: #64748b;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            margin: 0; padding: 0;
             font-family: 'Inter', sans-serif;
-            background-color: #525659; /* Gris oscuro tipo Acrobat */
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
+            background-color: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        /* PANEL IZQUIERDO (EDITOR) */
-        .editor-panel {
-            width: var(--sidebar-width);
-            background: white;
-            height: 100%;
-            overflow-y: auto;
-            padding: 30px;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+        /* --- HEADER --- */
+        header {
+            background: var(--surface);
+            width: 100%;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px -5px rgba(0,0,0,0.05);
+            margin-bottom: 40px;
+            border-bottom: 4px solid var(--primary);
+        }
+
+        h1 {
+            font-family: 'Merriweather', serif;
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        p.subtitle { color: var(--text-light); font-size: 1.1rem; max-width: 600px; margin: 0 auto 25px; }
+
+        /* --- BUSCADOR --- */
+        .search-container { position: relative; max-width: 500px; margin: 0 auto; }
+        
+        .search-box {
+            width: 100%; padding: 15px 25px; padding-left: 50px;
+            border: 2px solid #e2e8f0; border-radius: 50px;
+            font-size: 1rem; outline: none; transition: 0.3s;
+            background: #f8fafc;
+        }
+        .search-box:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.1); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
+
+        /* --- GRILLA DE ALUMNOS --- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 25px;
+            width: 100%; max-width: 1100px;
+            padding: 0 20px 60px;
+        }
+
+        /* --- TARJETA DE ESTUDIANTE --- */
+        .card {
+            background: var(--surface);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            border: 1px solid #e2e8f0;
+            display: flex; flex-direction: column;
+            animation: fadeIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        .card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(30, 58, 138, 0.15); border-color: var(--primary); }
+
+        /* Badge / Etiqueta (Ej: Cómputo General) */
+        .badge {
+            position: absolute; top: 15px; right: 15px;
+            background: var(--accent); color: white;
+            padding: 5px 12px; border-radius: 20px;
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             z-index: 10;
         }
 
-        .editor-section { margin-bottom: 30px; border-bottom: 1px solid #e2e8f0; padding-bottom: 20px; }
-        .editor-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; color: #1e293b; display: flex; align-items: center; gap: 8px; }
-        
-        label { display: block; font-size: 0.85rem; font-weight: 600; color: #64748b; margin-bottom: 5px; }
-        input, textarea, select {
-            width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px;
-            margin-bottom: 15px; font-family: inherit; font-size: 0.9rem;
-        }
-        
-        .btn-action {
-            width: 100%; background: var(--primary); color: white; padding: 12px;
-            border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
-            transition: 0.2s; display: flex; justify-content: center; items-align: center; gap: 8px;
-        }
-        .btn-action:hover { background: #1d4ed8; }
-        .btn-secondary { background: white; border: 2px solid #e2e8f0; color: #334155; }
-        .btn-secondary:hover { border-color: #cbd5e1; }
-        .btn-danger { background: #ef4444; margin-top: 5px; }
-
-        /* VISTA PREVIA (DERECHA) */
-        .preview-area {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            padding: 40px;
-            overflow-y: auto;
+        .card-img-container {
+            width: 100%; height: 260px; overflow: hidden;
+            background: #cbd5e1; position: relative;
         }
 
-        /* LA HOJA A4 (El Lienzo) */
-        .a4-page {
-            width: 210mm;
-            min-height: 297mm;
-            background: white;
-            box-shadow: 0 0 20px rgba(0,0,0,0.3);
-            position: relative;
-            overflow: hidden;
-            /* Aquí empieza la magia del diseño */
+        .card-img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.5s;
+        }
+        .card:hover .card-img { transform: scale(1.05); }
+
+        .card-body { padding: 20px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; }
+
+        .student-name {
+            font-family: 'Merriweather', serif;
+            font-size: 1.1rem; color: var(--text-main);
+            margin: 0 0 8px 0; font-weight: 700;
         }
 
-        /* =========================================
-           2. PLANTILLAS DE DISEÑO (THEMES)
-           ========================================= */
-        
-        /* GENERALES */
-        .catalog-header { padding: 40px; display: flex; justify-content: space-between; align-items: flex-start; }
-        .logo-img { max-height: 80px; max-width: 200px; object-fit: contain; }
-        .catalog-grid { display: grid; gap: 20px; padding: 40px; }
-        .product-item { page-break-inside: avoid; /* Evita que se corte al imprimir */ }
-        .product-img { width: 100%; height: 200px; object-fit: cover; background: #f8fafc; }
-        
-        /* TEMA 1: MINIMALIST (Clean, Apple Style) */
-        .theme-minimalist .a4-page { font-family: 'Inter', sans-serif; color: #111; }
-        .theme-minimalist .catalog-header { border-bottom: 2px solid #111; padding-bottom: 20px; margin: 40px; align-items: center; }
-        .theme-minimalist h1 { font-family: 'Playfair Display', serif; font-size: 3rem; margin: 0; line-height: 1; }
-        .theme-minimalist .subtitle { font-family: 'Inter', sans-serif; letter-spacing: 2px; text-transform: uppercase; font-size: 0.8rem; margin-top: 10px; }
-        .theme-minimalist .catalog-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
-        .theme-minimalist .product-item { text-align: left; }
-        .theme-minimalist .product-name { font-weight: 700; font-size: 1.1rem; margin-top: 15px; }
-        .theme-minimalist .product-price { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-top: 5px; }
-        .theme-minimalist .footer { position: absolute; bottom: 0; left: 0; width: 100%; text-align: center; padding: 20px; border-top: 1px solid #eee; font-size: 0.8rem; }
+        .student-achievement {
+            color: var(--primary); font-weight: 600; font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
 
-        /* TEMA 2: BOLD AGENCY (Modern, High Contrast) */
-        .theme-bold .a4-page { font-family: 'Inter', sans-serif; background: #111; color: white; }
-        .theme-bold .catalog-header { background: #facc15; color: #111; margin: 0; padding: 60px 40px; }
-        .theme-bold h1 { font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 4rem; line-height: 0.9; margin: 0; }
-        .theme-bold .catalog-grid { grid-template-columns: 1fr 1fr 1fr; gap: 15px; padding: 20px; }
-        .theme-bold .product-item { background: #222; border-radius: 0px; padding-bottom: 15px; }
-        .theme-bold .product-img { height: 180px; filter: grayscale(20%); transition: 0.3s; }
-        .theme-bold .product-info { padding: 15px; }
-        .theme-bold .product-name { font-weight: 700; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
-        .theme-bold .product-price { color: #facc15; font-weight: 700; font-size: 1.2rem; margin-top: 5px; display: block;}
-        .theme-bold .footer { background: #222; color: #777; position: absolute; bottom: 0; width: 100%; padding: 20px; text-align: center; }
+        .btn-link {
+            margin-top: auto; /* Empuja al fondo */
+            display: inline-block; text-decoration: none;
+            color: var(--text-light); font-size: 0.85rem; font-weight: 500;
+            padding: 8px 15px; border-radius: 6px; background: #f1f5f9;
+            transition: 0.2s; align-self: center;
+        }
+        .btn-link:hover { background: var(--primary); color: white; }
 
-        /* TEMA 3: ELEGANT (Luxury, Serif) */
-        .theme-elegant .a4-page { font-family: 'Playfair Display', serif; color: #4a4a4a; border: 20px solid white; outline: 1px solid #ddd; }
-        .theme-elegant .catalog-header { text-align: center; display: block; padding-top: 60px; }
-        .theme-elegant h1 { font-size: 3.5rem; font-style: italic; color: #1a1a1a; margin-bottom: 10px; }
-        .theme-elegant .line { width: 50px; height: 1px; background: #d4af37; margin: 20px auto; }
-        .theme-elegant .catalog-grid { grid-template-columns: 1fr; padding: 40px 80px; } /* Lista vertical */
-        .theme-elegant .product-item { display: flex; gap: 30px; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 30px; margin-bottom: 30px; }
-        .theme-elegant .product-img { width: 150px; height: 150px; border-radius: 50%; /* Círculo */ object-fit: cover; }
-        .theme-elegant .product-name { font-size: 1.5rem; color: #1a1a1a; margin-bottom: 5px; }
-        .theme-elegant .product-desc { font-family: 'Inter', sans-serif; font-size: 0.9rem; color: #888; font-style: normal; }
-        .theme-elegant .product-price { font-size: 1.3rem; color: #d4af37; font-weight: 700; margin-left: auto; }
+        /* Loader */
+        .loader {
+            border: 4px solid #e2e8f0; border-top: 4px solid var(--primary);
+            border-radius: 50%; width: 50px; height: 50px;
+            animation: spin 1s linear infinite; margin: 50px auto;
+        }
 
-        /* =========================================
-           3. ESTILOS DE IMPRESIÓN (PDF)
-           ========================================= */
-        @media print {
-            body { background: white; height: auto; overflow: visible; display: block; }
-            .editor-panel { display: none; } /* Ocultar editor */
-            .preview-area { padding: 0; display: block; }
-            .a4-page {
-                box-shadow: none;
-                margin: 0;
-                width: 100%;
-                height: auto;
-                min-height: 100vh;
-                page-break-after: always;
-                -webkit-print-color-adjust: exact; /* Forzar colores de fondo */
-                print-color-adjust: exact;
-            }
-            /* Quitar márgenes automáticos del navegador */
-            @page { margin: 0; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .grid { grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); }
+            .card-img-container { height: 300px; } /* Fotos más grandes en móvil */
         }
     </style>
 </head>
 <body>
 
-    <div class="editor-panel">
-        <h2 style="margin-top:0;">Configuración</h2>
+    <header>
+        <h1 id="tituloColegio">Academia Excelencia</h1>
+        <p class="subtitle">Nuestros Ingresantes y Orgullos Académicos 2025</p>
         
-        <div class="editor-section">
-            <div class="editor-title"><i class="fa-solid fa-paintbrush"></i> Diseño</div>
-            <label>Elige una Plantilla</label>
-            <select id="themeSelector" onchange="changeTheme()">
-                <option value="theme-minimalist">Minimalista (Apple Style)</option>
-                <option value="theme-bold">Bold Agency (Moderno Oscuro)</option>
-                <option value="theme-elegant">Elegant Luxury (Serif & Gold)</option>
-            </select>
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" class="search-box" placeholder="Buscar alumno o universidad...">
         </div>
+    </header>
 
-        <div class="editor-section">
-            <div class="editor-title"><i class="fa-solid fa-building"></i> Datos de Portada</div>
-            <label>Nombre de la Empresa</label>
-            <input type="text" id="companyName" value="MI MARCA" oninput="updateUI()">
-            
-            <label>Subtítulo / Slogan</label>
-            <input type="text" id="companySlogan" value="Catálogo 2025" oninput="updateUI()">
-            
-            <label>Logo (URL o Archivo)</label>
-            <input type="file" id="logoInput" accept="image/*" onchange="loadImage(this, 'logoPreview')">
-            
-            <label>Datos de Contacto (Pie de página)</label>
-            <input type="text" id="companyContact" value="www.mimarca.com | +51 999 999 999" oninput="updateUI()">
-        </div>
-
-        <div class="editor-section">
-            <div class="editor-title"><i class="fa-solid fa-box-open"></i> Agregar Producto</div>
-            
-            <label>Nombre del Producto</label>
-            <input type="text" id="prodName" placeholder="Ej: Zapatillas Urbanas">
-            
-            <label>Precio</label>
-            <input type="text" id="prodPrice" placeholder="Ej: S/ 150.00">
-            
-            <label>Descripción</label>
-            <textarea id="prodDesc" rows="2" placeholder="Detalles cortos..."></textarea>
-            
-            <label>Imagen del Producto</label>
-            <input type="file" id="prodImgInput" accept="image/*">
-            
-            <button class="btn-action" onclick="addProduct()">
-                <i class="fa-solid fa-plus"></i> Agregar al Catálogo
-            </button>
-        </div>
-
-        <div class="editor-section">
-            <div class="editor-title">Acciones</div>
-            <button class="btn-action btn-secondary" onclick="window.print()">
-                <i class="fa-solid fa-file-pdf"></i> Exportar a PDF
-            </button>
-            <p style="font-size:0.75rem; color:#666; margin-top:10px;">
-                *Al imprimir, selecciona "Guardar como PDF", Margenes: "Ninguno" y activa "Gráficos de fondo".
-            </p>
-        </div>
-    </div>
-
-    <div class="preview-area" id="previewArea">
-        
-        <div id="pageContent" class="a4-page">
-            
-            <div class="catalog-header">
-                <div>
-                    <h1 id="viewTitle">MI MARCA</h1>
-                    <div class="line"></div> <div id="viewSlogan" class="subtitle">Catálogo 2025</div>
-                </div>
-                <img id="logoPreview" class="logo-img" src="" style="display:none;">
-            </div>
-
-            <div class="catalog-grid" id="productGrid">
-                </div>
-
-            <div class="footer">
-                <span id="viewContact">www.mimarca.com | +51 999 999 999</span>
-            </div>
-
-        </div>
-
+    <div id="galeria" class="grid">
+        <div class="loader"></div>
     </div>
 
     <script>
-        // ESTADO GLOBAL
-        let products = [];
-        let currentLogo = "";
+        /* =========================================
+           CONFIGURACIÓN (SOLO CAMBIAS ESTO)
+           ========================================= */
+        const CONFIG = {
+            titulo: "Colegio San Patricio", // Nombre del Colegio
+            sheetID: "1ew2qtysq4rwWkL7VU2MTaOv2O3tmD28kFYN5eVHCiUY", // ID del Sheet
+            pestana: "alumnos" // Nombre de la pestaña en el Sheet
+        };
 
-        // INICIALIZAR
-        document.addEventListener('DOMContentLoaded', () => {
-            // Cargar productos de ejemplo
-            products = [
-                { name: "Cámara Pro X", price: "S/ 1,200", desc: "Resolución 4K y lente 50mm.", img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=500&q=80" },
-                { name: "Auriculares Noise", price: "S/ 350", desc: "Cancelación de ruido activa.", img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80" },
-                { name: "Reloj Smart", price: "S/ 280", desc: "Monitor cardíaco y GPS.", img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80" },
-                { name: "Lentes de Sol", price: "S/ 120", desc: "Protección UV400 polarizados.", img: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=500&q=80" }
-            ];
-            changeTheme(); // Aplicar tema por defecto
-            renderProducts();
-        });
+        // Aplicar título
+        document.getElementById('tituloColegio').innerText = CONFIG.titulo;
 
-        // 1. CAMBIAR TEMA
-        function changeTheme() {
-            const theme = document.getElementById('themeSelector').value;
-            const container = document.getElementById('previewArea');
-            
-            // Remover clases anteriores
-            container.className = 'preview-area ' + theme;
-        }
+        /* =========================================
+           LÓGICA DEL SISTEMA
+           ========================================= */
+        const API = `https://opensheet.elk.sh/${CONFIG.sheetID}/${CONFIG.pestana}`;
+        const contenedor = document.getElementById('galeria');
+        const buscador = document.getElementById('searchInput');
+        let alumnosData = [];
 
-        // 2. ACTUALIZAR TEXTOS EN TIEMPO REAL
-        function updateUI() {
-            document.getElementById('viewTitle').innerText = document.getElementById('companyName').value;
-            document.getElementById('viewSlogan').innerText = document.getElementById('companySlogan').value;
-            document.getElementById('viewContact').innerText = document.getElementById('companyContact').value;
-        }
+        async function cargarDatos() {
+            try {
+                const res = await fetch(API);
+                alumnosData = await res.json();
+                
+                renderizar(alumnosData);
 
-        // 3. CARGAR IMÁGENES LOCALES
-        function loadImage(input, targetId) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.getElementById(targetId);
-                    img.src = e.target.result;
-                    img.style.display = 'block';
-                    
-                    // Si es el input de producto, guardamos temporalmente
-                    if(targetId === 'tempProdImg') { 
-                        // Lógica auxiliar si fuera necesario vista previa
-                    }
-                }
-                reader.readAsDataURL(input.files[0]);
+            } catch (error) {
+                console.error(error);
+                contenedor.innerHTML = '<p style="text-align:center; width:100%; color:red">Error cargando los datos. Verifique el ID.</p>';
             }
         }
 
-        // 4. AGREGAR PRODUCTO
-        function addProduct() {
-            const name = document.getElementById('prodName').value;
-            const price = document.getElementById('prodPrice').value;
-            const desc = document.getElementById('prodDesc').value;
-            const imgInput = document.getElementById('prodImgInput');
+        function renderizar(lista) {
+            contenedor.innerHTML = '';
 
-            if(!name || !price) {
-                alert("Ingresa al menos nombre y precio");
+            if (lista.length === 0) {
+                contenedor.innerHTML = '<p style="text-align:center; width:100%; color:#666">No se encontraron resultados.</p>';
                 return;
             }
 
-            // Procesar imagen
-            let imgSrc = "https://via.placeholder.com/300?text=Sin+Imagen";
-            
-            if (imgInput.files && imgInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    // Guardamos el producto y renderizamos DENTRO del callback para asegurar que tenemos la imagen
-                    products.push({ name, price, desc, img: e.target.result });
-                    renderProducts();
-                    clearForm();
-                }
-                reader.readAsDataURL(imgInput.files[0]);
-            } else {
-                products.push({ name, price, desc, img: imgSrc });
-                renderProducts();
-                clearForm();
-            }
-        }
+            lista.forEach((alumno, index) => {
+                // Generar Avatar si no hay foto
+                const avatar = `https://ui-avatars.com/api/?name=${alumno.nombre}&background=1e3a8a&color=fff&size=400`;
+                const imagenFinal = (alumno.imagen && alumno.imagen.trim() !== '') ? alumno.imagen : avatar;
 
-        function clearForm() {
-            document.getElementById('prodName').value = '';
-            document.getElementById('prodPrice').value = '';
-            document.getElementById('prodDesc').value = '';
-            document.getElementById('prodImgInput').value = '';
-        }
+                // Etiqueta (Badge)
+                const htmlBadge = alumno.etiqueta 
+                    ? `<div class="badge">${alumno.etiqueta}</div>` 
+                    : '';
 
-        // 5. RENDERIZAR LISTA
-        function renderProducts() {
-            const grid = document.getElementById('productGrid');
-            grid.innerHTML = '';
+                // Botón opcional (Testimonio / Video)
+                const htmlBoton = alumno.enlace 
+                    ? `<a href="${alumno.enlace}" target="_blank" class="btn-link">▶ Ver Testimonio</a>` 
+                    : '';
 
-            products.forEach((prod, index) => {
-                const itemHTML = `
-                    <div class="product-item">
-                        <img src="${prod.img}" class="product-img">
-                        <div class="product-info">
-                            <div class="product-name">${prod.name}</div>
-                            <div class="product-desc">${prod.desc}</div>
-                            <div class="product-price">${prod.price}</div>
-                            <button onclick="removeProduct(${index})" class="btn-action btn-danger" style="margin-top:10px; padding:5px; font-size:0.7rem; width:auto; display:inline-block;">Borrar (Solo editor)</button>
+                // Delay para animación cascada
+                const delay = index * 0.1; 
+
+                const cardHTML = `
+                    <div class="card" style="animation-delay: ${delay}s">
+                        ${htmlBadge}
+                        <div class="card-img-container">
+                            <img src="${imagenFinal}" class="card-img" alt="${alumno.nombre}" onerror="this.src='${avatar}'">
+                        </div>
+                        <div class="card-body">
+                            <div class="student-name">${alumno.nombre}</div>
+                            <div class="student-achievement">${alumno.subtitulo}</div>
+                            ${htmlBoton}
                         </div>
                     </div>
                 `;
-                grid.innerHTML += itemHTML;
+                contenedor.innerHTML += cardHTML;
             });
         }
 
-        function removeProduct(index) {
-            products.splice(index, 1);
-            renderProducts();
-        }
+        // Buscador en tiempo real
+        buscador.addEventListener('input', (e) => {
+            const texto = e.target.value.toLowerCase();
+            const filtrados = alumnosData.filter(alumno => 
+                (alumno.nombre && alumno.nombre.toLowerCase().includes(texto)) || 
+                (alumno.subtitulo && alumno.subtitulo.toLowerCase().includes(texto))
+            );
+            renderizar(filtrados);
+        });
+
+        // Iniciar
+        document.addEventListener('DOMContentLoaded', cargarDatos);
 
     </script>
 </body>
