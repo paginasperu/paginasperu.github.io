@@ -132,28 +132,47 @@
     let allProducts = [];
     let activeCategory = 'all';
 
-    // ==========================================
-    // NUEVA FUNCIÓN AUXILIAR: Convierte enlaces de Drive a enlaces directos
+// ==========================================
+    // NUEVA FUNCIÓN AUXILIAR: Convierte enlaces de Drive a enlaces directos (Mejorada)
     // ==========================================
     function convertirDriveLink(url) {
         if (!url || typeof url !== 'string') return url;
-
-        // Si ya parece ser un enlace directo de descarga, lo dejamos.
-        if (url.includes('drive.google.com/uc?export=view&id=')) {
+        
+        // 1. Si ya es un enlace directo funcional, lo devolvemos
+        if (url.includes('drive.google.com/uc?')) {
             return url;
         }
 
-        // Buscamos el ID en los enlaces de compartir o visualización
-        let match = url.match(/\/d\/([a-zA-Z0-9_-]+)\/view/) ||
-                    url.match(/id=([a-zA-Z0-9_-]+)/);
-
-        if (match && match[1]) {
-            const fileId = match[1];
-            // Construye el enlace directo usando el patrón 'uc?export=view&id='
-            return `https://drive.google.com/uc?export=view&id=${fileId}`;
+        // 2. Patrones de búsqueda para el ID
+        let fileId = null;
+        
+        // Patrón 1: /file/d/ID_AQUI/view
+        let matchFile = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+        if (matchFile && matchFile[1]) {
+            fileId = matchFile[1];
+        } 
+        
+        // Patrón 2: &id=ID_AQUI o ?id=ID_AQUI
+        else {
+            let matchId = url.match(/id=([a-zA-Z0-9_-]+)/);
+            if (matchId && matchId[1]) {
+                fileId = matchId[1];
+            }
+        }
+        
+        // 3. Construcción del enlace directo si se encuentra el ID
+        if (fileId) {
+            // Intentar con el patrón que suele funcionar para miniaturas/incrustación directa
+            // Este patrón es más robusto que el 'export=view'
+            return `https://drive.google.com/thumbnail?id=${fileId}&sz=w800`;
+            
+            // Si el de arriba falla, se podría intentar con:
+            // return `https://drive.google.com/uc?export=download&id=${fileId}`; 
+            // O el original (que ya estaba):
+            // return `https://drive.google.com/uc?export=view&id=${fileId}`;
         }
 
-        // Si no es un enlace de Drive reconocible, devolvemos la URL original.
+        // 4. Si no es un enlace de Drive reconocible, devolvemos la URL original.
         return url;
     }
 
