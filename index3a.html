@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo Químico Industrial | Especificaciones Técnicas</title>
+    <style>
+        /* Estilos profesionales para industria química */
+        :root {
+            --blue-tech: #0066cc;
+            --blue-dark: #004a99;
+            --gray-light: #f8f9fa;
+            --gray-medium: #6c757d;
+            --gray-dark: #343a40;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --success: #28a745;
+            --border: #dee2e6;
+            --shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+            --radius: .375rem;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #f5f7fa;
+            color: var(--gray-dark);
+            line-height: 1.6;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        
+        /* Header profesional */
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .search-box {
+            max-width: 500px;
+            margin: 1rem auto;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: .75rem 1rem .75rem 3rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-medium);
+        }
+        
+        /* Filtros técnicos */
+        .filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin: 1.5rem 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .filter-group select {
+            width: 100%;
+            padding: .5rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+        
+        /* Grid de productos */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        /* Tarjeta de producto con FICHA TÉCNICA (lo que quieres) */
+        .product-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform .2s;
+            border: 1px solid var(--border);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: #e9ecef;
+        }
+        
+        .product-content {
+            padding: 1.25rem;
+        }
+        
+        .product-title {
+            font-size: 1.25rem;
+            color: var(--blue-dark);
+            margin-bottom: .5rem;
+            font-weight: 600;
+        }
+        
+        .product-formula {
+            font-family: 'Courier New', monospace;
+            color: var(--gray-medium);
+            font-size: .9rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* ¡ESTA ES LA PARTE IMPORTANTE QUE QUIERES! */
+        .specs-table {
+            width: 100%;
+            margin: 1rem 0;
+            border-collapse: collapse;
+            font-size: .875rem;
+        }
+        
+        .specs-table tr {
+            border-bottom: 1px solid #f1f3f5;
+        }
+        
+        .specs-table td {
+            padding: .5rem;
+        }
+        
+        .specs-table td:first-child {
+            font-weight: 600;
+            color: var(--gray-medium);
+            width: 40%;
+        }
+        
+        .specs-table td:last-child {
+            color: var(--gray-dark);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .cas-number {
+            background: #e8f4fd;
+            padding: .25rem .5rem;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: .8rem;
+        }
+        
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--blue-tech);
+            margin-top: 1rem;
+        }
+        
+        .hazard-badge {
+            display: inline-block;
+            padding: .25rem .5rem;
+            border-radius: 3px;
+            font-size: .75rem;
+            font-weight: 600;
+            margin-right: .5rem;
+            margin-bottom: .5rem;
+        }
+        
+        .hazard-toxic { background: #fee; color: #c00; }
+        .hazard-flammable { background: #ffeaa7; color: #d35400; }
+        .hazard-corrosive { background: #f3e5f5; color: #8e24aa; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 style="color: var(--blue-dark); margin: 0;">
+                <i class="fas fa-flask"></i> Catálogo Técnico Químico
+            </h1>
+            <p style="color: var(--gray-medium); margin: .5rem 0 0;">
+                Especificaciones técnicas para compradores industriales
+            </p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- Búsqueda -->
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Buscar por nombre, fórmula, CAS o especificación...">
+        </div>
+        
+        <!-- Filtros TÉCNICOS -->
+        <div class="filters">
+            <div class="filter-group">
+                <label>Tipo de Producto</label>
+                <select>
+                    <option>Todos</option>
+                    <option>Ácidos</option>
+                    <option>Bases</option>
+                    <option>Solventes</option>
+                    <option>Reactivos</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Pureza Mínima</label>
+                <select>
+                    <option>Cualquiera</option>
+                    <option>≥ 99.9% (Analítico)</option>
+                    <option>≥ 99% (Reactivo)</option>
+                    <option>≥ 95% (Técnico)</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Clase de Peligro</label>
+                <select>
+                    <option>Todas</option>
+                    <option>Tóxico</option>
+                    <option>Inflamable</option>
+                    <option>Corrosivo</option>
+                    <option>No peligroso</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Ordenar por</label>
+                <select>
+                    <option>Nombre A-Z</option>
+                    <option>Precio ascendente</option>
+                    <option>Precio descendente</option>
+                    <option>Pureza</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Productos con FICHAS TÉCNICAS -->
+        <div class="products-grid" id="productsGrid">
+            <!-- Producto 1 -->
+            <div class="product-card">
+                <img src="https://loremflickr.com/400/200/chemistry,acid?random=1" 
+                     alt="Ácido Sulfúrico" 
+                     class="product-image">
+                <div class="product-content">
+                    <h3 class="product-title">Ácido Sulfúrico</h3>
+                    <div class="product-formula">H₂SO₄</div>
+                    
+                    <!-- ¡TABLA DE ESPECIFICACIONES TÉCNICAS! -->
+                    <table class="specs-table">
+                        <tr>
+                            <td>Pureza:</td>
+                            <td><strong>98%</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Presentación:</td>
+                            <td>Cilindro 250kg</td>
+                        </tr>
+                        <tr>
+                            <td>CAS:</td>
+                            <td><span class="cas-number">7664-93-9</span></td>
+                        </tr>
+                        <tr>
+                            <td>Densidad:</td>
+                            <td>1.84 g/mL</td>
+                        </tr>
+                        <tr>
+                            <td>Clase:</td>
+                            <td>Ácido mineral fuerte</td>
+                        </tr>
+                    </table>
+                    
+                    <!-- Indicadores de peligro -->
+                    <div>
+                        <span class="hazard-badge hazard-corrosive">Corrosivo</span>
+                        <span class="hazard-badge hazard-toxic">Tóxico</span>
+                    </div>
+                    
+                    <div class="product-price">$18.90 / kg</div>
+                </div>
+            </div>
+            
+            <!-- Producto 2 -->
+            <div class="product-card">
+                <img src="https://loremflickr.com/400/200/methanol,chemical?random=2" 
+                     alt="Metanol" 
+                     class="product-image">
+                <div class="product-content">
+                    <h3 class="product-title">Metanol HPLC</h3>
+                    <div class="product-formula">CH₃OH</div>
+                    
+                    <table class="specs-table">
+                        <tr>
+                            <td>Pureza:</td>
+                            <td><strong>99.9%</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Presentación:</td>
+                            <td>Bidón 20L</td>
+                        </tr>
+                        <tr>
+                            <td>CAS:</td>
+                            <td><span class="cas-number">67-56-1</span></td>
+                        </tr>
+                        <tr>
+                            <td>Densidad:</td>
+                            <td>0.791 g/mL</td>
+                        </tr>
+                        <tr>
+                            <td>Grado:</td>
+                            <td>HPLC</td>
+                        </tr>
+                    </table>
+                    
+                    <div>
+                        <span class="hazard-badge hazard-flammable">Inflamable</span>
+                        <span class="hazard-badge hazard-toxic">Tóxico</span>
+                    </div>
+                    
+                    <div class="product-price">$15.80 / L</div>
+                </div>
+            </div>
+            
+            <!-- Producto 3 -->
+            <div class="product-card">
+                <img src="https://loremflickr.com/400/200/sodium,hydroxide?random=3" 
+                     alt="Hidróxido de Sodio" 
+                     class="product-image">
+                <div class="product-content">
+                    <h3 class="product-title">Hidróxido de Sodio</h3>
+                    <div class="product-formula">NaOH</div>
+                    
+                    <table class="specs-table">
+                        <tr>
+                            <td>Pureza:</td>
+                            <td><strong>99%</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Presentación:</td>
+                            <td>Perlas 25kg</td>
+                        </tr>
+                        <tr>
+                            <td>CAS:</td>
+                            <td><span class="cas-number">1310-73-2</span></td>
+                        </tr>
+                        <tr>
+                            <td>Forma:</td>
+                            <td>Sólido higroscópico</td>
+                        </tr>
+                        <tr>
+                            <td>Aplicación:</td>
+                            <td>Fabricación de jabones</td>
+                        </tr>
+                    </table>
+                    
+                    <div>
+                        <span class="hazard-badge hazard-corrosive">Corrosivo</span>
+                    </div>
+                    
+                    <div class="product-price">$2.85 / kg</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Datos simulados para productos químicos
+        const products = [
+            {
+                id: 1,
+                name: "Ácido Sulfúrico",
+                formula: "H₂SO₄",
+                purity: "98%",
+                presentation: "Cilindro 250kg",
+                cas: "7664-93-9",
+                density: "1.84 g/mL",
+                type: "Ácido mineral fuerte",
+                hazards: ["corrosive", "toxic"],
+                price: 18.90,
+                unit: "kg",
+                imageTag: "chemistry,acid"
+            },
+            {
+                id: 2,
+                name: "Metanol HPLC",
+                formula: "CH₃OH",
+                purity: "99.9%",
+                presentation: "Bidón 20L",
+                cas: "67-56-1",
+                density: "0.791 g/mL",
+                type: "Solvente HPLC",
+                hazards: ["flammable", "toxic"],
+                price: 15.80,
+                unit: "L",
+                imageTag: "methanol,chemical"
+            },
+            {
+                id: 3,
+                name: "Hidróxido de Sodio",
+                formula: "NaOH",
+                purity: "99%",
+                presentation: "Perlas 25kg",
+                cas: "1310-73-2",
+                density: "2.13 g/cm³",
+                type: "Base fuerte",
+                hazards: ["corrosive"],
+                price: 2.85,
+                unit: "kg",
+                imageTag: "sodium,hydroxide"
+            }
+        ];
+        
+        // Funcionalidad de búsqueda y filtros
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Catálogo técnico químico cargado');
+            console.log('Productos disponibles:', products.length);
+        });
+    </script>
+    
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</body>
+</html>
