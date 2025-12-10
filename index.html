@@ -1,1 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Plataforma de validación digital para marcas peruanas">
+    <title>OFICIAL.PE</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%23111111%22/></svg>">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* RESET */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* CUERPO */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F9F9F7;
+            color: #1a1a1a;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* CONTENEDOR */
+        .container {
+            max-width: 700px;
+            width: 100%;
+            animation: fadeIn 1.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        /* MARCA SUPERIOR */
+        .brand {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #888;
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+
+        /* TÍTULO PRINCIPAL (H1) */
+        h1 {
+            font-size: 3rem; 
+            font-weight: 300; 
+            line-height: 1.2;
+            margin-bottom: 30px;
+            color: #111;
+            letter-spacing: -0.5px;
+        }
+
+        /* SUBTÍTULO */
+        p.subhead {
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: #444;
+            line-height: 1.5;
+            margin-bottom: 50px;
+        }
+        
+        /* ESTILO PARA ".oficial.pe" */
+        .highlight {
+            font-weight: 500;
+            color: #000;
+        }
+
+        /* BOTÓN DE WHATSAPP */
+        .cta-button {
+            display: inline-block;
+            text-decoration: none;
+            font-size: 1rem;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 12px 25px;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #111;
+            color: #fff;
+            border-color: #111;
+        }
+
+        /* ANIMACIÓN */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* MÓVIL */
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            p.subhead { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="container">
+        <div class="brand">OFICIAL.PE</div>
+
+        <h1>Plataforma de validación digital para marcas peruanas</h1>
+
+        <p class="subhead">
+            "Si no es <span class="highlight">.oficial.pe</span>, no es oficial"
+        </p>
+
+        <a href="https://wa.me/51950141414" class="cta-button" target="_blank">
+            Validad mi marca
+        </a>
+    </main>
+
+</body>
+</html>
