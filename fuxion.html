@@ -149,13 +149,14 @@
             box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
         }
 
-        .filters-container {
+.filters-container {
             display: flex;
             gap: 10px;
             overflow-x: auto;
-            padding-bottom: 5px;
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+            padding-bottom: 15px; /* Más espacio para el scroll/sombra */
+            margin-bottom: 35px;  /* AQUÍ ESTÁ EL CAMBIO: Espacio vital hacia abajo */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
         .filters-container::-webkit-scrollbar { display: none; }
 
