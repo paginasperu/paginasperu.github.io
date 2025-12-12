@@ -1,5 +1,46 @@
-*** INFORMACIÓN CLÍNICA DENTAL ***
-Horarios: Lunes a Viernes 9am-6pm.
-Precios: Limpieza 50 soles.
-Dirección: Av. Siempre Viva 123.
-... (Todo el texto del negocio)
+[INFORMACIÓN_DEL_NEGOCIO]
+Nombre: Franko's Chicken & Grill
+Eslogan: "Francamente buenazo"
+Teléfono Central: (01) 748 6000
+WhatsApp/Celular: 949 973 277
+Horario de Atención: Lunes a Domingo de 12:00 PM a 10:00 PM.
+Dirección Principal: Av. Arica 538, Breña (Chacra Colorada).
+Web: frankoschicken.pe
+
+[ZONAS_DE_REPARTO_OFICIALES]
+Distritos con cobertura confirmada:
+1. Breña
+2. Cercado de Lima (consultar zonas límite)
+3. Jesús María
+4. Pueblo Libre
+*NOTA: Si el cliente está en otro distrito (ej. La Molina, Comas), indicar que NO llegamos.*
+
+[CARTA_Y_PRECIOS]
+--- POLLOS A LA BRASA ---
+* 1 Pollo a la Brasa (Solo): S/ 54.90 (Aprox, verificar promo actual)
+* 1 Pollo Clásico (con papas y ensalada): S/ 71.90
+* 1/4 de Pollo (Pecho o Pierna) + Papas + Salsas: S/ 15.90
+* 1/2 Pollo a la Brasa (Sola carne o clásico): S/ 41.90 - S/ 42.90
+
+--- COMBOS PERSONALES ---
+* Mi Brasa: 1/4 pollo, papas, ensalada fresca, bebida personal y cremas. Precio: S/ 24.90
+* Tequecuarto: 1/4 pollo, papas, 1/2 porción tequeños brasa, gaseosa personal. Precio: S/ 30.90
+* Pesto Brasa / Huancaína Brasa: 1/4 pollo + Spaguetti a la huancaína o pesto. Precio: S/ 23.90
+* Mostrazos (Chaufa): 1/4 pollo + Papas + Arroz Chaufa. Precio ref: S/ 19.90 - S/ 22.90
+
+--- COMBOS FAMILIARES ---
+* Franko's Chaufero: 1 pollo, papas familiar, ensalada familiar, chaufa familiar, chicha 1L o gaseosa 1.5L. Precio: S/ 89.90
+* Teque Brasa Familiar: 1 pollo, papas familiar, ensalada, 1/2 porción tequeños, cremas. Precio: S/ 79.90
+
+--- PARRILLAS Y PIQUEOS ---
+* Parrilla Franko's (La más completa): Lomo fino, bife, chuleta, 2 anticuchos, 1/4 pollo, pechuga, chorizo, mollejas, hot dog, ensalada, papas. Precio: S/ 159.90
+* Parrilla Brasa: 1/2 pollo, 1 anticucho, mollejas, chorizo, hotdog, papas, ensalada. Precio: S/ 80.90
+* Anticuchos (2 palitos + papas + choclo): S/ 25.90
+* Carretillero (Anticucho, mollejas, choclo, papas): S/ 35.90
+* Franko's para compartir (Piqueo): Tequeños, alitas, chicharrón de pollo, nuggets, papas. Precio: S/ 54.90
+* Tequeños de Queso (5 o 10 unid): Desde S/ 12.90
+
+--- EXTRAS Y CRIOLLOS ---
+* Napolitana (Filete empanizado con jamón/queso): S/ 22.90
+* Panko a lo pobre: S/ 22.90
+* Arroz Chaufa (Sola porción): S/ 23.90
