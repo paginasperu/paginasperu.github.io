@@ -1,5 +1,12 @@
 // MOTOR.JS - Lógica Central + Sistema Multi-IA
 
+// === DECLARACIÓN DE VARIABLES GLOBALES ===
+// Obtenemos los elementos una sola vez al inicio para que todas las funciones puedan usarlos
+const userInput = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+const statusText = document.getElementById('status-text');
+// ===========================================
+
 async function iniciarSistema() {
     const config = window.CHAT_CONFIG || {};
     
@@ -8,9 +15,7 @@ async function iniciarSistema() {
     document.documentElement.style.setProperty('--chat-color', color);
     document.getElementById('header-title').innerText = config.titulo || "Asistente";
     document.getElementById('bot-welcome-text').innerText = config.saludoInicial || "Hola";
-    document.getElementById('userInput').placeholder = config.placeholder || "Escribe aquí...";
-
-    const statusText = document.getElementById('status-text');
+    userInput.placeholder = config.placeholder || "Escribe aquí..."; // Usa la variable global 'userInput'
 
     try {
         // Cargar Archivos de Texto
@@ -25,32 +30,29 @@ async function iniciarSistema() {
         window.CTX_INSTRUCCIONES = await resInstrucciones.text();
 
         // Activar Chat
-        document.getElementById('userInput').disabled = false;
-        document.getElementById('sendBtn').disabled = false;
-        statusText.innerText = "En línea";
+        userInput.disabled = false; // Usa la variable global 'userInput'
+        sendBtn.disabled = false;   // Usa la variable global 'sendBtn'
+        statusText.innerText = "En línea"; // Usa la variable global 'statusText'
         statusText.classList.remove('animate-pulse');
         console.log("Sistema cargado.");
 
         // =========================================================
-// === CÓDIGO PARA DETECTAR LA TECLA ENTER (INICIO) ===
-// =========================================================
+        // === CÓDIGO PARA DETECTAR LA TECLA ENTER (INICIO) ===
+        // =========================================================
 
-const userInputElement = document.getElementById('userInput');
+        userInput.addEventListener('keydown', function(event) {
+            // Verificamos si la tecla presionada es 'Enter'
+            if (event.key === 'Enter') {
+                // Prevenimos un salto de línea si el input fuera un textarea
+                event.preventDefault(); 
+                // Llamamos a la función principal de envío
+                enviarMensaje();
+            }
+        });
 
-// Agregamos un 'escuchador' para el evento de presionar tecla
-userInputElement.addEventListener('keydown', function(event) {
-    // Verificamos si la tecla presionada es 'Enter'
-    if (event.key === 'Enter') {
-        // Prevenimos un salto de línea si el input fuera un textarea
-        event.preventDefault(); 
-        // Llamamos a la función principal de envío
-        enviarMensaje();
-    }
-});
-
-// =======================================================
-// === CÓDIGO PARA DETECTAR LA TECLA ENTER (FIN) ===
-// =======================================================
+        // =======================================================
+        // === CÓDIGO PARA DETECTAR LA TECLA ENTER (FIN) ===
+        // =======================================================
 
     } catch (error) {
         console.error(error);
@@ -61,7 +63,12 @@ userInputElement.addEventListener('keydown', function(event) {
 
 // Lógica de Reintento (Failover)
 async function llamarIA(prompt) {
-    const proveedores = window.CHAT_CONFIG.proveedores;
+    // Usamos el operador de encadenamiento opcional para evitar errores si config.js no carga
+    const proveedores = window.CHAT_CONFIG?.proveedores; 
+    if (!proveedores || proveedores.length === 0) {
+        throw new Error("No hay proveedores de IA configurados en config.js.");
+    }
+
     let ultimoError = null;
 
     for (let i = 0; i < proveedores.length; i++) {
@@ -117,7 +124,7 @@ async function llamarIA(prompt) {
 
 // Función Principal
 async function enviarMensaje() {
-    const userInput = document.getElementById('userInput');
+    // Usamos las variables globales
     const trampa = document.getElementById('honeypot');
     
     if (trampa && trampa.value !== "") return; // Bot detectado
@@ -144,7 +151,6 @@ async function enviarMensaje() {
             ${pregunta}
         `;
 
-        // LLAMADA INTELIGENTE (Prueba Gemini -> Luego DeepSeek)
         const respuestaIA = await llamarIA(promptFinal);
         
         document.getElementById(loadingId).remove();
