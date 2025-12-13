@@ -10,7 +10,7 @@ const chatContainer = document.getElementById('chat-container');
 // La solicitud irá a la URL del Worker, NO a la URL oficial de DeepSeek.
 const apiKey = ""; // Ya no se usa para DeepSeek, pero se mantiene vacía.
 // *** REEMPLAZA ESTA URL CON LA URL DE TU CLOUDFLARE WORKER ***
-const deepSeekUrl = "[https://deepseek-chat-proxy.usuario.workers.dev](https://deepseek-chat-proxy.usuario.workers.dev)"; 
+const deepSeekUrl = "https://deepseek-chat-proxy.precios-com-pe.workers.dev"; 
 
 // Instrucciones del Sistema para la IA (Define el rol y conocimiento)
 const systemInstruction = `Eres Fedeliza, el asistente virtual oficial de Frankos Chicken & Grill.
