@@ -18,7 +18,7 @@ window.CHAT_CONFIG = {
             nombre: "Gemini Flash Lite (Latest)",
             tipo: "google",
             // 👇 PEGA TU NUEVA CLAVE AQUÍ
-            apiKey: "TU_NUEVA_CLAVE_GOOGLE_AQUI", 
+            apiKey: "AIzaSyAT_deiQjOuaiEedotekG2KV5aGsBrFZx4", 
             modelo: "gemini-flash-lite-latest"
         },
         {
@@ -26,7 +26,7 @@ window.CHAT_CONFIG = {
             // Usamos la versión específica que apareció en tu lista.
             nombre: "Gemini 2.0 Flash Lite (02-05)",
             tipo: "google",
-            apiKey: "TU_NUEVA_CLAVE_GOOGLE_AQUI", 
+            apiKey: "AIzaSyAT_deiQjOuaiEedotekG2KV5aGsBrFZx4", 
             modelo: "gemini-2.0-flash-lite-preview-02-05"
         },
         {
@@ -34,7 +34,7 @@ window.CHAT_CONFIG = {
             // Si los Lite fallan, intentamos con el estándar.
             nombre: "Gemini 2.0 Flash (Estándar)",
             tipo: "google",
-            apiKey: "TU_NUEVA_CLAVE_GOOGLE_AQUI", 
+            apiKey: "AIzaSyAT_deiQjOuaiEedotekG2KV5aGsBrFZx4", 
             modelo: "gemini-2.0-flash"
         },
         {
