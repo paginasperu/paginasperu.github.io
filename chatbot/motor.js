@@ -121,7 +121,7 @@ function buildFuseEngine(data) {
     const options = {
         keys: ['palabras_clave'],
         includeScore: true,
-        threshold: 0.6, // FIX: Elevamos el threshold para permitir búsquedas más amplias
+        threshold: 0.6, // Elevamos el threshold para permitir búsquedas más amplias
         ignoreLocation: true      
     };
     
@@ -176,8 +176,8 @@ function generarRespuesta(texto) {
     if (resultados.length > 0) {
         const mejorResultado = resultados[0]; 
         
-        // NIVEL 1: MATCH DIRECTO Y CONFIABLE (Muy buena similitud)
-        if (mejorResultado.score < 0.35) { // Umbral bajo para la respuesta principal
+        // NIVEL 1: MATCH DIRECTO Y CONFIABLE (Hemos subido el umbral a 0.4 para más tolerancia)
+        if (mejorResultado.score < 0.4) { 
             respuestaBase = mejorResultado.item.respuesta_texto;
         } 
         
