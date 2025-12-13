@@ -1,33 +1,71 @@
 // MOTOR.JS - Sistema Modular de Carga Única (Reglas + Personalidad)
-// Carga todo el conocimiento desde UNA SOLA URL externa y lo clasifica.
+// Implementa caching local para eliminar la latencia de red.
 
-// === VARIABLES GLOBALES Y REFERENCIAS AL DOM ===
+// === VARIABLES GLOBALES ===
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const sugerenciasContainer = document.getElementById('sugerencias-container');
-const chatContainer = document.getElementById('chat-container'); // FIX: Se obtiene la referencia global aquí
+const chatContainer = document.getElementById('chat-container'); 
 
-let fuseEngine; // Motor de búsqueda Fuse.js
-// INICIALIZACIÓN ROBUSTA: Garantizamos que estos arrays siempre existan.
+let fuseEngine; 
 let personalidadData = { saludo: [], cierre: [], sin_entender: [] }; 
+
+// === FUNCIÓN CRÍTICA: FETCH CON CACHÉ ===
+async function fetchWithCache(url, ttlHours) {
+    const CACHE_KEY = 'chat_kb_cache';
+    const CACHE_TIMESTAMP_KEY = 'chat_kb_ts';
+    const TTL_MS = ttlHours * 60 * 60 * 1000; // Convertir horas a milisegundos
+    
+    // 1. Intentar cargar desde la caché local
+    const cachedData = localStorage.getItem(CACHE_KEY);
+    const cachedTime = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+    const now = Date.now();
+
+    if (cachedData && cachedTime && (now - parseInt(cachedTime) < TTL_MS)) {
+        console.log("✅ Datos cargados desde la caché local (rápido).");
+        return cachedData;
+    }
+
+    // 2. Si no hay caché o está expirada, cargar desde la red
+    console.log("⏳ Cargando datos frescos desde Google Sheets...");
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Error de red al obtener la base de datos.");
+        
+        const data = await response.text();
+        
+        // 3. Guardar en caché antes de devolver
+        localStorage.setItem(CACHE_KEY, data);
+        localStorage.setItem(CACHE_TIMESTAMP_KEY, now.toString());
+        
+        console.log("💾 Base de datos actualizada y guardada en caché.");
+        return data;
+    } catch (error) {
+        console.error("❌ Fallo en la red, intentando usar caché caducada si existe...", error);
+        
+        // 4. Fallback: Si la red falla, usar caché caducada como último recurso
+        if (cachedData) {
+            console.warn("⚠️ Usando datos de caché caducada debido a fallo de red.");
+            return cachedData;
+        }
+        throw error; // Si no hay caché y la red falla, el sistema no puede iniciar.
+    }
+}
 
 // === INICIO DEL SISTEMA ===
 async function iniciarSistema() {
     const config = window.CHAT_CONFIG || {};
     
-    // 1. Aplicar Textos Estáticos
     document.getElementById('header-title').innerText = config.titulo || "Asistente";
     userInput.placeholder = config.placeholder || "Escribe aquí...";
     document.getElementById('status-text').innerText = "Cargando datos...";
     
     try {
-        // 2. Cargar Base de Datos Única
-        const resDatos = await fetch(config.data_source_url);
-        if (!resDatos.ok) throw new Error("Error al cargar la URL del Sheet (Código: " + resDatos.status + ").");
-        const textoBase = await resDatos.text();
+        // 2. Cargar Base de Datos usando el mecanismo de caché
+        const textoBase = await fetchWithCache(config.data_source_url, config.cache_ttl_hours);
         
         // 3. Parsear el texto plano y separar en Reglas y Personalidad
-        const conocimiento = parseTotalData(textoBase); // La función ahora llena personalidadData
+        const conocimiento = parseTotalData(textoBase); 
 
         // 4. Construir el motor Fuse.js con las reglas
         buildFuseEngine(conocimiento);
@@ -41,7 +79,7 @@ async function iniciarSistema() {
     } catch (error) {
         console.error("Error FATAL al iniciar el sistema:", error);
         document.getElementById('status-text').innerText = "ERROR DE CONEXIÓN";
-        agregarBurbuja("⚠️ Error crítico: No pude cargar la base de conocimiento. Revise la URL pública y el formato de las cabeceras.", 'bot');
+        agregarBurbuja("⚠️ Error crítico: No pude cargar la base de conocimiento. El chat no puede operar.", 'bot');
         return;
     }
 
@@ -77,6 +115,8 @@ function parseTotalData(rawData) {
 
     if (idReglaIndex === -1 || palabrasClaveIndex === -1 || respuestaTextoIndex === -1) {
         console.error("Error de formato: Faltan cabeceras obligatorias (id_regla, palabras_clave, respuesta_texto).");
+        // Si hay error en la cabecera, limpiamos personalidadData para evitar errores posteriores
+        personalidadData = { saludo: ["Hola."], cierre: ["Adiós."], sin_entender: ["Error."] }; 
         return [];
     }
 
@@ -88,7 +128,6 @@ function parseTotalData(rawData) {
         const id = valores[idReglaIndex] ? valores[idReglaIndex].trim().toLowerCase() : '';
         let respuesta = valores[respuestaTextoIndex] ? valores[respuestaTextoIndex].trim().replace(/^"|"$/g, '') : '';
         
-        // Reemplazar \\n por \n (para Markdown)
         respuesta = respuesta.replace(/\\n/g, '\n'); 
 
         // 1. CLASIFICAR COMO PERSONALIDAD
@@ -146,7 +185,6 @@ async function procesarMensaje() {
 
     document.getElementById(loadingId)?.remove();
     
-    // El texto final se renderiza con Marked (soporte para Markdown)
     const contenidoHTML = (typeof marked !== 'undefined') 
         ? marked.parse(respuestaFinal) 
         : respuestaFinal.replace(/\n/g, '<br>');
@@ -211,7 +249,7 @@ function mostrarBotonesSugeridos(sugerencias) {
         wrapper.appendChild(button);
     });
     sugerenciasContainer.appendChild(wrapper);
-    chatContainer.scrollTop = chatContainer.scrollHeight; // FIX: Cambio a 'chatContainer'
+    chatContainer.scrollTop = chatContainer.scrollHeight; 
 }
 
 // === UTILIDADES ===
@@ -227,7 +265,6 @@ function toggleInput(estado) {
 }
 
 function agregarBurbuja(html, tipo) {
-    // FIX: Se usa la variable global chatContainer
     const container = chatContainer; 
     const div = document.createElement('div');
     const colorCliente = window.CHAT_CONFIG.colorPrincipal;
@@ -247,7 +284,6 @@ function agregarBurbuja(html, tipo) {
 }
 
 function mostrarLoading() {
-    // FIX: Se usa la variable global chatContainer
     const container = chatContainer;
     const id = 'load-' + Date.now();
     const div = document.createElement('div');
