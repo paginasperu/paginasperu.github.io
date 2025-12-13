@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Frankos Chicken - Pedidos con IA</title>
     
-    <!-- Librerías -->
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
-    <script src="[https://cdn.jsdelivr.net/npm/marked/marked.min.js](https://cdn.jsdelivr.net/npm/marked/marked.min.js)"></script>
+    <!-- Librerías (URLs corregidas) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
     <style>
-        /* CONFIGURACIÓN BASE DEL CHAT (Se sobreescribe en JS) */
+        /* CONFIGURACIÓN BASE DEL CHAT */
         :root { --chat-color: #ea580c; }
         
-        body { background-color: #f3ff6; font-family: 'Inter', sans-serif; }
+        /* Font cambiado a Segoe UI según tu original */
+        body { background-color: #f3f4f6; font-family: 'Segoe UI', sans-serif; }
         .chat-box { height: calc(100vh - 140px); }
         
         /* Efecto de Typing */
@@ -41,7 +42,6 @@
         .bot-bubble {
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
             line-height: 1.4;
-            /* Se evita usar estilos muy fuertes para negritas */
         }
         .bot-bubble pre {
             background-color: #f1f5f9;
@@ -55,10 +55,11 @@
         .bot-bubble a { color: var(--chat-color); font-weight: 600; text-decoration: underline; }
     </style>
 </head>
-<body class="flex flex-col h-screen max-w-2xl mx-auto bg-gray-50 shadow-2xl">
+<!-- BODY restaurado a tu diseño original -->
+<body class="flex flex-col h-screen max-w-2xl mx-auto bg-gray-50 shadow-xl">
 
-    <!-- HEADER -->
-    <header class="text-white p-4 flex items-center gap-3 shadow-md transition-colors sticky top-0 z-10" 
+    <!-- HEADER (Clase sticky eliminada) -->
+    <header class="text-white p-4 flex items-center gap-3 shadow-md transition-colors" 
             style="background-color: var(--chat-color);">
         <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold text-lg">FC</div>
         <div>
@@ -77,8 +78,8 @@
         <!-- CONTENEDOR PARA BOTONES DE SUGERENCIA (Eliminado) -->
     </div>
 
-    <!-- ÁREA DE INPUT -->
-    <div class="p-4 bg-white border-t border-gray-200 sticky bottom-0 z-10">
+    <!-- ÁREA DE INPUT (Clase sticky eliminada) -->
+    <div class="p-4 bg-white border-t border-gray-200">
         <div class="flex gap-2 relative">
             <input type="text" id="userInput" placeholder="Escribe aquí..." maxlength="150" 
                    class="flex-1 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-1 transition-all">
@@ -89,6 +90,7 @@
                 ➤
             </button>
         </div>
+        <!-- Texto inferior ajustado -->
         <p class="text-center text-[10px] text-gray-400 mt-2">Asistente impulsado por DeepSeek</p>
     </div>
 
