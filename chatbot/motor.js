@@ -7,74 +7,8 @@ const sendBtn = document.getElementById('sendBtn');
 const statusText = document.getElementById('status-text');
 
 let pageLoadedAt = Date.now(); // Captura el tiempo de inicio de la carga de la página.
-let isProcessing = false; // Bandera para prevenir llamadas duplicadas (Recomendación: MANTENER)
+let isProcessing = false; // Bandera para prevenir llamadas duplicadas (Bloqueo de seguridad)
 // ==========================
-
-// ==========================================================
-// === UTILIDAD TEMPORAL: LISTAR MODELOS (PARA DIAGNÓSTICO) ===
-// BORRAR TODO ESTE BLOQUE DE listAvailableGeminiModels DESPUÉS DE LA PRUEBA.
-// ==========================================================
-/**
- * Función para obtener y listar todos los modelos Gemini disponibles
- * para una clave API específica.
- * * Esto ayuda a diagnosticar errores 404 causados por nombres de modelo incorrectos.
- */
-async function listAvailableGeminiModels(apiKey) {
-    if (!apiKey || apiKey === "AIzaSyDSv_H9HytUFYDPmCQX8JJflZ7405HczAE") {
-        console.error("❌ ERROR: Por favor, proporciona tu clave API real.");
-        return;
-    }
-
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
-    
-    console.log("Cargando lista de modelos. Esto puede tardar unos segundos...");
-
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-
-        if (!response.ok) {
-            console.error(`❌ ERROR ${response.status}: Fallo al obtener la lista.`);
-            console.error("Detalles del error:", data);
-            
-            if (response.status === 400 || response.status === 403) {
-                console.error("Sugerencia: El error 400/403 puede indicar que la 'Generative Language API' no está habilitada o que la clave no tiene las restricciones correctas.");
-            }
-            return;
-        }
-
-        if (!data.models || data.models.length === 0) {
-            console.log("No se encontraron modelos disponibles con esta clave.");
-            return;
-        }
-
-        const chatModels = data.models
-            // Filtramos solo los modelos que pueden generar contenido (chat/texto)
-            .filter(model => model.supportedGenerationMethods.includes("GENERATE_CONTENT"))
-            // Extraemos los datos clave
-            .map(model => ({
-                Nombre: model.displayName,
-                Alias: model.name.split('/')[1] // Quitamos "models/"
-            }));
-        
-        console.log("=========================================");
-        console.log("✅ MODELOS GEMINI DISPONIBLES PARA TU CLAVE");
-        console.log("=========================================");
-        
-        chatModels.forEach(model => {
-            console.log(`[${model.Nombre}] -> Alias a usar en config.js: "${model.Alias}"`);
-        });
-
-        console.log("=========================================");
-
-    } catch (error) {
-        console.error("❌ ERROR DE RED: No se pudo conectar a la API.", error);
-    }
-}
-// ==========================================================
-// === FIN DE UTILIDAD TEMPORAL ===
-// ==========================================================
-
 
 // === INICIO DEL SISTEMA ===
 async function iniciarSistema() {
@@ -99,22 +33,14 @@ async function iniciarSistema() {
         window.CTX_DATOS = await resDatos.text();
         window.CTX_INSTRUCCIONES = await resInstrucciones.text();
 
-        // 3. LLAMADA TEMPORAL A LA UTILIDAD: Reemplaza "TU_CLAVE_REAL_AQUI"
-        //    Esto se ejecuta solo al cargar la página.
-        const geminiApiKey = config.proveedores?.[0]?.apiKey;
-        if (geminiApiKey) {
-            listAvailableGeminiModels(geminiApiKey);
-        }
-        // ==============================================================
-
-        // 4. Activar Chat
+        // 3. Activar Chat
         userInput.disabled = false;
         sendBtn.disabled = false;
         statusText.innerText = "En línea";
         statusText.classList.remove('animate-pulse');
         console.log("Sistema cargado correctamente.");
 
-        // 5. Detectar tecla ENTER
+        // 4. Detectar tecla ENTER
         userInput.addEventListener('keydown', function(event) {
             if (event.key === 'Enter') {
                 event.preventDefault(); 
