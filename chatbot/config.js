@@ -8,7 +8,7 @@ window.CHAT_CONFIG = {
     colorPrincipal: "#ea580c", 
     saludoInicial: "¡Hola! Bienvenido a Frankos Chicken. Soy Fedeliza. ¿Qué se te antoja hoy? 🍗",
     placeholder: "Escribe 'carta', 'precio' o selecciona una opción...",
-    whatsapp: "51999999999", // CAMBIAR POR TU NÚMERO REAL
+    whatsapp: "51949973277", // CAMBIAR POR TU NÚMERO REAL
 
     // === SUGERENCIAS RÁPIDAS (Botones que activan las reglas) ===
     sugerencias_rapidas: [
