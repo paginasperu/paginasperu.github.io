@@ -1,35 +1,41 @@
 window.CHAT_CONFIG = {
     // === DISEÑO VISUAL ===
-    titulo: "Asistente Frankos",
-    colorPrincipal: "#d73618",
-    saludoInicial: "¡Hola! Soy Frankos. ¿En qué puedo ayudarte? 🍗",
-    placeholder: "Pregunta precios u horarios...",
+    titulo: "Asistente Dra. Ana",
+    colorPrincipal: "#2563eb",
+    saludoInicial: "¡Hola! Soy Ana. ¿En qué puedo ayudarte? 🦷",
+    placeholder: "Pregunta precios o horarios...",
 
     // === LÍMITE DE USO (FILTRO DE CORTESÍA DEL CLIENTE) ===
-    // 30 mensajes cada 60 minutos. Se aplica por navegador.
     spamLimit: 30,
     spamDurationMinutes: 60,
 
-    // === LISTA DE CEREBROS (Failover Automático) ===
+    // === LISTA DE CEREBROS (Estrategia: Estabilidad y Cuota Alta) ===
     proveedores: [
         {
-            nombre: "Gemini (Gratis)",
+            // PROVEEDOR PRINCIPAL: Usamos la versión 1.5 Flash ESTÁNDAR.
+            // Esta versión tiene una cuota gratuita de aprox. 1,500 peticiones/día.
+            // NO USAR versiones "exp", "preview" o "2.0" aquí, ya que esas tienen límites de 20-50 al día.
+            nombre: "Gemini 1.5 Flash (Alta Disponibilidad)",
             tipo: "google",
-            // Pega aquí tu llave de Google
-            apiKey: "AIzaSyDSv_H9HytUFYDPmCQX8JJflZ7405HczAE", 
-            modelo: "gemini-2.5-flash"
+            apiKey: "TU_CLAVE_ACTIVA_DE_GEMINI", 
+            modelo: "gemini-1.5-flash"
         },
         {
-            nombre: "DeepSeek (Proxy Chain)",
+            // RESPALDO: Versión Pro. Más inteligente pero más lenta y con menos cuota (aprox 50/día).
+            nombre: "Gemini 1.5 Pro (Respaldo)",
+            tipo: "google",
+            apiKey: "TU_CLAVE_ACTIVA_DE_GEMINI", 
+            modelo: "gemini-1.5-pro"
+        },
+        {
+            // ÚLTIMO RECURSO: DeepSeek
+            // Solo se activará si Google bloquea totalmente tu proyecto.
+            nombre: "DeepSeek (Emergencia)",
             tipo: "openai-compatible",
             modelo: "deepseek-chat",
-            // Tu clave de DeepSeek
-            apiKey: "sk-TU_CLAVE_DEEPSEEK",
-            // LISTA DE PROXIES: El sistema probará uno por uno con timeout
+            apiKey: "CLAVE_DEEPSEEK_PENDIENTE", 
             proxies: [
-                "https://worker1.tuapp.workers.dev/chat/completions",
-                "https://worker2.tuapp.workers.dev/chat/completions",
-                "https://api.deepseek.com/chat/completions" // Directo como último recurso
+                "https://tu-proxy-1.workers.dev/chat/completions"
             ]
         }
     ]
