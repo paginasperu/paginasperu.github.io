@@ -1,4 +1,4 @@
-// config.js - Configuraciones Globales de Cliente y Desarrollador
+// ajustes.js - Configuraciones Globales de Cliente y Desarrollador
 
 export const CONFIG_BOT = {
     // === CONFIGURACIÓN DE LA EMPRESA (FRONTEND) ===
@@ -15,7 +15,9 @@ export const TECH_CONFIG = {
     max_retries: 3,                     // Reintentos de conexión.
     
     // === ACCESO SIMPLE (UX BARRIER) ===
-    CLAVE_ACCESO: "1511",             // CLAVE para acceso simple (SOLO UX, NO SEGURIDAD REAL)
+    // ¡TRUCO DE DESARROLLO! Se deja vacío para evitar el acceso en desarrollo.
+    // Para Producción, cambie a la clave real: "1511"
+    CLAVE_ACCESO: "",             
     CLAVE_TEXTO: "Ingresa la clave de acceso para continuar:", // Mensaje del prompt de clave
 
     // === CONFIGURACIÓN DE UI ===
