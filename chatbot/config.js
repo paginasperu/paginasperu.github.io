@@ -15,7 +15,7 @@ export const TECH_CONFIG = {
     max_retries: 3,                     // Reintentos de conexión.
     
     // === ACCESO SIMPLE (UX BARRIER) ===
-    CLAVE_ACCESO: "frankos",             // CLAVE para acceso simple (SOLO UX, NO SEGURIDAD REAL)
+    CLAVE_ACCESO: "1511",             // CLAVE para acceso simple (SOLO UX, NO SEGURIDAD REAL)
     CLAVE_TEXTO: "Ingresa la clave de acceso para continuar:", // Mensaje del prompt de clave
 
     // === CONFIGURACIÓN DE UI ===
