@@ -3,9 +3,6 @@
 import { TECH_CONFIG, CONFIG_BOT } from './config.js'; 
 import { marked } from 'https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js'; 
 
-// === VARIABLES TÉCNICAS (MOVIDAS POR SEGURIDAD) ===
-const deepSeekUrl = "https://deepseek-chat-proxy.precios-com-pe.workers.dev"; // URL del Proxy (Cloudflare Worker)
-
 // === VARIABLES GLOBALES ===
 let systemInstruction = ""; 
 const userInput = document.getElementById('userInput');
@@ -55,7 +52,7 @@ async function cargarYAnalizarContexto() {
         // El textoInstruccion ahora es solo el prompt.
         let instruccionPrompt = textoInstruccion;
         
-        // Reemplazo de Placeholders (solo los que quedan de CONFIG_BOT y TECH_CONFIG)
+        // Reemplazo de Placeholders (solo los que dependen de CONFIG_BOT y TECH_CONFIG)
         instruccionPrompt = instruccionPrompt
             .replace(/\[whatsapp\]/g, TECH_CONFIG.whatsapp)
             .replace(/\[nombre_empresa\]/g, CONFIG_BOT.nombre_empresa || 'Empresa');
@@ -168,8 +165,8 @@ async function procesarMensaje() {
 
 // === API CALL (Stateless = Ahorro Máximo) ===
 async function llamarIA(pregunta) {
-    // modelo, temperatura y max_retries vienen de TECH_CONFIG, deepSeekUrl es global.
-    const { modelo, temperatura, max_retries } = TECH_CONFIG; 
+    // modelo, temperatura, max_retries y deepSeekUrl se extraen de TECH_CONFIG
+    const { modelo, temperatura, max_retries, deepSeekUrl } = TECH_CONFIG; 
     let delay = 1000;
 
     const messages = [
@@ -179,7 +176,7 @@ async function llamarIA(pregunta) {
 
     for (let i = 0; i < max_retries; i++) {
         try {
-            const res = await fetch(deepSeekUrl, { // Usa la constante global deepSeekUrl
+            const res = await fetch(deepSeekUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
