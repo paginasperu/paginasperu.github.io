@@ -9,7 +9,8 @@ const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const chatContainer = document.getElementById('chat-container'); 
 const WA_LINK = `https://wa.me/${TECH_CONFIG.whatsapp}`;
-const requestTimestamps = []; // Para el Rate Limiting
+const requestTimestamps = []; // Para el Rate Limiting (por minuto)
+let messageCount = 0;         // Contador de mensajes totales para el demo
 
 // === SISTEMA DE SEGURIDAD: RATE LIMITING (Sliding Window) ===
 function checkRateLimit() {
@@ -34,6 +35,7 @@ function checkRateLimit() {
 }
 
 // === CARGA DE CONTEXTO ===
+// (Función cargarYAnalizarContexto se mantiene igual que antes)
 async function cargarYAnalizarContexto() {
     try {
         document.getElementById('status-text').innerText = "Cargando sistema...";
@@ -112,15 +114,26 @@ async function iniciarSistema() {
 async function procesarMensaje() {
     const textoUsuario = userInput.value.trim();
     
-    // 1. Validación de Input (Seguridad Básica)
+    // === 1. BLOQUEO DE DEMO (CAPA DE UX) ===
+    if (messageCount >= TECH_CONFIG.max_demo_messages) {
+        const demoEndMsg = `🛑 ¡Demo finalizado! Has alcanzado el límite de ${TECH_CONFIG.max_demo_messages} mensajes. Por favor, contáctanos para obtener tu propia licencia.`;
+        if (messageCount === TECH_CONFIG.max_demo_messages) { // Mostrar el mensaje final solo una vez
+             agregarBurbuja(demoEndMsg, 'bot');
+             messageCount++; // Para que no vuelva a entrar en esta condición
+        }
+        userInput.value = '';
+        toggleInput(false); // Bloquea la interacción
+        return;
+    }
+    
+    // 2. Validación de Input (Seguridad Básica)
     if (!textoUsuario) return;
     if (textoUsuario.length < TECH_CONFIG.min_input_length) {
-        // No gastamos tokens ni mostramos nada, solo limpiamos
         userInput.value = ''; 
         return; 
     }
 
-    // 2. Rate Limiting (Protección de Tokens/Costos)
+    // 3. Rate Limiting (Protección de Tokens/Costos)
     const limit = checkRateLimit();
     if (limit.limitReached) {
         agregarBurbuja(`⚠️ Demasiadas consultas. Espera ${limit.retryAfter}s.`, 'bot');
@@ -150,14 +163,20 @@ async function procesarMensaje() {
         }
         
         agregarBurbuja(htmlFinal, 'bot');
+        messageCount++; // Incrementa el contador después de una respuesta exitosa
 
     } catch (e) {
         document.getElementById(loadingId)?.remove();
         console.error(e);
         agregarBurbuja(`Error de conexión. <a href="${WA_LINK}" class="chat-btn">WhatsApp</a>`, 'bot');
     } finally {
-        toggleInput(true);
-        userInput.focus();
+        // Chequea si esta última respuesta alcanzó el límite
+        if (messageCount >= TECH_CONFIG.max_demo_messages) {
+            toggleInput(false);
+        } else {
+            toggleInput(true);
+            userInput.focus();
+        }
     }
 }
 
@@ -178,7 +197,7 @@ async function llamarIA(pregunta) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     model: modelo,
-                    messages: messages, // No enviamos historial previo -> Ahorro de tokens masivo
+                    messages: messages, 
                     temperature: temperatura,
                     stream: false
                 })
@@ -208,10 +227,10 @@ function agregarBurbuja(html, tipo) {
     if (tipo === 'user') {
         div.className = "p-3 max-w-[85%] shadow-sm text-sm text-white rounded-2xl rounded-tr-none self-end ml-auto";
         div.style.backgroundColor = TECH_CONFIG.color_principal;
-        div.textContent = html; // TextContent previene XSS del usuario
+        div.textContent = html; 
     } else {
         div.className = "p-3 max-w-[85%] shadow-sm text-sm bg-white text-gray-800 border border-gray-200 rounded-2xl rounded-tl-none self-start mr-auto bot-bubble";
-        div.innerHTML = html; // InnerHTML seguro porque viene de marked()
+        div.innerHTML = html; 
     }
     chatContainer.appendChild(div);
     chatContainer.scrollTop = chatContainer.scrollHeight;
