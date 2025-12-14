@@ -42,7 +42,7 @@ async function cargarYAnalizarContexto() {
 
         const [resInst, resData] = await Promise.all([
             fetch('instrucciones.txt'),
-            fetch('data.txt')
+            fetch('datos.txt')
         ]);
 
         if (!resInst.ok || !resData.ok) throw new Error("Error cargando archivos base");
