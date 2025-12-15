@@ -64,7 +64,7 @@ export const AI_CONFIG = {
 // ═══════════════════════════════════════════════════════════════
 export const SEGURIDAD_CONFIG = {
     // Acceso
-    CLAVE_ACCESO: "",                       // Clave requerida para entrar al chat. Dejar "" para bypass.
+    CLAVE_ACCESO: "1511",                       // Clave requerida para entrar al chat. Dejar "" para bypass.
     
     // Validación de Input
     MIN_LENGTH_INPUT: 4,                    // Longitud mínima para un mensaje válido.
