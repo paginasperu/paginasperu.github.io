@@ -6,7 +6,7 @@
 export const APP_CONFIG = {
     NOMBRE_EMPRESA: "Frankos Chicken",       // Nombre visible principal (ej. en el Header).
     VERSION: "1.0.0",                       // Versión actual de la aplicación.
-    MODO_ENTORNO: "development",            // 'development' (Bypass de clave) | 'production' (Clave requerida)
+    MODO_ENTORNO: "development",            
     
     // SEO Y METADATOS (CRÍTICO)
     TITLE_SUFFIX: "| Asistente de Pedidos y Soporte", 
@@ -68,7 +68,7 @@ export const SEGURIDAD_CONFIG = {
     
     // Validación de Input
     MIN_LENGTH_INPUT: 4,                    // Longitud mínima para un mensaje válido.
-    MAX_LENGTH_INPUT: 200,                  // Longitud máxima del mensaje (Estratégico para modo Demo).
+    MAX_LENGTH_INPUT: 150,                  // Longitud máxima del mensaje (Estratégico para modo Demo).
     
     // Límite de Demo (Frontend)
     MAX_DEMO_MESSAGES: 5,                   // Límite de mensajes para la demo por sesión.
