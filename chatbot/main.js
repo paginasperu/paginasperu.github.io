@@ -1,116 +1,88 @@
-// funciones.js - Lógica de Negocio, Seguridad y Conexión
+import { CONFIG } from './config.js';
+import { marked } from 'https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js';
 
-// IMPORTACIONES MODULARES
-import { APP_CONFIG, UI_CONFIG, AI_CONFIG, SEGURIDAD_CONFIG } from './ajustes.js'; 
-import { marked } from 'https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js'; 
-
-// === VARIABLES GLOBALES ===
-let systemInstruction = ""; 
-let conversationHistory = []; 
-// Elementos del Chat
+let systemInstruction = "";
+let conversationHistory = [];
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
-const chatContainer = document.getElementById('chat-container'); 
-const chatInterface = document.getElementById('chat-interface'); 
-// Elementos del Acceso
-const accessGate = document.getElementById('access-gate'); 
-const keyInput = document.getElementById('keyInput');     
-const keySubmit = document.getElementById('keySubmit');   
-const keyPrompt = document.getElementById('key-prompt');  
-const keyError = document.getElementById('keyError');     
-// Elementos de Texto (NUEVOS)
-const footerText = document.getElementById('footer-text'); 
-const headerIconInitials = document.getElementById('header-icon-initials'); 
+const chatContainer = document.getElementById('chat-container');
+const chatInterface = document.getElementById('chat-interface');
+const accessGate = document.getElementById('access-gate');
+const keyInput = document.getElementById('keyInput');
+const keySubmit = document.getElementById('keySubmit');
+const keyError = document.getElementById('keyError');
 
 
-const WA_LINK = `https://wa.me/${UI_CONFIG.WHATSAPP_NUMERO}`;
-const requestTimestamps = []; 
-let messageCount = 0;         
+const WA_LINK = `https://wa.me/${CONFIG.WHATSAPP_NUMERO}`;
+const requestTimestamps = [];
+let messageCount = 0;
 
 
-// === CONFIGURACIÓN DINÁMICA DEL DOM (PULIDA) ===
 function aplicarConfiguracionGlobal() {
-    // 1. Título de la pestaña y Meta Descripción (SEO)
-    document.title = `${APP_CONFIG.NOMBRE_EMPRESA} ${APP_CONFIG.TITLE_SUFFIX}`;
+    document.title = CONFIG.NOMBRE_EMPRESA || "Chatbot";
+    
     const metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) metaDesc.setAttribute("content", APP_CONFIG.META_DESCRIPTION);
+    if (metaDesc) { }
 
-    // 2. Favicon Dinámico
     const linkIcon = document.querySelector("link[rel*='icon']");
     if (linkIcon) {
-        linkIcon.href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${UI_CONFIG.FAVICON_EMOJI}</text></svg>`;
+        linkIcon.href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${CONFIG.FAVICON_EMOJI}</text></svg>`;
     }
 
-    // 3. Colores y Textos Visuales
-    document.documentElement.style.setProperty('--chat-color', UI_CONFIG.COLOR_PRIMARIO);
+    document.documentElement.style.setProperty('--chat-color', CONFIG.COLOR_PRIMARIO);
     
-    // === LÓGICA CONDICIONAL DEL LOGO ===
-    if (UI_CONFIG.LOGO_URL && headerIconInitials) {
-        // Opción 1: Usar URL de Imagen
+    const headerIconInitials = document.getElementById('header-icon-initials');
+    
+    if (CONFIG.LOGO_URL && headerIconInitials) {
         const img = document.createElement('img');
-        img.src = UI_CONFIG.LOGO_URL;
-        img.alt = APP_CONFIG.NOMBRE_EMPRESA;
-        img.className = 'w-full h-full object-contain';
+        img.src = CONFIG.LOGO_URL;
+        img.alt = CONFIG.NOMBRE_EMPRESA;
+        img.className = 'w-full h-full object-contain rounded-full';
         headerIconInitials.innerHTML = '';
         headerIconInitials.appendChild(img);
     } else if (headerIconInitials) {
-        // Opción 2: Usar Iniciales/Emoji
-        headerIconInitials.innerText = UI_CONFIG.ICONO_HEADER;
+        headerIconInitials.innerText = CONFIG.ICONO_HEADER;
     }
     
-    // Header Title (Si está cargando, poner nombre empresa)
     const headerTitle = document.getElementById('header-title');
-    if (headerTitle.innerText === "Cargando...") headerTitle.innerText = APP_CONFIG.NOMBRE_EMPRESA;
-
-    // === Textos del Gate y Footer ===
-    keyPrompt.innerText = UI_CONFIG.TEXTO_CLAVE_ACCESO;
-    keySubmit.innerText = UI_CONFIG.TEXTO_BOTON_ACCESO;
-    
-    if (footerText) footerText.innerText = UI_CONFIG.FOOTER_TEXTO;
+    if (headerTitle.innerText === "Cargando...") headerTitle.innerText = CONFIG.NOMBRE_EMPRESA;
 }
 
 
-// === FUNCIÓN DE CARGA DE CONTEXTO (OPTIMIZADA) ===
 async function cargarYAnalizarContexto() {
     try {
         document.getElementById('status-text').innerText = "Cargando sistema...";
 
-        // CAMBIO CRÍTICO: SOLO UNA LLAMADA A CONTEXTO.TXT
-        const resContexto = await fetch('./contexto.txt'); 
+        const resContexto = await fetch('./prompt.txt');
 
-        if (!resContexto.ok) throw new Error("Error cargando archivo de contexto (contexto.txt)");
+        if (!resContexto.ok) throw new Error("Error cargando archivo de contexto (prompt.txt)");
 
         let systemInstruction = await resContexto.text();
         
-        // Reemplazo de variables en el CONTEXTO (solo nombre de la empresa)
         systemInstruction = systemInstruction
-            .replace(/\[nombre_empresa\]/g, APP_CONFIG.NOMBRE_EMPRESA || 'Empresa');
-            // Nota: [whatsapp_link] se mantiene como token para ser devuelto por la IA.
-
-        if (AI_CONFIG.ENABLE_LOGGING) console.log("Contexto IA cargado exitosamente.");
+            .replace(/\[nombre_empresa\]/g, CONFIG.NOMBRE_EMPRESA || 'Empresa');
+            
         return systemInstruction;
 
     } catch (error) {
-        if (AI_CONFIG.ENABLE_LOGGING) console.error("Error crítico en carga de contexto:", error);
+        console.error("Error crítico en carga de contexto:", error);
         return "Error de sistema. Contacte a soporte.";
     }
 }
 
 
-// === RESTO DE FUNCIONES (SIN CAMBIOS FUNCIONALES) ===
 function checkRateLimit() {
     const now = Date.now();
-    const windowMs = SEGURIDAD_CONFIG.RATE_LIMIT_WINDOW_SECONDS * 1000;
+    const windowMs = CONFIG.RATE_LIMIT_WINDOW_SECONDS * 1000;
     
     while (requestTimestamps.length > 0 && requestTimestamps[0] < now - windowMs) {
         requestTimestamps.shift();
     }
 
-    if (requestTimestamps.length >= SEGURIDAD_CONFIG.RATE_LIMIT_MAX_REQUESTS) {
-        if (AI_CONFIG.ENABLE_LOGGING) console.warn("Rate limit activado por IP.");
-        return { 
-            limitReached: true, 
-            retryAfter: Math.ceil((requestTimestamps[0] + windowMs - now) / 1000) 
+    if (requestTimestamps.length >= CONFIG.RATE_LIMIT_MAX_REQUESTS) {
+        return {
+            limitReached: true,
+            retryAfter: Math.ceil((requestTimestamps[0] + windowMs - now) / 1000)
         };
     }
     
@@ -119,21 +91,35 @@ function checkRateLimit() {
 }
 
 function setupAccessGate() {
-    keySubmit.style.backgroundColor = UI_CONFIG.COLOR_PRIMARIO;
+    keySubmit.style.backgroundColor = CONFIG.COLOR_PRIMARIO;
+    
+    const isKeyExpired = () => {
+        if (!CONFIG.CLAVE_EXPIRACION) return false;
+        const now = new Date();
+        const expirationDate = new Date(CONFIG.CLAVE_EXPIRACION);
+        return now > expirationDate;
+    };
     
     const checkKey = () => {
-        const input = keyInput.value.trim().toLowerCase();
-        const realKey = SEGURIDAD_CONFIG.CLAVE_ACCESO.toLowerCase();
+        const realKey = CONFIG.CLAVE_ACCESO.toLowerCase();
+        
+        const isBypassEnabled = realKey === "" || isKeyExpired();
 
-        const isBypassEnabled = realKey === "";
+        if (isKeyExpired() && realKey !== "") {
+            keyError.classList.remove('hidden');
+            keyError.innerText = "La clave de acceso ha caducado. Contacta al administrador.";
+        }
+        
+        const input = keyInput.value.trim().toLowerCase();
         const isCorrectKey = input === realKey;
         
         if (isCorrectKey || isBypassEnabled) {
             keyError.classList.add('hidden');
             accessGate.classList.add('hidden');
             chatInterface.classList.remove('hidden');
-            cargarIA(); 
+            cargarIA();
         } else {
+            keyError.innerText = "Clave incorrecta. Intenta de nuevo.";
             keyError.classList.remove('hidden');
             keyInput.value = '';
             keyInput.focus();
@@ -142,9 +128,9 @@ function setupAccessGate() {
     
     keySubmit.addEventListener('click', checkKey);
     keyInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { 
-            e.preventDefault(); 
-            checkKey(); 
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            checkKey();
         }
     });
 }
@@ -152,14 +138,12 @@ function setupAccessGate() {
 async function cargarIA() {
     systemInstruction = await cargarYAnalizarContexto();
     
-    // UI Setup Final
-    document.getElementById('header-title').innerText = APP_CONFIG.NOMBRE_EMPRESA || "Chat";
-    document.getElementById('bot-welcome-text').innerText = UI_CONFIG.SALUDO_INICIAL || "Hola.";
+    document.getElementById('header-title').innerText = CONFIG.NOMBRE_EMPRESA || "Chat";
+    document.getElementById('bot-welcome-text').innerText = CONFIG.SALUDO_INICIAL || "Hola.";
     document.getElementById('status-text').innerText = "En línea 🟢";
     
-    // Input Security Setup
-    userInput.setAttribute('maxlength', SEGURIDAD_CONFIG.MAX_LENGTH_INPUT);
-    userInput.setAttribute('placeholder', UI_CONFIG.PLACEHOLDER_INPUT);
+    userInput.setAttribute('maxlength', CONFIG.MAX_LENGTH_INPUT);
+    userInput.setAttribute('placeholder', CONFIG.PLACEHOLDER_INPUT);
     
     toggleInput(true);
 
@@ -172,7 +156,7 @@ async function cargarIA() {
 async function iniciarSistema() {
     aplicarConfiguracionGlobal();
     
-    if (SEGURIDAD_CONFIG.CLAVE_ACCESO) {
+    if (CONFIG.CLAVE_ACCESO) {
         setupAccessGate();
     } else {
         accessGate.classList.add('hidden');
@@ -184,9 +168,9 @@ async function iniciarSistema() {
 async function procesarMensaje() {
     const textoUsuario = userInput.value.trim();
     
-    if (messageCount >= SEGURIDAD_CONFIG.MAX_DEMO_MESSAGES) {
-        const demoEndMsg = `🛑 ¡Demo finalizado! Has alcanzado el límite de ${SEGURIDAD_CONFIG.MAX_DEMO_MESSAGES} mensajes. Por favor, contáctanos para continuar.`;
-        if (messageCount === SEGURIDAD_CONFIG.MAX_DEMO_MESSAGES) {
+    if (messageCount >= CONFIG.MAX_DEMO_MESSAGES) {
+        const demoEndMsg = `🛑 ¡Demo finalizado! Has alcanzado el límite de ${CONFIG.MAX_DEMO_MESSAGES} mensajes. Por favor, contáctanos para continuar.`;
+        if (messageCount === CONFIG.MAX_DEMO_MESSAGES) {
              agregarBurbuja(demoEndMsg, 'bot');
              messageCount++;
         }
@@ -195,19 +179,18 @@ async function procesarMensaje() {
         return;
     }
     
-    if (UI_CONFIG.SHOW_REMAINING_MESSAGES && 
-        messageCount >= SEGURIDAD_CONFIG.MAX_DEMO_MESSAGES - UI_CONFIG.WARNING_THRESHOLD &&
-        messageCount < SEGURIDAD_CONFIG.MAX_DEMO_MESSAGES) {
+    if (CONFIG.SHOW_REMAINING_MESSAGES &&
+        messageCount >= CONFIG.MAX_DEMO_MESSAGES - CONFIG.WARNING_THRESHOLD &&
+        messageCount < CONFIG.MAX_DEMO_MESSAGES) {
         
-        const remaining = SEGURIDAD_CONFIG.MAX_DEMO_MESSAGES - messageCount;
+        const remaining = CONFIG.MAX_DEMO_MESSAGES - messageCount;
         agregarBurbuja(`⚠️ Atención: Te quedan ${remaining} mensaje(s) de demostración.`, 'bot');
     }
 
     if (!textoUsuario) return;
-    if (textoUsuario.length < SEGURIDAD_CONFIG.MIN_LENGTH_INPUT || textoUsuario.length > SEGURIDAD_CONFIG.MAX_LENGTH_INPUT) {
-        if (AI_CONFIG.ENABLE_LOGGING) console.warn("Input no válido por longitud.");
-        userInput.value = ''; 
-        return; 
+    if (textoUsuario.length < CONFIG.MIN_LENGTH_INPUT || textoUsuario.length > CONFIG.MAX_LENGTH_INPUT) {
+        userInput.value = '';
+        return;
     }
 
     const limit = checkRateLimit();
@@ -226,7 +209,7 @@ async function procesarMensaje() {
     const loadingId = mostrarLoading();
     
     try {
-        const respuesta = await llamarIA(); 
+        const respuesta = await llamarIA();
         document.getElementById(loadingId)?.remove();
         
         conversationHistory.push({ role: "assistant", content: respuesta });
@@ -235,7 +218,6 @@ async function procesarMensaje() {
         let htmlFinal = "";
 
         if (respuesta.includes(whatsappCheck)) {
-            // Si la IA devuelve el token de falla, separamos el texto (si hay) y adjuntamos el CTA.
             const cleanText = respuesta.replace(whatsappCheck, 'Para más detalles, comunícate por WhatsApp.');
             const btnLink = `<a href="${WA_LINK}?text=${encodeURIComponent('Necesito ayuda con la consulta: ' + textoUsuario)}" target="_blank" class="chat-btn">Contáctanos aquí</a>`;
             htmlFinal = marked.parse(cleanText) + btnLink;
@@ -248,10 +230,10 @@ async function procesarMensaje() {
 
     } catch (e) {
         document.getElementById(loadingId)?.remove();
-        if (AI_CONFIG.ENABLE_LOGGING) console.error("Error en llamada IA:", e);
+        console.error("Error en llamada IA:", e);
         agregarBurbuja(`Error de conexión o timeout. <a href="${WA_LINK}" class="chat-btn">WhatsApp</a>`, 'bot');
     } finally {
-        if (messageCount >= SEGURIDAD_CONFIG.MAX_DEMO_MESSAGES) {
+        if (messageCount >= CONFIG.MAX_DEMO_MESSAGES) {
             toggleInput(false);
         } else {
             toggleInput(true);
@@ -261,14 +243,14 @@ async function procesarMensaje() {
 }
 
 async function llamarIA() {
-    const { MODELO, TEMPERATURA, RETRY_LIMIT, RETRY_DELAY_MS, URL_PROXY, TIMEOUT_MS, MAX_TOKENS_RESPONSE, MAX_CONTEXT_MESSAGES } = AI_CONFIG; 
+    const { MODELO, TEMPERATURA, RETRY_LIMIT, RETRY_DELAY_MS, URL_PROXY, TIMEOUT_MS, MAX_TOKENS_RESPONSE, MAX_HISTORIAL_MESSAGES } = CONFIG;
     let delay = RETRY_DELAY_MS;
     
     let messages = [
         { role: "system", content: systemInstruction }
     ];
 
-    const contextStart = Math.max(0, conversationHistory.length - MAX_CONTEXT_MESSAGES);
+    const contextStart = Math.max(0, conversationHistory.length - MAX_HISTORIAL_MESSAGES);
     messages = messages.concat(conversationHistory.slice(contextStart));
 
 
@@ -281,16 +263,16 @@ async function llamarIA() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    model: MODELO, 
-                    messages: messages, 
+                    model: MODELO,
+                    messages: messages,
                     temperature: TEMPERATURA,
-                    max_tokens: MAX_TOKENS_RESPONSE, 
+                    max_tokens: MAX_TOKENS_RESPONSE,
                     stream: false
                 }),
-                signal: controller.signal 
+                signal: controller.signal
             });
 
-            clearTimeout(timeoutId); 
+            clearTimeout(timeoutId);
 
             if (!res.ok) throw new Error(`API Error: ${res.status}`);
             const data = await res.json();
@@ -303,7 +285,7 @@ async function llamarIA() {
             }
             if (i === RETRY_LIMIT - 1) throw err;
             await new Promise(r => setTimeout(r, delay));
-            delay *= 2; 
+            delay *= 2;
         }
     }
 }
@@ -317,11 +299,11 @@ function agregarBurbuja(html, tipo) {
     const div = document.createElement('div');
     if (tipo === 'user') {
         div.className = "p-3 max-w-[85%] shadow-sm text-sm text-white rounded-2xl rounded-tr-none self-end ml-auto";
-        div.style.backgroundColor = UI_CONFIG.COLOR_PRIMARIO;
-        div.textContent = html; 
+        div.style.backgroundColor = CONFIG.COLOR_PRIMARIO;
+        div.textContent = html;
     } else {
         div.className = "p-3 max-w-[85%] shadow-sm text-sm bg-white text-gray-800 border border-gray-200 rounded-2xl rounded-tl-none self-start mr-auto bot-bubble";
-        div.innerHTML = html; 
+        div.innerHTML = html;
     }
     chatContainer.appendChild(div);
     chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -332,10 +314,9 @@ function mostrarLoading() {
     const div = document.createElement('div');
     div.id = id;
     div.className = "p-3 max-w-[85%] bg-white border border-gray-200 rounded-2xl rounded-tl-none self-start flex gap-1";
-    // CORRECCIÓN: Se asegura w-2 h-2 para que los puntos sean visibles
     div.innerHTML = `<div class="w-2 h-2 rounded-full typing-dot"></div><div class="w-2 h-2 rounded-full typing-dot" style="animation-delay:0.2s"></div><div class="w-2 h-2 rounded-full typing-dot" style="animation-delay:0.4s"></div>`;
     chatContainer.appendChild(div);
-    chatContainer.scrollTop = chatContainer.scrollHeight; 
+    chatContainer.scrollTop = chatContainer.scrollHeight;
     return id;
 }
 
