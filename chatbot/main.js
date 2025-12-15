@@ -148,16 +148,13 @@ function setupAccessGate() {
         const match = dateString.match(/^(\d{2})-(\d{2})-(\d{4}) (\d{2}:\d{2}:\d{2})$/);
         
         if (match) {
-            // REORGANIZA a YYYY-MM-DDTHH:mm:ss PERO SIN OFFSET NI Z
-            // Esto le dice a JavaScript que la hora de expiración es la HORA LOCAL DEL DISPOSITIVO
+            // Reorganiza a YYYY-MM-DDTHH:mm:ss SIN OFFSET (utiliza la hora local de la PC)
             const [full, day, month, year, time] = match;
             dateString = `${year}-${month}-${day}T${time}`; 
         } else if (dateString.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/)) {
             // Maneja el formato YYYY-MM-DD HH:mm:ss
             dateString = dateString.replace(' ', 'T'); 
         }
-        // Si no coincide con ninguno, JS intentará parsearlo (como si fuera formato ISO o local)
-
 
         const expirationDate = new Date(dateString); 
         const now = new Date(); 
@@ -167,7 +164,8 @@ function setupAccessGate() {
              return false;
         }
         
-        return now.getTime() > expirationDate.getTime();
+        // CORRECCIÓN CRÍTICA: Usa >= para incluir el momento exacto de la expiración
+        return now.getTime() >= expirationDate.getTime();
     };
 
     const checkKey = async () => {
