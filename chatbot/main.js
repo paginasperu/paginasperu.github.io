@@ -1,26 +1,14 @@
 import { CONFIG } from './config.js';
 import { marked } from 'https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js';
 
-// --- Estado Global del Sistema ---
-let systemInstruction = "";
-let conversationHistory = [];
-let messageCount = 0;
-let requestTimestamps = [];
-let longWaitTimeoutId; 
+// --- Estado Global ---
+let systemInstruction = "", conversationHistory = [], messageCount = 0, requestTimestamps = [], longWaitTimeoutId; 
+const userInput = document.getElementById('userInput'), sendBtn = document.getElementById('sendBtn'), chatContainer = document.getElementById('chat-container');
+const chatInterface = document.getElementById('chat-interface'), feedbackDemoText = document.getElementById('feedback-demo-text'), WA_LINK = `https://wa.me/${CONFIG.WHATSAPP_NUMERO}`;
 
-const userInput = document.getElementById('userInput');
-const sendBtn = document.getElementById('sendBtn');
-const chatContainer = document.getElementById('chat-container');
-const chatInterface = document.getElementById('chat-interface');
-const feedbackDemoText = document.getElementById('feedback-demo-text');
-const WA_LINK = `https://wa.me/${CONFIG.WHATSAPP_NUMERO}`;
-
-// --- UX y Scroll ---
+// --- Interfaz y Scroll ---
 function handleScroll() {
-    const observer = new MutationObserver(() => {
-        observer.disconnect();
-        chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
-    });
+    const observer = new MutationObserver(() => { observer.disconnect(); chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' }); });
     observer.observe(chatContainer, { childList: true });
 }
 
@@ -36,7 +24,6 @@ function updateDemoFeedback(count) {
     }
 }
 
-// --- Configuración e Identidad ---
 function aplicarConfiguracionGlobal() {
     document.title = CONFIG.NOMBRE_EMPRESA;
     document.documentElement.style.setProperty('--chat-color', CONFIG.COLOR_PRIMARIO);
@@ -54,22 +41,17 @@ function aplicarConfiguracionGlobal() {
     }
 }
 
-// --- Seguridad y Acceso (Lógica Blindada + Enter Habilitado) ---
+// --- Seguridad y Acceso (Corregido para evitar Guardar Contraseña) ---
 function setupAccessGate() {
-    const keySubmit = document.getElementById('keySubmit');
-    const keyInput = document.getElementById('keyInput');
-    const keyError = document.getElementById('keyError');
+    const keySubmit = document.getElementById('keySubmit'), keyInput = document.getElementById('keyInput'), keyError = document.getElementById('keyError');
     keySubmit.style.backgroundColor = CONFIG.COLOR_PRIMARIO;
+    
+    // EVITAR AUTOCOMPLETADO DE GOOGLE
+    keyInput.setAttribute('autocomplete', 'new-password');
 
-    // Función de validación unificada
     const validarAcceso = async () => {
         const inputKey = keyInput.value.trim(); 
-        
-        if (!inputKey) {
-            keyError.innerText = "Por favor, ingresa una clave.";
-            keyError.classList.remove('hidden');
-            return;
-        }
+        if (!inputKey) { keyError.innerText = "Ingresa una clave."; keyError.classList.remove('hidden'); return; }
 
         try {
             const res = await fetch(`https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json`);
@@ -78,17 +60,12 @@ function setupAccessGate() {
             const row = json.table.rows[1]?.c || json.table.rows[0]?.c || [];
             
             const realKey = String(row[0]?.v || "").trim();
-            const expirationRaw = row[1]?.f || row[1]?.v || "";
+            const expRaw = row[1]?.f || row[1]?.v || "";
 
-            if (expirationRaw) {
-                const p = expirationRaw.match(/(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2}):(\d{2})/);
-                if (p) {
-                    const dateLimit = new Date(p[3], p[2] - 1, p[1], p[4], p[5], p[6]);
-                    if (new Date() > dateLimit) {
-                        keyError.innerText = "La clave ha caducado. Contacta a soporte.";
-                        keyError.classList.remove('hidden');
-                        return;
-                    }
+            if (expRaw) {
+                const p = expRaw.match(/(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2}):(\d{2})/);
+                if (p && (new Date() > new Date(p[3], p[2]-1, p[1], p[4], p[5], p[6]))) {
+                    keyError.innerText = "Clave caducada."; keyError.classList.remove('hidden'); return;
                 }
             }
 
@@ -97,28 +74,27 @@ function setupAccessGate() {
                 chatInterface.classList.remove('hidden');
                 cargarIA();
             } else {
-                keyError.innerText = "Clave incorrecta. Intenta de nuevo.";
-                keyError.classList.remove('hidden');
+                keyError.innerText = "Clave incorrecta."; keyError.classList.remove('hidden');
             }
-        } catch (e) {
-            keyError.innerText = "Error de conexión con el servidor.";
-            keyError.classList.remove('hidden');
-        }
+        } catch (e) { keyError.innerText = "Error de conexión."; keyError.classList.remove('hidden'); }
     };
 
-    // Eventos de activación
     keySubmit.onclick = validarAcceso;
     keyInput.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); validarAcceso(); } };
 }
 
-// --- Inicialización y Flujo del Chat ---
+// --- Chat y IA ---
 async function cargarIA() {
     try {
         const res = await fetch('./prompt.txt');
         systemInstruction = res.ok ? await res.text() : "";
         document.getElementById('bot-welcome-text').innerText = CONFIG.SALUDO_INICIAL;
+        
+        // EVITAR QUE CHROME CONFUNDA EL CHAT CON UN LOGIN
+        userInput.setAttribute('autocomplete', 'off');
         userInput.placeholder = CONFIG.PLACEHOLDER_INPUT;
         userInput.maxLength = CONFIG.MAX_LENGTH_INPUT;
+        
         toggleInput(true);
         updateDemoFeedback(0);
         sendBtn.onclick = procesarMensaje;
@@ -130,10 +106,11 @@ async function procesarMensaje() {
     const text = userInput.value.trim();
     if (messageCount >= CONFIG.MAX_DEMO_MESSAGES || text.length < CONFIG.MIN_LENGTH_INPUT) return;
 
+    // Rate Limit
     const now = Date.now(), windowMs = CONFIG.RATE_LIMIT_WINDOW_SECONDS * 1000;
     requestTimestamps = requestTimestamps.filter(t => t > now - windowMs);
     if (requestTimestamps.length >= CONFIG.RATE_LIMIT_MAX_REQUESTS) {
-        agregarBurbuja(`⚠️ Espera ${Math.ceil((requestTimestamps[0] + windowMs - now) / 1000)}s antes de seguir.`, 'bot');
+        agregarBurbuja(`⚠️ Espera ${Math.ceil((requestTimestamps[0] + windowMs - now) / 1000)}s.`, 'bot');
         return;
     }
     requestTimestamps.push(now);
@@ -149,17 +126,21 @@ async function procesarMensaje() {
         document.getElementById(loadingId)?.remove();
         
         conversationHistory.push({ role: "assistant", content: respuesta });
+        const clean = respuesta.replace('[whatsapp]', 'Escríbenos por WhatsApp.');
+        const btn = respuesta.includes('[whatsapp]') ? `<a href="${WA_LINK}?text=Ayuda: ${encodeURIComponent(text)}" target="_blank" class="chat-btn">WhatsApp</a>` : "";
         
-        const cleanText = respuesta.replace('[whatsapp]', 'Escríbenos por WhatsApp para ayudarte mejor.');
-        const btnLink = respuesta.includes('[whatsapp]') ? `<a href="${WA_LINK}?text=Ayuda con: ${encodeURIComponent(text)}" target="_blank" class="chat-btn">WhatsApp</a>` : "";
-        
-        agregarBurbuja(marked.parse(cleanText) + btnLink, 'bot');
+        agregarBurbuja(marked.parse(clean) + btn, 'bot');
         messageCount++;
         updateDemoFeedback(messageCount);
     } catch (e) {
+        // CORRECCIÓN: Solo muestra error si realmente falló la petición, no por el límite de mensajes
         clearTimeout(longWaitTimeoutId);
-        document.getElementById(loadingId)?.remove();
-        agregarBurbuja(marked.parse("¡Ups! Tuve un problema de conexión. ¿Reintentamos?"), 'bot');
+        const loadEl = document.getElementById(loadingId);
+        if (loadEl) loadEl.remove();
+        
+        if (messageCount < CONFIG.MAX_DEMO_MESSAGES) {
+            agregarBurbuja(marked.parse("¡Ups! Hubo un problema de conexión. ¿Intentamos de nuevo?"), 'bot');
+        }
     } finally {
         const active = messageCount < CONFIG.MAX_DEMO_MESSAGES;
         toggleInput(active);
@@ -173,32 +154,25 @@ async function llamarIA(loadingId) {
 
     for (let i = 0; i <= CONFIG.RETRY_LIMIT; i++) {
         try {
-            const ctrl = new AbortController();
-            const tId = setTimeout(() => ctrl.abort(), CONFIG.TIMEOUT_MS);
+            const ctrl = new AbortController(), tId = setTimeout(() => ctrl.abort(), CONFIG.TIMEOUT_MS);
             const res = await fetch(CONFIG.URL_PROXY, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    model: CONFIG.MODELO,
-                    messages: messages,
-                    temperature: CONFIG.TEMPERATURA,
-                    top_p: CONFIG.TOP_P,
-                    frequency_penalty: CONFIG.FREQUENCY_PENALTY,
-                    presence_penalty: CONFIG.PRESENCE_PENALTY,
-                    max_tokens: CONFIG.MAX_TOKENS_RESPONSE
+                    model: CONFIG.MODELO, messages, temperature: CONFIG.TEMPERATURA,
+                    top_p: CONFIG.TOP_P, frequency_penalty: CONFIG.FREQUENCY_PENALTY,
+                    presence_penalty: CONFIG.PRESENCE_PENALTY, max_tokens: CONFIG.MAX_TOKENS_RESPONSE
                 }),
                 signal: ctrl.signal
             });
-            clearTimeout(tId);
-            if (!res.ok) throw new Error();
-            const data = await res.json();
-            return data.choices[0].message.content;
+            clearTimeout(tId); if (!res.ok) throw new Error();
+            const data = await res.json(); return data.choices[0].message.content;
         } catch (err) {
             if (i === CONFIG.RETRY_LIMIT) throw err;
             if (i >= 0) {
                 const el = document.getElementById(loadingId);
                 if (i > 0 && el) { 
-                    el.innerHTML = `<span style="color:#d97706; font-weight: 500;">Reintentando... ${Math.round(delay/1000)}s</span>`;
+                    el.innerHTML = `<span style="color:#d97706">Reintentando... ${Math.round(delay/1000)}s</span>`;
                     await new Promise(r => setTimeout(r, delay));
                     delay *= 2;
                     if (el) el.innerHTML = `<div class="w-2 h-2 rounded-full typing-dot"></div><div class="w-2 h-2 rounded-full typing-dot" style="animation-delay:0.2s"></div>`;
@@ -233,7 +207,7 @@ function mostrarLoading() {
     handleScroll();
     longWaitTimeoutId = setTimeout(() => {
         const el = document.getElementById(id);
-        if (el) el.innerHTML = `<span style="color:#d97706; font-weight: 500;">⚠️ Alta demanda, estamos procesando tu respuesta...</span>`;
+        if (el) el.innerHTML = `<span style="color:#d97706; font-weight: 500;">⚠️ Alta demanda, procesando...</span>`;
     }, 10000);
     return id;
 }
