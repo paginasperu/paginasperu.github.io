@@ -8,15 +8,19 @@ LOGO_URL: "https://i.ibb.co/W4m7vxxn/logo-frankos-chicken.jpg",
 WHATSAPP_NUMERO: "51949973277",
 SALUDO_INICIAL: "¡Hola! Bienvenido a Frankos Chicken. ¿En qué puedo ayudarte hoy?",
 PLACEHOLDER_INPUT: "Escribe tu consulta...",
+
 SHOW_REMAINING_MESSAGES: true,
 WARNING_THRESHOLD: 1,
+
 URL_PROXY: "https://deepseek-chat-proxy.precios-com-pe.workers.dev",
 MODELO: "deepseek-chat",
 TEMPERATURA: 0.2,
-TIMEOUT_MS: 15000,
-MAX_TOKENS_RESPONSE: 500,
-MAX_HISTORIAL_MESSAGES: 5,
+TIMEOUT_MS: 6000,
 RETRY_LIMIT: 1,
+
+MAX_TOKENS_RESPONSE: 450,
+MAX_HISTORIAL_MESSAGES: 5,
+
 RETRY_DELAY_MS: 1000,
 SHEET_ID: "1wZjHdi2taaNd5XiBYYPYKQm_ESG9fo6CP_jY7o7Wfzs",
 MIN_LENGTH_INPUT: 4,
