@@ -54,14 +54,15 @@ function aplicarConfiguracionGlobal() {
     }
 }
 
-// --- Seguridad y Acceso (Lógica Blindada) ---
+// --- Seguridad y Acceso (Lógica Blindada + Enter Habilitado) ---
 function setupAccessGate() {
     const keySubmit = document.getElementById('keySubmit');
     const keyInput = document.getElementById('keyInput');
     const keyError = document.getElementById('keyError');
     keySubmit.style.backgroundColor = CONFIG.COLOR_PRIMARIO;
 
-    keySubmit.onclick = async () => {
+    // Función de validación unificada
+    const validarAcceso = async () => {
         const inputKey = keyInput.value.trim(); 
         
         if (!inputKey) {
@@ -79,7 +80,6 @@ function setupAccessGate() {
             const realKey = String(row[0]?.v || "").trim();
             const expirationRaw = row[1]?.f || row[1]?.v || "";
 
-            // Validación de Expiración DD-MM-YYYY HH:mm:ss
             if (expirationRaw) {
                 const p = expirationRaw.match(/(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2}):(\d{2})/);
                 if (p) {
@@ -92,7 +92,6 @@ function setupAccessGate() {
                 }
             }
 
-            // Validación Exacta (Case Sensitive)
             if (inputKey === realKey) {
                 document.getElementById('access-gate').classList.add('hidden');
                 chatInterface.classList.remove('hidden');
@@ -106,6 +105,10 @@ function setupAccessGate() {
             keyError.classList.remove('hidden');
         }
     };
+
+    // Eventos de activación
+    keySubmit.onclick = validarAcceso;
+    keyInput.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); validarAcceso(); } };
 }
 
 // --- Inicialización y Flujo del Chat ---
@@ -127,7 +130,6 @@ async function procesarMensaje() {
     const text = userInput.value.trim();
     if (messageCount >= CONFIG.MAX_DEMO_MESSAGES || text.length < CONFIG.MIN_LENGTH_INPUT) return;
 
-    // Rate Limit (Límite de ráfaga)
     const now = Date.now(), windowMs = CONFIG.RATE_LIMIT_WINDOW_SECONDS * 1000;
     requestTimestamps = requestTimestamps.filter(t => t > now - windowMs);
     if (requestTimestamps.length >= CONFIG.RATE_LIMIT_MAX_REQUESTS) {
@@ -165,12 +167,10 @@ async function procesarMensaje() {
     }
 }
 
-// --- Función de Red Profesional (Estándar AWS/Google) ---
 async function llamarIA(loadingId) {
     let delay = CONFIG.RETRY_DELAY_MS;
     const messages = [{ role: "system", content: systemInstruction }, ...conversationHistory.slice(-CONFIG.MAX_HISTORIAL_MESSAGES)];
 
-    // i <= RETRY_LIMIT -> Intento Inicial + N Reintentos Reales
     for (let i = 0; i <= CONFIG.RETRY_LIMIT; i++) {
         try {
             const ctrl = new AbortController();
@@ -197,7 +197,7 @@ async function llamarIA(loadingId) {
             if (i === CONFIG.RETRY_LIMIT) throw err;
             if (i >= 0) {
                 const el = document.getElementById(loadingId);
-                if (i > 0 && el) { // Feedback visible desde el segundo intento (primer reintento)
+                if (i > 0 && el) { 
                     el.innerHTML = `<span style="color:#d97706; font-weight: 500;">Reintentando... ${Math.round(delay/1000)}s</span>`;
                     await new Promise(r => setTimeout(r, delay));
                     delay *= 2;
@@ -208,7 +208,6 @@ async function llamarIA(loadingId) {
     }
 }
 
-// --- Utilidades de UI ---
 function toggleInput(s) { userInput.disabled = !s; sendBtn.disabled = !s; }
 
 function agregarBurbuja(html, tipo) {
@@ -232,8 +231,6 @@ function mostrarLoading() {
     div.innerHTML = `<div class="w-2 h-2 rounded-full typing-dot"></div><div class="w-2 h-2 rounded-full typing-dot" style="animation-delay:0.2s"></div><div class="w-2 h-2 rounded-full typing-dot" style="animation-delay:0.4s"></div>`;
     chatContainer.appendChild(div);
     handleScroll();
-    
-    // Alerta de espera prolongada (10s)
     longWaitTimeoutId = setTimeout(() => {
         const el = document.getElementById(id);
         if (el) el.innerHTML = `<span style="color:#d97706; font-weight: 500;">⚠️ Alta demanda, estamos procesando tu respuesta...</span>`;
