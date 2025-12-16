@@ -103,14 +103,16 @@ async function llamarIA() {
 }
 
 function updateDemoFeedback(count) {
-    if (!CONFIG.SHOW_REMAINING_MESSAGES || !feedbackDemoText) return;
+    if (!feedbackDemoText) return;
     const remaining = CONFIG.MAX_DEMO_MESSAGES - count;
     if (remaining <= 0) {
         feedbackDemoText.innerText = `🛑 Límite alcanzado.`;
         feedbackDemoText.style.color = "red";
-    } else if (remaining <= CONFIG.WARNING_THRESHOLD) {
+    } else if (remaining <= 3) {
         feedbackDemoText.innerText = `⚠️ Te quedan ${remaining} mensajes.`;
         feedbackDemoText.style.color = CONFIG.COLOR_PRIMARIO;
+    } else {
+        feedbackDemoText.innerText = "";
     }
 }
 
