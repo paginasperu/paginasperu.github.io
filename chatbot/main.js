@@ -41,13 +41,14 @@ function aplicarConfiguracionGlobal() {
     }
 }
 
-// --- Seguridad y Acceso (Corregido para evitar Guardar Contraseña) ---
+// --- Seguridad y Acceso (Protección en el Login) ---
 function setupAccessGate() {
     const keySubmit = document.getElementById('keySubmit'), keyInput = document.getElementById('keyInput'), keyError = document.getElementById('keyError');
     keySubmit.style.backgroundColor = CONFIG.COLOR_PRIMARIO;
     
-    // EVITAR AUTOCOMPLETADO DE GOOGLE
-    keyInput.setAttribute('autocomplete', 'new-password');
+    // BLOQUEO 1: Evitar que el navegador reconozca la clave inicial
+    keyInput.setAttribute('autocomplete', 'one-time-code'); 
+    keyInput.setAttribute('name', 'access_token_' + Math.random().toString(36).substring(7));
 
     const validarAcceso = async () => {
         const inputKey = keyInput.value.trim(); 
@@ -83,15 +84,16 @@ function setupAccessGate() {
     keyInput.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); validarAcceso(); } };
 }
 
-// --- Chat y IA ---
+// --- Chat e IA (Protección en el Chat) ---
 async function cargarIA() {
     try {
         const res = await fetch('./prompt.txt');
         systemInstruction = res.ok ? await res.text() : "";
         document.getElementById('bot-welcome-text').innerText = CONFIG.SALUDO_INICIAL;
         
-        // EVITAR QUE CHROME CONFUNDA EL CHAT CON UN LOGIN
+        // BLOQUEO 2: Cambiar el nombre del campo de chat para que no parezca un formulario de login
         userInput.setAttribute('autocomplete', 'off');
+        userInput.setAttribute('name', 'chat_query_' + Date.now()); // Nombre dinámico
         userInput.placeholder = CONFIG.PLACEHOLDER_INPUT;
         userInput.maxLength = CONFIG.MAX_LENGTH_INPUT;
         
@@ -133,13 +135,11 @@ async function procesarMensaje() {
         messageCount++;
         updateDemoFeedback(messageCount);
     } catch (e) {
-        // CORRECCIÓN: Solo muestra error si realmente falló la petición, no por el límite de mensajes
         clearTimeout(longWaitTimeoutId);
         const loadEl = document.getElementById(loadingId);
         if (loadEl) loadEl.remove();
-        
         if (messageCount < CONFIG.MAX_DEMO_MESSAGES) {
-            agregarBurbuja(marked.parse("¡Ups! Hubo un problema de conexión. ¿Intentamos de nuevo?"), 'bot');
+            agregarBurbuja(marked.parse("¡Ups! Hubo un problema de conexión."), 'bot');
         }
     } finally {
         const active = messageCount < CONFIG.MAX_DEMO_MESSAGES;
