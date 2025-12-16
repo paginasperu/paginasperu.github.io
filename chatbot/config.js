@@ -30,6 +30,6 @@ export const CONFIG = {
   RATE_LIMIT_MAX_REQUESTS: 5,
   RATE_LIMIT_WINDOW_SECONDS: 60,
   
-  SHEET_ID: "1wZjHdi2taaNd5XiBYYPYKQm_ESG9fo6CP_jY7o7Wfzs",
+  DEMO_MODE: true
   
 };
