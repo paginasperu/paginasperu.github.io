@@ -3,53 +3,49 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Catálogo Luxe | Buscador Fijo</title>
+<title>Catálogo Luxe | Minimal</title>
 <style>
   :root { --radius: 14px; --bg: #fafafa; --max-width: 1200px; }
   body { font-family: 'Segoe UI', Arial, sans-serif; margin:0; background: var(--bg); color:#222; overflow-x: hidden; }
 
-  /* CABECERA ESTILO APP */
+  /* CABECERA MINIMALISTA */
   header { 
     background: #fff; border-bottom: 1px solid #ddd; 
     position: sticky; top: 0; z-index: 100; width: 100%; 
   }
   .header-content {
     max-width: var(--max-width); margin: 0 auto; padding: 10px 16px;
-    display: flex; align-items: center; gap: 12px; box-sizing: border-box;
+    display: flex; align-items: center; gap: 10px; box-sizing: border-box;
   }
 
-  /* BUSCADOR QUE OCUPA TODO EL ESPACIO */
-  .search-wrapper { flex-grow: 1; position: relative; }
+  .search-wrapper { flex-grow: 1; }
   .search-input {
-    width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 12px;
-    font-size: 16px; outline: none; background: #f5f5f5; transition: 0.2s; box-sizing: border-box;
+    width: 100%; padding: 12px 16px; border: 1px solid #eee; border-radius: 12px;
+    font-size: 16px; outline: none; background: #f2f2f2; transition: 0.2s; box-sizing: border-box;
   }
-  .search-input:focus { background: #fff; border-color: #222; box-shadow: 0 0 0 3px rgba(0,0,0,0.05); }
+  .search-input:focus { background: #fff; border-color: #ccc; }
 
-  /* ICONO HAMBURGUESA */
+  /* BOTÓN HAMBURGUESA SUTIL */
   .menu-toggle {
-    background: #222; color: #fff; border: none; border-radius: 12px;
-    width: 48px; height: 48px; font-size: 22px; cursor: pointer;
+    background: #f2f2f2; color: #666; border: none; border-radius: 12px;
+    width: 48px; height: 48px; font-size: 20px; cursor: pointer;
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    transition: 0.2s;
   }
-
-  /* CATEGORÍAS EN DESKTOP (Se ocultan en móvil para ir a la hamburguesa) */
-  .desktop-select { width: 200px; display: block; }
-  @media(max-width: 768px) {
-    .desktop-select { display: none; } /* En móvil solo se ven en el menú lateral */
-  }
+  .menu-toggle:hover { background: #e8e8e8; color: #222; }
 
   /* PANEL LATERAL (DRAWER) */
   .mobile-drawer {
     position: fixed; top: 0; right: -100%; width: 280px; height: 100%;
-    background: #fff; box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-    z-index: 200; transition: 0.3s ease-in-out; padding: 30px 20px; box-sizing: border-box;
+    background: #fff; box-shadow: -5px 0 15px rgba(0,0,0,0.05);
+    z-index: 200; transition: 0.3s ease; padding: 30px 20px; box-sizing: border-box;
   }
   .mobile-drawer.active { right: 0; }
-  .drawer-title { font-weight: 800; font-size: 1.2rem; margin-bottom: 25px; display: block; }
+  .drawer-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 20px; display: block; }
+  
   .overlay { 
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: rgba(0,0,0,0.4); display: none; z-index: 150; backdrop-filter: blur(2px);
+    background: rgba(0,0,0,0.2); display: none; z-index: 150; backdrop-filter: blur(2px);
   }
   .overlay.active { display: block; }
 
@@ -62,16 +58,16 @@
     display: flex; flex-direction: column; height: 100%; transition: 0.2s;
   }
   .thumb { 
-    width: 100%; aspect-ratio: 1/1; background: #eee; border-radius: 10px; margin-bottom: 12px;
+    width: 100%; aspect-ratio: 1/1; background: #f5f5f5; border-radius: 10px; margin-bottom: 12px;
     display: flex; align-items: center; justify-content: center;
   }
   .thumb::after { content: '👜'; font-size: 2.5rem; opacity: 0.2; }
   .title { font-weight: 700; font-size: 16px; margin-bottom: 8px; }
   .description { font-size: 13.5px; color: #555; line-height: 1.5; white-space: pre-wrap; flex-grow: 1; margin-bottom: 15px; }
-  .price { font-weight: 700; font-size: 1.2rem; border-top: 1px solid #f0f0f0; padding-top: 12px; }
+  .price { font-weight: 700; font-size: 1.2rem; border-top: 1px solid #f9f9f9; padding-top: 12px; }
   
   .hidden { display: none !important; }
-  #status { text-align: center; padding: 40px; color: #888; }
+  #status { text-align: center; padding: 40px; color: #999; }
 </style>
 </head>
 <body>
@@ -79,26 +75,20 @@
 <header>
   <div class="header-content">
     <div class="search-wrapper">
-      <input type="text" class="search-input" id="mainSearch" placeholder="Buscar por nombre o descripción..." />
+      <input type="text" class="search-input" id="mainSearch" placeholder="Buscar productos..." />
     </div>
-    
-    <select class="search-input desktop-select" id="desktopCat">
-      <option value="todas">Categorías</option>
-    </select>
-
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <button class="menu-toggle" id="btnToggle">☰</button>
   </div>
 </header>
 
-<div class="overlay" onclick="toggleMenu()"></div>
+<div class="overlay" id="overlay"></div>
 
 <div class="mobile-drawer" id="menuDrawer">
-  <span class="drawer-title">Filtros</span>
-  <label style="font-size: 12px; color: #888;">SELECCIONAR CATEGORÍA</label>
-  <select class="search-input" id="mobileCat" style="margin-top:10px; background: #fff;">
+  <span class="drawer-title">Filtrar por categoría</span>
+  <select class="search-input" id="mobileCat" style="background: #f9f9f9;">
     <option value="todas">Todas las categorías</option>
   </select>
-  <button onclick="toggleMenu()" style="margin-top: 40px; width: 100%; padding: 12px; border: none; background: #eee; border-radius: 10px; cursor: pointer;">Cerrar</button>
+  <button id="btnClose" style="margin-top: 30px; width: 100%; padding: 12px; border: none; background: #eee; border-radius: 10px; cursor: pointer; font-weight: 600;">Cerrar</button>
 </div>
 
 <main class="container">
@@ -112,22 +102,32 @@
   const sheetId = idMatch ? idMatch[1] : '';
   const dataUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
 
+  // Elementos del DOM
   const grid = document.getElementById('products');
   const status = document.getElementById('status');
-  const desktopCat = document.getElementById('desktopCat');
   const mobileCat = document.getElementById('mobileCat');
   const mainSearch = document.getElementById('mainSearch');
+  const menuDrawer = document.getElementById('menuDrawer');
+  const overlay = document.getElementById('overlay');
+  const btnToggle = document.getElementById('btnToggle');
+  const btnClose = document.getElementById('btnClose');
+
+  // Función para manejar el menú (definida globalmente)
+  function toggleMenu() {
+    menuDrawer.classList.toggle('active');
+    overlay.classList.toggle('active');
+  }
+
+  btnToggle.addEventListener('click', toggleMenu);
+  btnClose.addEventListener('click', toggleMenu);
+  overlay.addEventListener('click', toggleMenu);
 
   const limpiarTexto = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-
-  function toggleMenu() {
-    document.getElementById('menuDrawer').classList.toggle('active');
-    document.querySelector('.overlay').classList.toggle('active');
-  }
 
   async function init() {
     try {
       const resp = await fetch(dataUrl);
+      if (!resp.ok) throw new Error();
       const csvText = await resp.text();
       const rows = parseCSV(csvText);
       const productsData = rows.slice(1);
@@ -150,17 +150,16 @@
         `;
       }).join('');
 
+      // Llenar categorías
       categories.forEach(cat => {
-        const opt1 = new Option(cat, limpiarTexto(cat));
-        const opt2 = new Option(cat, limpiarTexto(cat));
-        desktopCat.add(opt1);
-        mobileCat.add(opt2);
+        const opt = new Option(cat, limpiarTexto(cat));
+        mobileCat.add(opt);
       });
 
       status.style.display = 'none';
-      setupLogic();
+      setupFilters();
     } catch (e) {
-      status.innerHTML = "⚠️ Error al cargar.";
+      status.innerHTML = "⚠️ Error: Verifica que el Sheet sea público.";
     }
   }
 
@@ -173,3 +172,35 @@
         else if (char === '"') inQuotes = false;
         else field += char;
       } else {
+        if (char === '"') inQuotes = true;
+        else if (char === ',') { row.push(field); field = ''; }
+        else if (char === '\n') { row.push(field); result.push(row); row = []; field = ''; }
+        else field += char;
+      }
+    }
+    row.push(field); result.push(row);
+    return result;
+  }
+
+  function setupFilters() {
+    const items = [...document.querySelectorAll('.card')];
+    
+    function run() {
+      const q = limpiarTexto(mainSearch.value);
+      const cat = mobileCat.value;
+
+      items.forEach(card => {
+        const matchesText = !q || card.dataset.fulltext.includes(q);
+        const matchesCat = cat === 'todas' || card.dataset.category === cat;
+        card.classList.toggle('hidden', !(matchesText && matchesCat));
+      });
+    }
+
+    mainSearch.addEventListener('input', run);
+    mobileCat.addEventListener('change', () => { run(); toggleMenu(); });
+  }
+
+  init();
+</script>
+</body>
+</html>
