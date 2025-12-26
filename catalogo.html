@@ -8,74 +8,86 @@
   :root { --radius: 12px; --bg: #fafafa; --max-width: 1200px; }
   body { font-family: 'Segoe UI', Arial, sans-serif; margin:0; background: var(--bg); color:#222; }
 
+  /* CABECERA ALINEADA */
   header { 
     background: #fff; border-bottom: 1px solid #ddd; 
     position: sticky; top: 0; z-index: 1000; width: 100%; 
   }
   .header-content {
-    max-width: var(--max-width); margin: 0 auto; padding: 10px 16px;
-    display: flex; align-items: center; gap: 10px; box-sizing: border-box;
+    max-width: var(--max-width); margin: 0 auto; padding: 12px 16px;
+    display: flex; align-items: center; gap: 12px; box-sizing: border-box;
   }
 
   .search-wrapper { flex-grow: 1; }
   .search-input {
-    width: 100%; padding: 11px 16px; border: 1px solid #eee; border-radius: 10px;
-    font-size: 15px; outline: none; background: #f2f2f2; transition: 0.2s; box-sizing: border-box;
+    width: 100%; padding: 12px 16px; border: 1px solid #eee; border-radius: 10px;
+    font-size: 16px; outline: none; background: #f2f2f2; transition: 0.2s; box-sizing: border-box;
   }
+  .search-input:focus { background: #fff; border-color: #ccc; }
 
-  /* CATEGORÍAS */
+  /* SELECTORES DE CATEGORÍAS */
   .cat-select { 
     padding: 11px; border: 1px solid #eee; border-radius: 10px; 
     background: #f2f2f2; font-size: 14px; cursor: pointer; outline: none;
   }
   
-  /* MOSTRAR/OCULTAR SEGÚN PANTALLA */
-  .desktop-cat { width: 180px; display: block; }
+  .desktop-cat { width: 200px; display: block; }
   .mobile-menu-wrapper { display: none; position: relative; }
 
+  /* VISTA MÓVIL */
   @media(max-width: 768px) {
     .desktop-cat { display: none; }
     .mobile-menu-wrapper { display: block; }
-    /* Estilo para que el select sea invisible pero cubra el botón de hamburguesa */
+    
+    /* El select nativo cubre el icono de hamburguesa */
     .mobile-cat-native {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      opacity: 0; cursor: pointer; appearance: none;
+      opacity: 0; cursor: pointer; appearance: none; z-index: 2;
     }
     .hamburger-icon {
-      width: 44px; height: 44px; background: #f2f2f2; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center; color: #666; font-size: 20px;
+      width: 48px; height: 48px; background: #f2f2f2; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; color: #666; font-size: 22px;
+      border: 1px solid #eee;
     }
   }
 
-  /* GRILLA DE PRODUCTOS - ESPACIADO CORREGIDO */
-  .container { max-width: var(--max-width); margin: 25px auto; padding: 0 16px; box-sizing: border-box; }
+  /* GRILLA DE PRODUCTOS CON ESPACIADO REAL */
+  .container { max-width: var(--max-width); margin: 30px auto; padding: 0 16px; box-sizing: border-box; }
   .grid { 
     display: grid; 
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
-    gap: 25px; /* Espacio entre fichas */
+    gap: 30px; /* Espacio generoso entre fichas */
     align-items: stretch; 
   }
   
   .card { 
-    background: #fff; border: 1px solid #eee; border-radius: var(--radius); padding: 18px; 
+    background: #fff; border: 1px solid #eee; border-radius: var(--radius); padding: 20px; 
     display: flex; flex-direction: column; height: 100%; transition: 0.2s; box-sizing: border-box;
   }
   
+  /* CONTENEDOR DE IMAGEN (Icono provisional) */
   .thumb { 
-    width: 100%; aspect-ratio: 1/1; background: #f0f0f0; border-radius: 8px; margin-bottom: 15px;
+    width: 100%; aspect-ratio: 1/1; background: #f0f0f0; border-radius: 10px; margin-bottom: 18px;
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
-  .thumb::after { content: '👜'; font-size: 2.2rem; opacity: 0.2; }
+  .thumb::after { content: '👜'; font-size: 2.5rem; opacity: 0.2; }
   
-  .title { font-weight: 700; font-size: 16px; margin-bottom: 10px; }
+  .title { font-weight: 700; font-size: 17px; margin-bottom: 12px; color: #000; }
+  
+  /* DESCRIPCIÓN CON ALTURA VARIABLE DINÁMICA */
   .description { 
-    font-size: 13.5px; color: #555; line-height: 1.6; 
+    font-size: 14px; color: #555; line-height: 1.6; 
     white-space: pre-wrap; flex-grow: 1; margin-bottom: 20px; 
   }
-  .price { font-weight: 700; font-size: 1.2rem; border-top: 1px solid #f2f2f2; padding-top: 15px; }
+  
+  /* PRECIO SIEMPRE AL FONDO */
+  .price { 
+    font-weight: 700; font-size: 1.3rem; color: #000;
+    border-top: 1px solid #f2f2f2; padding-top: 15px; margin-top: auto; 
+  }
   
   .hidden { display: none !important; }
-  #status { text-align: center; padding: 50px; color: #999; }
+  #status { text-align: center; padding: 60px; color: #aaa; font-size: 1.1rem; }
 </style>
 </head>
 <body>
@@ -83,17 +95,17 @@
 <header>
   <div class="header-content">
     <div class="search-wrapper">
-      <input type="text" class="search-input" id="mainSearch" placeholder="Buscar productos..." />
+      <input type="text" class="search-input" id="mainSearch" placeholder="Buscar carteras por nombre o color..." />
     </div>
 
     <select class="cat-select desktop-cat" id="catDesktop">
-      <option value="todas">Categorías</option>
+      <option value="todas">Todas las categorías</option>
     </select>
 
     <div class="mobile-menu-wrapper">
       <div class="hamburger-icon">☰</div>
       <select class="mobile-cat-native" id="catMobile">
-        <option value="todas">Todas</option>
+        <option value="todas">Categorías</option>
       </select>
     </div>
   </div>
@@ -105,7 +117,9 @@
 </main>
 
 <script>
+  // Enlace directo a tu Google Sheets (Compartido públicamente)
   const originalUrl = 'https://docs.google.com/spreadsheets/d/1SbZbDnDjBplG8vKc6Y75ZTn5aqakFLAv7xxM4TQXKP8/edit?gid=0#gid=0';
+  
   const idMatch = originalUrl.match(/\/d\/(.+?)\//);
   const sheetId = idMatch ? idMatch[1] : '';
   const dataUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
@@ -116,6 +130,7 @@
   const catMobile = document.getElementById('catMobile');
   const mainSearch = document.getElementById('mainSearch');
 
+  // Normalización para ignorar tildes y mayúsculas
   const limpiarTexto = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
   async function init() {
@@ -123,7 +138,7 @@
       const resp = await fetch(dataUrl);
       const csvText = await resp.text();
       const rows = parseCSV(csvText);
-      const productsData = rows.slice(1);
+      const productsData = rows.slice(1); // Saltamos la cabecera del Excel
       const categories = new Set();
 
       grid.innerHTML = productsData.map(col => {
@@ -132,7 +147,9 @@
         if(categoria) categories.add(categoria);
 
         return `
-          <div class="card" data-category="${limpiarTexto(categoria)}" data-fulltext="${limpiarTexto(nombre + ' ' + descripcion)}">
+          <div class="card" 
+               data-category="${limpiarTexto(categoria)}" 
+               data-fulltext="${limpiarTexto(nombre + ' ' + descripcion)}">
             <div class="thumb"></div>
             <div class="title">${nombre}</div>
             <div class="description">${descripcion}</div>
@@ -141,6 +158,7 @@
         `;
       }).join('');
 
+      // Llenamos los selectores con las categorías reales del Sheets
       categories.forEach(cat => {
         const val = limpiarTexto(cat);
         catDesktop.add(new Option(cat, val));
@@ -150,10 +168,11 @@
       status.style.display = 'none';
       setupFilters();
     } catch (e) {
-      status.innerHTML = "⚠️ Error al cargar los datos.";
+      status.innerHTML = "⚠️ Error al conectar con Google Sheets. Asegúrate de que el archivo esté compartido para que cualquiera con el enlace pueda leer.";
     }
   }
 
+  // Procesa el CSV respetando comas dentro de textos entrecomillados
   function parseCSV(text) {
     const result = []; let row = []; let field = ''; let inQuotes = false;
     for (let i = 0; i < text.length; i++) {
@@ -175,8 +194,10 @@
 
   function setupFilters() {
     const items = [...document.querySelectorAll('.card')];
+    
     function run() {
       const q = limpiarTexto(mainSearch.value);
+      // Determinamos cuál selector está activo según el ancho de pantalla
       const cat = window.getComputedStyle(catDesktop).display !== 'none' ? catDesktop.value : catMobile.value;
 
       items.forEach(card => {
