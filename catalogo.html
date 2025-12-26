@@ -5,22 +5,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Catálogo Luxe | Google Sheets</title>
 <style>
-  :root { --radius: 14px; --bg: #fafafa; }
+  :root { --radius: 14px; --bg: #fafafa; --max-width: 1200px; }
   body { font-family: 'Segoe UI', Arial, sans-serif; margin:0; background: var(--bg); color:#222; }
 
+  /* CABECERA CON ALINEACIÓN CORREGIDA */
   header {
-    display: grid; grid-template-columns: 1fr 220px; gap: 12px;
-    padding: 14px 5%; background: #fff; border-bottom: 1px solid #ddd;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
     position: sticky; top: 0; z-index: 100;
+    width: 100%;
   }
+
+  /* Este contenedor asegura que la cabecera y el grid midan lo mismo */
+  .header-content {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 12px;
+    box-sizing: border-box;
+  }
+
   header input, header select {
     padding: 10px 15px; border: 1px solid #ccc; border-radius: 10px; font-size: 14px; outline: none; background: #fdfdfd;
+    width: 100%; box-sizing: border-box;
   }
 
-  @media(max-width:720px){ header { grid-template-columns: 1fr 1fr; } }
-  @media(max-width:480px){ header { grid-template-columns: 1fr; } }
+  /* RESPONSIVE CABECERA */
+  @media(max-width:720px){ .header-content { grid-template-columns: 1fr 1fr; } }
+  @media(max-width:480px){ .header-content { grid-template-columns: 1fr; } }
 
-  .container { max-width: 1200px; margin: 20px auto; padding: 0 16px; }
+  /* GRILLA DE PRODUCTOS */
+  .container { max-width: var(--max-width); margin: 20px auto; padding: 0 16px; box-sizing: border-box; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
   
   .card { 
@@ -48,27 +65,28 @@
 <body>
 
 <header>
-  <input id="search" type="text" placeholder="Buscar carteras por nombre o color..." />
-  <select id="category">
-    <option value="todas">Todas las categorías</option>
-    <option value="mano">Mano</option>
-    <option value="hombro">Hombro</option>
-    <option value="mochila">Mochila</option>
-    <option value="bandolera">Bandolera</option>
-    <option value="luxury">Premium</option>
-  </select>
+  <div class="header-content">
+    <input id="search" type="text" placeholder="Buscar carteras por nombre o color..." />
+    <select id="category">
+      <option value="todas">Todas las categorías</option>
+      <option value="mano">Mano</option>
+      <option value="hombro">Hombro</option>
+      <option value="mochila">Mochila</option>
+      <option value="bandolera">Bandolera</option>
+      <option value="luxury">Premium</option>
+    </select>
+  </div>
 </header>
 
 <main class="container">
-  <div id="status">Conectando con Google Sheets...</div>
+  <div id="status">Cargando productos...</div>
   <div id="products" class="grid"></div>
 </main>
 
 <script>
-  // 1. TU ENLACE DIRECTO (Asegúrate que esté compartido como "Cualquier persona con el enlace puede leer")
-  const originalUrl = 'https://docs.google.com/spreadsheets/d/1SbZbDnDjBplG8vKc6Y75ZTn5aqakFLAv7xxM4TQXKP8/edit?usp=sharing';
+  // Tu enlace de Google Sheets
+  const originalUrl = 'https://docs.google.com/spreadsheets/d/1SbZbDnDjBplG8vKc6Y75ZTn5aqakFLAv7xxM4TQXKP8/edit?gid=0#gid=0';
   
-  // 2. TRANSFORMACIÓN AUTOMÁTICA A FORMATO DE DATOS (CSV)
   const idMatch = originalUrl.match(/\/d\/(.+?)\//);
   const sheetId = idMatch ? idMatch[1] : '';
   const dataUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
@@ -80,11 +98,7 @@
     try {
       const resp = await fetch(dataUrl);
       const csvText = await resp.text();
-      
-      // Separar por filas y limpiar vacíos
       const rows = csvText.split('\n').map(row => row.split(',')).filter(cols => cols.length >= 4);
-      
-      // Saltamos la primera fila (cabeceras)
       const productsData = rows.slice(1);
 
       grid.innerHTML = productsData.map(col => {
@@ -103,7 +117,7 @@
       status.style.display = 'none';
       setupLogic();
     } catch (e) {
-      status.innerHTML = "⚠️ Error: Asegúrate de que el Google Sheet esté compartido públicamente para lectura.";
+      status.innerHTML = "⚠️ Error al conectar con el catálogo.";
     }
   }
 
@@ -119,7 +133,7 @@
       items.forEach(card => {
         const matchesText = card.dataset.name.toLowerCase().includes(q) || card.dataset.color.toLowerCase().includes(q);
         const matchesCat = cat === 'todas' || card.dataset.category.includes(cat);
-        card.classList.toggle('hidden', !(matchesText && matchesCat));
+        card.classList.toggle('hidden', !(matchText && matchesCat));
       });
     }
 
