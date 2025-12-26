@@ -3,71 +3,69 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Catálogo Luxe | Altura Automática</title>
+<title>Catálogo Luxe | Pro Mobile</title>
 <style>
-  :root { --radius: 14px; --bg: #fafafa; --max-width: 1200px; }
+  :root { --radius: 14px; --bg: #fafafa; --max-width: 1200px; --accent: #000; }
   body { font-family: 'Segoe UI', Arial, sans-serif; margin:0; background: var(--bg); color:#222; }
 
-  /* CABECERA ALINEADA */
-  header { background: #fff; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 100; width: 100%; }
+  /* CABECERA COMPACTA */
+  header { background: #fff; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 1000; width: 100%; }
   .header-content {
-    max-width: var(--max-width); margin: 0 auto; padding: 14px 16px;
-    display: grid; grid-template-columns: 1fr 220px; gap: 12px; box-sizing: border-box;
+    max-width: var(--max-width); margin: 0 auto; padding: 10px 16px;
+    display: flex; align-items: center; gap: 10px; box-sizing: border-box;
   }
-  header input, header select {
-    padding: 10px 15px; border: 1px solid #ccc; border-radius: 10px; font-size: 14px; 
+
+  .search-wrapper { flex-grow: 1; position: relative; }
+  header input {
+    padding: 10px 15px; border: 1px solid #ccc; border-radius: 12px; font-size: 14px; 
     outline: none; background: #fdfdfd; width: 100%; box-sizing: border-box;
   }
 
-  @media(max-width:720px){ .header-content { grid-template-columns: 1fr 1fr; } }
-  @media(max-width:480px){ .header-content { grid-template-columns: 1fr; } }
-
-  /* GRILLA CON ALTURA AUTOMÁTICA POR FILA */
-  .container { max-width: var(--max-width); margin: 20px auto; padding: 0 16px; box-sizing: border-box; }
-  
-  .grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
-    gap: 20px; 
-    /* Esto hace que todos los items de una fila tengan la misma altura */
-    align-items: stretch; 
+  /* BOTÓN DE CATEGORÍAS (ICONO) */
+  .filter-btn {
+    background: #f0f0f0; border: 1px solid #ccc; border-radius: 12px;
+    width: 42px; height: 42px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s; position: relative; flex-shrink: 0;
   }
+  .filter-btn:active { background: #e0e0e0; }
+  .filter-btn svg { width: 20px; height: 20px; fill: #333; }
+
+  /* DESPLEGABLE FLOTANTE */
+  #categoryMenu {
+    position: absolute; top: 55px; right: 16px; 
+    background: #fff; border: 1px solid #ddd; border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    min-width: 180px; display: none; flex-direction: column;
+    overflow: hidden; z-index: 1100;
+  }
+  #categoryMenu.show { display: flex; animation: fadeIn 0.2s ease; }
+  .cat-option {
+    padding: 12px 16px; font-size: 14px; cursor: pointer; border-bottom: 1px solid #f5f5f5;
+    background: none; text-align: left; border-right: none; border-left: none; border-top: none; width: 100%;
+  }
+  .cat-option:hover { background: #f9f9f9; }
+  .cat-option.active { background: #eee; font-weight: bold; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* CONTENEDOR Y GRID */
+  .container { max-width: var(--max-width); margin: 20px auto; padding: 0 16px; box-sizing: border-box; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; align-items: stretch; }
   
   .card { 
     background: #fff; border: 1px solid #eee; border-radius: var(--radius); 
-    padding: 16px; 
-    display: flex; 
-    flex-direction: column; 
-    height: 100%; /* Ocupa todo el alto que dicte la fila */
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-sizing: border-box;
+    padding: 16px; display: flex; flex-direction: column; height: 100%;
+    transition: transform 0.2s; box-sizing: border-box;
   }
-  .card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
-
   .thumb { 
-    width: 100%; aspect-ratio: 1/1; flex-shrink: 0;
-    background: linear-gradient(135deg, #eee, #ddd); 
-    border-radius: 10px; margin-bottom: 12px;
-    display: flex; align-items: center; justify-content: center;
+    width: 100%; aspect-ratio: 1/1; background: linear-gradient(135deg, #eee, #ddd); 
+    border-radius: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center;
   }
   .thumb::after { content: '👜'; font-size: 2.5rem; opacity: 0.2; }
-
-  .title { font-weight: 700; font-size: 16px; margin-bottom: 8px; color: #000; }
-
-  /* DESCRIPCIÓN VARIABLE */
-  .description { 
-    font-size: 13.5px; color: #555; line-height: 1.5;
-    white-space: pre-wrap; 
-    margin-bottom: 15px;
-    flex-grow: 1; /* Empuja el precio hacia abajo para que todos los precios alineen al fondo */
-  }
-
-  .price { 
-    font-weight: 700; font-size: 1.2rem; color: #000; 
-    border-top: 1px solid #f0f0f0; 
-    padding-top: 12px; 
-    margin-top: auto; /* Anclaje visual al fondo de la tarjeta */
-  }
+  .title { font-weight: 700; font-size: 16px; margin-bottom: 8px; }
+  .description { font-size: 13.5px; color: #555; line-height: 1.5; white-space: pre-wrap; margin-bottom: 15px; flex-grow: 1; }
+  .price { font-weight: 700; font-size: 1.2rem; border-top: 1px solid #f0f0f0; padding-top: 12px; margin-top: auto; }
   
   .hidden { display: none !important; }
   #status { text-align: center; padding: 40px; color: #888; }
@@ -77,10 +75,15 @@
 
 <header>
   <div class="header-content">
-    <input id="search" type="text" placeholder="Buscar productos..." />
-    <select id="category">
-      <option value="todas">Todas las categorías</option>
-    </select>
+    <div class="search-wrapper">
+      <input id="search" type="text" placeholder="Buscar productos..." />
+    </div>
+    <button class="filter-btn" id="filterBtn" title="Filtrar categorías">
+      <svg viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h18V5H3zm0 7h12v-2H3v2z"/></svg>
+    </button>
+    <div id="categoryMenu">
+      <button class="cat-option active" data-value="todas">Todas</button>
+      </div>
   </div>
 </header>
 
@@ -90,21 +93,19 @@
 </main>
 
 <script>
-  // Tu enlace de Google Sheets
   const originalUrl = 'https://docs.google.com/spreadsheets/d/1SbZbDnDjBplG8vKc6Y75ZTn5aqakFLAv7xxM4TQXKP8/edit?gid=0#gid=0';
-  
   const idMatch = originalUrl.match(/\/d\/(.+?)\//);
   const sheetId = idMatch ? idMatch[1] : '';
   const dataUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
 
   const grid = document.getElementById('products');
   const status = document.getElementById('status');
-  const categorySelect = document.getElementById('category');
+  const menu = document.getElementById('categoryMenu');
+  const filterBtn = document.getElementById('filterBtn');
 
-  // FUNCIÓN CLAVE: Elimina tildes y convierte a minúsculas
-  const limpiarTexto = (str) => {
-    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-  }
+  const limpiarTexto = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+
+  let selectedCategory = 'todas';
 
   async function init() {
     try {
@@ -118,7 +119,6 @@
       grid.innerHTML = productsData.map(col => {
         if (col.length < 4) return '';
         const [nombre, categoria, precio, descripcion] = col.map(c => c.trim());
-        
         if(categoria) categories.add(categoria);
 
         return `
@@ -134,25 +134,41 @@
         `;
       }).join('');
 
+      // Generar menú de categorías
       categories.forEach(cat => {
-        const option = document.createElement('option');
-        option.value = limpiarTexto(cat);
-        option.textContent = cat;
-        categorySelect.appendChild(option);
+        const btn = document.createElement('button');
+        btn.className = 'cat-option';
+        btn.textContent = cat;
+        btn.dataset.value = limpiarTexto(cat);
+        btn.onclick = () => selectCat(btn.dataset.value, btn);
+        menu.appendChild(btn);
       });
 
       status.style.display = 'none';
       setupLogic();
     } catch (e) {
-      status.innerHTML = "⚠️ Error al conectar con el catálogo.";
+      status.innerHTML = "⚠️ Error de conexión.";
     }
+  }
+
+  // Lógica de apertura/cierre del menú
+  filterBtn.onclick = (e) => {
+    e.stopPropagation();
+    menu.classList.toggle('show');
+  };
+  document.onclick = () => menu.classList.remove('show');
+
+  function selectCat(val, el) {
+    selectedCategory = val;
+    document.querySelectorAll('.cat-option').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    menu.classList.remove('show');
+    runFilter();
   }
 
   function parseCSV(text) {
     const result = [];
-    let row = [];
-    let field = '';
-    let inQuotes = false;
+    let row = [], field = '', inQuotes = false;
     for (let i = 0; i < text.length; i++) {
       const char = text[i];
       if (inQuotes) {
@@ -172,25 +188,20 @@
 
   function setupLogic() {
     const search = document.getElementById('search');
-    const select = document.getElementById('category');
+    search.addEventListener('input', runFilter);
+  }
+
+  function runFilter() {
+    const q = limpiarTexto(document.getElementById('search').value);
     const items = [...document.querySelectorAll('.card')];
 
-    function runFilter() {
-      const q = limpiarTexto(search.value);
-      const cat = select.value;
-
-      items.forEach(card => {
-        const content = card.dataset.fulltext;
-        const category = card.dataset.category;
-
-        const matchesText = !q || content.includes(q);
-        const matchesCat = cat === 'todas' || category === cat;
-
-        card.classList.toggle('hidden', !(matchesText && matchesCat));
-      });
-    }
-    search.addEventListener('input', runFilter);
-    select.addEventListener('change', runFilter);
+    items.forEach(card => {
+      const content = card.dataset.fulltext;
+      const category = card.dataset.category;
+      const matchesText = !q || content.includes(q);
+      const matchesCat = selectedCategory === 'todas' || category === selectedCategory;
+      card.classList.toggle('hidden', !(matchesText && matchesCat));
+    });
   }
 
   init();
