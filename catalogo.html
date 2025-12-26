@@ -91,8 +91,8 @@
 <script>
   // CONFIGURACIÓN
   const sheetUrl = 'https://docs.google.com/spreadsheets/d/1SbZbDnDjBplG8vKc6Y75ZTn5aqakFLAv7xxM4TQXKP8/edit?gid=0#gid=0';
-  const phone = "51900000000"; // Tu WhatsApp sin el "+"
-  const currency = "S/ "; // Símbolo de moneda que se agregará automáticamente
+  const phone = "51900000000"; // Tu número sin el "+"
+  const currency = "S/ "; 
 
   const idMatch = sheetUrl.match(/\/d\/(.+?)\//);
   const dataUrl = `https://docs.google.com/spreadsheets/d/${idMatch[1]}/export?format=csv`;
@@ -128,7 +128,8 @@
         if(categoria) categories.add(categoria.trim());
 
         const hasOferta = ofertaRaw && ofertaRaw.trim() !== "";
-        const wsMsg = encodeURIComponent(`Hola, deseo más información sobre ${nombre}`);
+        // Mensaje con negritas (*) para WhatsApp
+        const wsMsg = encodeURIComponent(`Hola, deseo más información sobre *${nombre}*`);
 
         return `
           <div class="card" data-category="${limpiarTexto(categoria)}" data-fulltext="${limpiarTexto(nombre + ' ' + desc)}">
