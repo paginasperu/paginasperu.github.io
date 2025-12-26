@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Catálogo Luxe | Marca Adaptable</title>
+<title>Catálogo Luxe | Final Pro</title>
 <style>
   :root { --radius: 12px; --bg: #fafafa; --max-width: 1200px; --accent: #000; }
   body { font-family: 'Segoe UI', Arial, sans-serif; margin:0; background: var(--bg); color:#222; scroll-behavior: smooth; }
 
-  /* CABECERA DINÁMICA */
+  /* CABECERA DINÁMICA MEJORADA */
   header { 
     background: #fff; border-bottom: 1px solid #ddd; 
     position: sticky; top: 0; z-index: 1000; width: 100%; 
@@ -18,27 +18,36 @@
     display: flex; align-items: center; gap: 12px; box-sizing: border-box;
   }
 
-  /* LOGO / NOMBRE DEL NEGOCIO */
-  .brand { font-weight: 800; font-size: 1.2rem; letter-spacing: 1px; color: var(--accent); flex-shrink: 0; }
+  /* LOGO / NOMBRE ALINEADO */
+  .brand { 
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1.2rem; letter-spacing: 1px; color: var(--accent); flex-shrink: 0; 
+  }
   .brand .full-name { display: inline; }
-  .brand .short-name { display: none; }
+  .brand .short-name { 
+    display: none; 
+    background: var(--accent); color: #fff; 
+    width: 38px; height: 38px; /* Altura igualada al buscador */
+    border-radius: 8px; font-size: 1.1rem;
+    align-items: center; justify-content: center;
+  }
 
-  .search-wrapper { flex-grow: 1; }
+  .search-wrapper { flex-grow: 1; display: flex; align-items: center; }
   .search-input {
-    width: 100%; padding: 11px 16px; border: 1px solid #eee; border-radius: 10px;
+    width: 100%; height: 40px; padding: 0 16px; border: 1px solid #eee; border-radius: 10px;
     font-size: 16px; outline: none; background: #f2f2f2; transition: 0.2s; box-sizing: border-box;
   }
   .search-input:focus { background: #fff; border-color: #ccc; }
 
   /* CATEGORÍAS */
-  .cat-select { padding: 10px; border: 1px solid #eee; border-radius: 10px; background: #f2f2f2; font-size: 14px; cursor: pointer; }
+  .cat-select { height: 40px; padding: 0 10px; border: 1px solid #eee; border-radius: 10px; background: #f2f2f2; font-size: 14px; cursor: pointer; outline: none; }
   .desktop-cat { width: 160px; display: block; }
-  .mobile-menu-wrapper { display: none; position: relative; }
+  .mobile-menu-wrapper { display: none; position: relative; height: 40px; }
 
   /* RESPONSIVE CABECERA */
   @media(max-width: 768px) {
     .brand .full-name { display: none; }
-    .brand .short-name { display: inline; border: 2px solid var(--accent); padding: 2px 8px; border-radius: 6px; }
+    .brand .short-name { display: flex; } /* Ahora usa flex para centrar la L */
     .desktop-cat { display: none; }
     .mobile-menu-wrapper { display: block; }
     
@@ -47,8 +56,9 @@
       opacity: 0; cursor: pointer; appearance: none; z-index: 10;
     }
     .hamburger-icon {
-      width: 44px; height: 44px; background: #f2f2f2; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center; color: #666; font-size: 20px; border: 1px solid #ddd;
+      width: 40px; height: 40px; background: #f2f2f2; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; 
+      color: #666; font-size: 20px; border: none; /* Quitamos borde */
     }
   }
 
@@ -97,6 +107,7 @@
 </main>
 
 <script>
+  // Cambia este enlace por el tuyo si es necesario
   const originalUrl = 'https://docs.google.com/spreadsheets/d/1SbZbDnDjBplG8vKc6Y75ZTn5aqakFLAv7xxM4TQXKP8/edit?gid=0#gid=0';
   const idMatch = originalUrl.match(/\/d\/(.+?)\//);
   const sheetId = idMatch ? idMatch[1] : '';
