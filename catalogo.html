@@ -56,23 +56,34 @@
   .title { font-weight: 700; font-size: 16px; margin-bottom: 8px; padding-right: 45px; }
   .description { font-size: 13.5px; color: #555; line-height: 1.5; flex-grow: 1; margin-bottom: 15px; }
 
-  /* PRECIOS: MISMO TAMAÑO, OFERTA PRIMERO */
+  /* PRECIOS */
   .price-container { border-top: 1px solid #f2f2f2; padding-top: 12px; margin-top: auto; display: flex; align-items: center; gap: 8px; }
   .current-price { font-weight: 700; font-size: 1.1rem; color: #000; line-height: 1; }
   .old-price { font-size: 1.1rem; color: #999; text-decoration: line-through; font-weight: 400; line-height: 1; }
 
-  /* BOTÓN CUADRADO CON CENTRADO PERFECTO */
+  /* BOTÓN ACCIÓN CUADRADO - CORREGIDO */
   .btn-action {
-    position: absolute; bottom: 12px; right: 18px;
-    width: 34px; height: 34px;
-    background: #f9f9f9; border: 1px solid #eee;
-    border-radius: 8px; text-decoration: none; color: #444; 
-    font-size: 22px; font-weight: 600; 
-    display: flex; align-items: center; justify-content: center; 
-    line-height: 1; padding: 0; /* Reseteo de espacios para centrado */
-    transition: 0.2s; box-sizing: border-box;
+    position: absolute; 
+    bottom: 12px; 
+    right: 18px;
+    width: 34px; 
+    height: 34px;
+    margin-top: 12px; /* Separación de la línea superior */
+    background: #f9f9f9; 
+    border: 1px solid #eee;
+    border-radius: 8px; 
+    text-decoration: none; 
+    color: #444; 
+    font-size: 20px; 
+    font-weight: 600; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    line-height: 0; /* Elimina espacio tipográfico inferior */
+    padding: 0; 
+    transition: 0.2s; 
+    box-sizing: border-box;
   }
-  .btn-action span { margin-top: -2px; } /* Ajuste fino manual para el carácter + */
   .btn-action:hover { background: #222; color: #fff; border-color: #222; }
 
   .hidden { display: none !important; }
@@ -100,7 +111,7 @@
 
 <script>
   const sheetUrl = 'https://docs.google.com/spreadsheets/d/1SbZbDnDjBplG8vKc6Y75ZTn5aqakFLAv7xxM4TQXKP8/edit?gid=0#gid=0';
-  const phone = "51950141414"; 
+  const phone = "51900000000"; 
   const currency = "S/ "; 
 
   const idMatch = sheetUrl.match(/\/d\/(.+?)\//);
@@ -155,7 +166,7 @@
                 : `<span class="current-price">${formatoPrecio(precioRaw)}</span>`
               }
             </div>
-            <a href="https://wa.me/${phone}?text=${wsMsg}" class="btn-action" target="_blank"><span>+</span></a>
+            <a href="https://wa.me/${phone}?text=${wsMsg}" class="btn-action" target="_blank">+</a>
           </div>
         `;
       }).join('');
