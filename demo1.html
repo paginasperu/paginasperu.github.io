@@ -815,13 +815,13 @@
 
             if (rows.length === 0) return [];
 
-            const headers = rows[0].map(h => h.trim().toLowerCase());
+            const headers = rows[0].map(h => normalizeText(h.trim()));
             const mapper = {
                 'nombre': 'name', 'name': 'name',
                 'precio regular': 'price', 'price': 'price', 'regular price': 'price',
                 'precio rebajado': 'sale_price', 'sale_price': 'sale_price', 'sale price': 'sale_price',
-                'categoría': 'category', 'category': 'category',
-                'descripcion': 'desc', 'desc': 'desc', 'description': 'desc',
+                'categoria': 'category', 'category': 'category',
+                'descripcion': 'desc', 'desc': 'desc', 'description': 'desc', 'detalles': 'desc',
                 'imagen': 'image', 'image': 'image'
             };
 
