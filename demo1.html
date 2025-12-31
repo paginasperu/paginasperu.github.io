@@ -3,373 +3,428 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo Moderno | SPA</title>
+    <title>Catálogo de Carteras | Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        [x-cloak] { display: none !important; }
-        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-        .header-anim { transition: transform 0.3s ease-in-out; }
-        .header-hide { transform: translateY(-100%); }
-        .header-show { transform: translateY(0); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .header-hide { transform: translateY(-100%); transition: transform 0.3s ease; }
+        .header-show { transform: translateY(0); transition: transform 0.3s ease; }
+        .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
+        .list-view { display: flex; flex-direction: column; gap: 1rem; }
+        .list-view .product-card { display: flex; flex-direction: row; height: 120px; }
+        .list-view .product-card img { width: 100px; height: 100%; object-fit: cover; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans" 
-      x-data="shopApp()" 
-      x-init="init()"
-      @scroll.window="handleScroll">
+<body class="bg-gray-50 text-gray-900">
 
-    <header :class="headerVisible ? 'header-show' : 'header-hide'" 
-            class="fixed top-0 w-full z-50 bg-white shadow-sm header-anim">
-        <div class="container mx-auto px-4 py-2">
-            <div class="flex items-center justify-between gap-4">
-                <div class="flex items-center gap-2 shrink-0">
-                    <img :src="config.logo" class="h-10 w-10 object-contain">
-                    <span class="font-bold text-lg hidden sm:block" x-text="config.name"></span>
-                </div>
+    <script>
+        const CONFIG = {
+            STORE_NAME: "Carteras Chic",
+            PRIMARY_COLOR: "#be185d", // Pink-700
+            SHEET_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTE-XXXXX/pub?output=csv",
+            CURRENCY: "S/ ",
+            WHATSAPP: "51900000000",
+            INSTAGRAM: "https://instagram.com",
+            FACEBOOK: "https://facebook.com",
+            TIKTOK: "https://tiktok.com",
+            YOUTUBE: "https://youtube.com",
+            VERSION: "1.0.4",
+            CACHE_TIME: 60 * 60 * 1000 // 1 hora
+        };
+    </script>
 
-                <div class="relative flex-grow max-w-md">
-                    <input type="text" x-model="searchQuery" placeholder="Buscar..." 
-                           class="w-full bg-gray-100 border-none rounded-full py-2 pl-10 pr-4 focus:ring-2 focus:ring-opacity-50"
-                           :style="`--tw-ring-color: ${config.primaryColor}`">
-                    <i data-lucide="search" class="absolute left-3 top-2.5 text-gray-400 w-4 h-4"></i>
-                </div>
-
-                <button @click="cartOpen = true" class="relative p-2 hover:bg-gray-100 rounded-full transition">
+    <header id="main-header" class="fixed top-0 left-0 w-full bg-white z-50 shadow-sm header-show">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div id="logo-placeholder" class="w-10 h-10 bg-pink-700 rounded-full flex items-center justify-center text-white">
                     <i data-lucide="shopping-bag"></i>
-                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center" 
-                          x-show="cartCount > 0" x-text="cartCount"></span>
+                </div>
+                <h1 class="font-bold text-lg tracking-tight" id="brand-name">Cargando...</h1>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <button onclick="toggleCart()" class="relative p-2">
+                    <i data-lucide="shopping-cart"></i>
+                    <span id="cart-count" class="absolute top-0 right-0 bg-pink-700 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
                 </button>
             </div>
-
-            <div class="flex items-center justify-between mt-2 pt-2 border-t overflow-x-auto no-scrollbar gap-4">
-                <div class="flex gap-4 items-center whitespace-nowrap">
-                    <select x-model="filterCategory" class="text-sm bg-transparent border-none focus:ring-0 font-medium">
-                        <option value="">Todas las categorías</option>
-                        <template x-for="cat in categories" :key="cat">
-                            <option :value="cat" x-text="cat"></option>
-                        </template>
-                    </select>
-                    <select x-model="sortBy" class="text-sm bg-transparent border-none focus:ring-0 font-medium">
-                        <option value="default">Ordenar por</option>
-                        <option value="low">Precio: Bajo a Alto</option>
-                        <option value="high">Precio: Alto a Bajo</option>
-                    </select>
-                </div>
-                <div class="flex bg-gray-100 p-1 rounded-lg">
-                    <button @click="viewMode = 'grid'" :class="viewMode === 'grid' ? 'bg-white shadow-sm' : 'text-gray-400'" class="p-1 rounded transition"><i data-lucide="layout-grid" class="w-4 h-4"></i></button>
-                    <button @click="viewMode = 'list'" :class="viewMode === 'list' ? 'bg-white shadow-sm' : 'text-gray-400'" class="p-1 rounded ml-1 transition"><i data-lucide="list" class="w-4 h-4"></i></button>
-                </div>
+        </div>
+        
+        <div class="px-4 pb-3">
+            <div class="relative mb-3">
+                <i data-lucide="search" class="absolute left-3 top-2.5 text-gray-400 w-4 h-4"></i>
+                <input type="text" id="search-input" placeholder="Buscar carteras..." class="w-full bg-gray-100 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-pink-700 transition">
             </div>
+            <div id="category-list" class="flex gap-2 overflow-x-auto hide-scroll pb-1">
+                <button onclick="filterCategory('all')" class="cat-btn whitespace-nowrap px-4 py-1 rounded-full text-xs font-medium bg-pink-700 text-white">Todos</button>
+                </div>
         </div>
     </header>
 
-    <main class="container mx-auto px-4 pt-32 pb-20">
-        <template x-if="loading">
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <template x-for="i in 8">
-                    <div class="bg-gray-200 animate-pulse rounded-2xl h-64 w-full"></div>
-                </template>
+    <main class="pt-40 pb-20 px-4 max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center gap-2 bg-gray-200 p-1 rounded-lg">
+                <button onclick="setView('grid')" id="btn-grid" class="p-1.5 rounded bg-white shadow-sm"><i data-lucide="layout-grid" class="w-4 h-4"></i></button>
+                <button onclick="setView('list')" id="btn-list" class="p-1.5 rounded"><i data-lucide="list" class="w-4 h-4"></i></button>
             </div>
-        </template>
-
-        <div :class="viewMode === 'grid' ? 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4' : 'space-y-4'">
-            <template x-for="product in filteredProducts" :key="product.id">
-                <div @click="openProduct(product)" 
-                     class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer border border-gray-100"
-                     :class="viewMode === 'grid' ? 'flex flex-col' : 'flex flex-row h-40 md:h-48'">
-                    
-                    <div :class="viewMode === 'grid' ? 'w-full aspect-square' : 'w-40 md:w-56 shrink-0'" class="bg-white p-2">
-                        <img :src="product.imagen" :alt="product.nombre" class="w-full h-full object-contain mix-blend-multiply" loading="lazy">
-                    </div>
-
-                    <div class="p-4 flex flex-col flex-grow">
-                        <span class="text-[10px] font-bold uppercase text-gray-400 mb-1" x-text="product.categoria"></span>
-                        <h3 class="font-bold text-sm md:text-base line-clamp-2 leading-tight mb-2" x-text="product.nombre"></h3>
-                        <p x-show="viewMode === 'list'" class="text-xs text-gray-500 line-clamp-3 mb-4" x-text="product.descripcion"></p>
-                        
-                        <div class="mt-auto flex items-center gap-2">
-                            <span class="font-bold text-lg" :style="`color: ${config.primaryColor}`" 
-                                  x-text="config.currency + (product.precio_rebajado || product.precio_regular)"></span>
-                            <span x-show="product.precio_rebajado" class="text-xs line-through text-gray-400" 
-                                  x-text="config.currency + product.precio_regular"></span>
-                        </div>
-                    </div>
-                </div>
-            </template>
+            <select onchange="sortProducts(this.value)" class="bg-transparent text-sm font-medium focus:outline-none">
+                <option value="default">Recomendados</option>
+                <option value="price-asc">Precio: Menor a Mayor</option>
+                <option value="price-desc">Precio: Mayor a Menor</option>
+            </select>
         </div>
 
-        <div x-show="filteredProducts.length === 0 && !loading" class="text-center py-20">
-            <i data-lucide="package-search" class="mx-auto w-16 h-16 text-gray-200 mb-4"></i>
-            <p class="text-gray-500 font-medium">No encontramos productos con esos criterios.</p>
+        <div id="products-container" class="product-grid">
+            <div class="skeleton h-64 rounded-xl"></div>
+            <div class="skeleton h-64 rounded-xl"></div>
+            <div class="skeleton h-64 rounded-xl"></div>
+            <div class="skeleton h-64 rounded-xl"></div>
         </div>
     </main>
 
-    <div x-show="productModal" x-cloak class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
-        <div x-show="productModal" x-transition.opacity @click="productModal = false" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-        <div x-show="productModal" 
-             x-transition:enter="transition ease-out duration-300 transform"
-             x-transition:enter-start="translate-y-full sm:translate-y-0 sm:scale-95"
-             x-transition:enter-end="translate-y-0 sm:scale-100"
-             class="relative bg-white w-full max-w-3xl rounded-t-[2rem] sm:rounded-3xl overflow-hidden max-h-[90vh] overflow-y-auto">
-            
-            <button @click="productModal = false" class="absolute right-6 top-6 z-10 bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-
-            <template x-if="selectedProduct">
-                <div class="flex flex-col md:flex-row">
-                    <div class="md:w-1/2 bg-white p-8">
-                        <img :src="selectedProduct.imagen" class="w-full aspect-square object-contain">
-                    </div>
-                    <div class="md:w-1/2 p-8 flex flex-col">
-                        <span class="text-xs font-bold text-gray-400 uppercase mb-2" x-text="selectedProduct.categoria"></span>
-                        <h2 class="text-2xl font-black mb-4 leading-tight" x-text="selectedProduct.nombre"></h2>
-                        <div class="flex items-baseline gap-3 mb-6">
-                            <span class="text-3xl font-bold" :style="`color: ${config.primaryColor}`" x-text="config.currency + (selectedProduct.precio_rebajado || selectedProduct.precio_regular)"></span>
-                            <span x-show="selectedProduct.precio_rebajado" class="text-lg line-through text-gray-400" x-text="config.currency + selectedProduct.precio_regular"></span>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-8 leading-relaxed" x-text="selectedProduct.descripcion"></p>
-                        
-                        <button @click="addToCart(selectedProduct)" 
-                                class="mt-auto w-full py-4 rounded-2xl font-bold text-white shadow-lg shadow-purple-200 flex items-center justify-center gap-3 transition active:scale-95"
-                                :style="`background-color: ${config.primaryColor}`">
-                            <i data-lucide="shopping-cart" class="w-5 h-5"></i>
-                            Añadir al carrito
-                        </button>
-                    </div>
-                </div>
-            </template>
+    <footer class="bg-gray-100 py-10 px-4 text-center border-t border-gray-200">
+        <h2 class="font-bold text-xl mb-4" id="footer-name">Store</h2>
+        <div class="flex justify-center gap-6 mb-6">
+            <a id="link-wa" href="#" class="text-gray-600 hover:text-pink-700"><i data-lucide="phone"></i></a>
+            <a id="link-ig" href="#" class="text-gray-600 hover:text-pink-700"><i data-lucide="instagram"></i></a>
+            <a id="link-fb" href="#" class="text-gray-600 hover:text-pink-700"><i data-lucide="facebook"></i></a>
+            <a id="link-tk" href="#" class="text-gray-600 hover:text-pink-700"><i data-lucide="music-2"></i></a>
         </div>
-    </div>
-
-    <div x-show="cartOpen" x-cloak class="fixed inset-0 z-[70] overflow-hidden">
-        <div @click="cartOpen = false" x-transition.opacity class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
-        <div class="absolute inset-y-0 right-0 max-w-full flex">
-            <div x-show="cartOpen" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
-                 class="w-screen max-w-md bg-white shadow-2xl flex flex-col">
-                <div class="p-6 border-b flex justify-between items-center">
-                    <h2 class="text-xl font-black">Mi Pedido</h2>
-                    <button @click="cartOpen = false" class="p-2 hover:bg-gray-100 rounded-full"><i data-lucide="x"></i></button>
-                </div>
-                <div class="flex-grow overflow-y-auto p-6 space-y-6">
-                    <template x-for="item in cart" :key="item.id">
-                        <div class="flex gap-4">
-                            <img :src="item.imagen" class="w-20 h-20 object-contain bg-gray-50 rounded-xl">
-                            <div class="flex-grow">
-                                <h4 class="font-bold text-sm line-clamp-1" x-text="item.nombre"></h4>
-                                <p class="text-sm font-bold mt-1" :style="`color: ${config.primaryColor}`" x-text="config.currency + (item.precio_rebajado || item.precio_regular)"></p>
-                                <div class="flex items-center gap-3 mt-2">
-                                    <button @click="updateQty(item.id, -1)" class="w-7 h-7 border rounded-full flex items-center justify-center hover:bg-gray-50">-</button>
-                                    <span class="font-bold text-sm" x-text="item.qty"></span>
-                                    <button @click="updateQty(item.id, 1)" class="w-7 h-7 border rounded-full flex items-center justify-center hover:bg-gray-50">+</button>
-                                </div>
-                            </div>
-                            <button @click="removeFromCart(item.id)" class="text-gray-300 hover:text-red-500 transition"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
-                        </div>
-                    </template>
-                    <div x-show="cart.length === 0" class="text-center py-20">
-                        <i data-lucide="shopping-cart" class="w-12 h-12 mx-auto text-gray-200 mb-2"></i>
-                        <p class="text-gray-400">Tu carrito está vacío</p>
-                    </div>
-                </div>
-                <div class="p-6 bg-gray-50 border-t">
-                    <div class="flex justify-between items-center mb-6">
-                        <span class="text-gray-500 font-medium">Total estimado:</span>
-                        <span class="text-2xl font-black" x-text="config.currency + cartTotal"></span>
-                    </div>
-                    <button @click="sendWhatsApp" :disabled="cart.length === 0"
-                            class="w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-bold flex items-center justify-center gap-3 transition-all disabled:opacity-50 shadow-lg shadow-green-100">
-                        <i data-lucide="send"></i>
-                        Enviar por WhatsApp
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <footer class="bg-white py-12 border-t">
-        <div class="container mx-auto px-4 text-center">
-            <div class="flex justify-center gap-6 mb-8">
-                <a :href="config.instagram" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-pink-50 hover:text-pink-600 transition"><i data-lucide="instagram"></i></a>
-                <a :href="config.facebook" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition"><i data-lucide="facebook"></i></a>
-                <a :href="config.tiktok" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white transition"><i data-lucide="music-2"></i></a>
-            </div>
-            <p class="font-bold text-gray-900" x-text="config.name"></p>
-            <p class="text-xs text-gray-400 mt-2">Versión <span x-text="config.version"></span></p>
-        </div>
+        <p class="text-xs text-gray-400">© 2025 Todos los derechos reservados.</p>
     </footer>
 
+    <div id="product-modal" class="fixed inset-0 bg-black/50 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 hidden transition-opacity duration-300">
+        <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl overflow-hidden relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal()" class="absolute top-4 right-4 bg-white/80 backdrop-blur rounded-full p-2 z-10">
+                <i data-lucide="x"></i>
+            </button>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <div id="cart-drawer" class="fixed inset-0 bg-black/50 z-[110] translate-x-full transition-transform duration-300 flex justify-end">
+        <div class="bg-white w-full max-w-md h-full shadow-2xl flex flex-col">
+            <div class="p-6 border-b flex justify-between items-center">
+                <h3 class="font-bold text-xl">Tu Carrito</h3>
+                <button onclick="toggleCart()"><i data-lucide="arrow-right"></i></button>
+            </div>
+            <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4">
+                </div>
+            <div class="p-6 border-t border-gray-100 bg-gray-50">
+                <div class="flex justify-between text-lg font-bold mb-4">
+                    <span>Total:</span>
+                    <span id="cart-total">S/ 0.00</span>
+                </div>
+                <button onclick="sendOrder()" class="w-full bg-pink-700 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-pink-800 transition">
+                    <i data-lucide="message-circle"></i> Enviar pedido por WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        function shopApp() {
-            return {
-                config: {
-                    name: 'Carteras Premium',
-                    csvUrl: 'URL_DE_TU_GOOGLE_SHEETS_AQUI', 
-                    primaryColor: '#7c3aed',
-                    logo: 'https://cdn-icons-png.flaticon.com/512/2904/2904944.png',
-                    currency: 'S/ ',
-                    whatsapp: '51900000000',
-                    instagram: '#',
-                    facebook: '#',
-                    tiktok: '#',
-                    version: '1.2.0'
-                },
+        // --- LOGICA DE DATOS Y CACHE ---
+        let allProducts = [];
+        let currentFilter = 'all';
+        let currentView = 'grid';
+        let cart = JSON.parse(localStorage.getItem(`cart_${location.pathname}`)) || [];
 
-                loading: true,
-                products: [],
-                categories: [],
-                searchQuery: '',
-                filterCategory: '',
-                sortBy: 'default',
-                viewMode: localStorage.getItem('viewMode_kativa') || 'grid',
-                cart: JSON.parse(localStorage.getItem('cart_kativa')) || [],
-                cartOpen: false,
-                productModal: false,
-                selectedProduct: null,
-                headerVisible: true,
-                lastScroll: 0,
+        async function init() {
+            lucide.createIcons();
+            setupUI();
+            await loadData();
+            updateCartUI();
+            setupHeaderScroll();
+            setupSearch();
+        }
 
-                async init() {
-                    await this.fetchData();
-                    lucide.createIcons();
-                    this.$watch('viewMode', val => localStorage.setItem('viewMode_kativa', val));
-                    this.$watch('cart', val => {
-                        localStorage.setItem('cart_kativa', JSON.stringify(val));
-                        setTimeout(() => lucide.createIcons(), 10);
-                    }, { deep: true });
-                },
+        function setupUI() {
+            document.getElementById('brand-name').innerText = CONFIG.STORE_NAME;
+            document.getElementById('footer-name').innerText = CONFIG.STORE_NAME;
+            document.getElementById('link-wa').href = `https://wa.me/${CONFIG.WHATSAPP}`;
+            document.getElementById('link-ig').href = CONFIG.INSTAGRAM;
+            document.getElementById('link-fb').href = CONFIG.FACEBOOK;
+            document.getElementById('link-tk').href = CONFIG.TIKTOK;
+        }
 
-                async fetchData() {
-                    this.loading = true;
-                    const cacheKey = `kativa_cache_${this.config.version}`;
-                    const cached = localStorage.getItem(cacheKey);
-                    const now = new Date().getTime();
+        async function loadData() {
+            const cacheKey = `data_cache_${location.pathname}`;
+            const cached = JSON.parse(localStorage.getItem(cacheKey));
+            const now = Date.now();
 
-                    // Intentar usar caché (1 hora)
-                    if (cached) {
-                        const parsed = JSON.parse(cached);
-                        if (now - parsed.time < 3600000) {
-                            this.setProducts(parsed.data);
-                            this.loading = false;
-                            return;
-                        }
-                    }
-
-                    try {
-                        // Intentar Google Sheets
-                        if (this.config.csvUrl.includes("docs.google.com")) {
-                            const response = await fetch(this.config.csvUrl);
-                            const text = await response.text();
-                            const data = this.parseCSV(text);
-                            this.saveAndSet(data, cacheKey, now);
-                        } else {
-                            throw new Error("No Google Sheet URL");
-                        }
-                    } catch (e) {
-                        console.log("Cargando FakeStoreAPI por defecto...");
-                        // FALLBACK OBLIGATORIO A FAKESTOREAPI
-                        const res = await fetch('https://fakestoreapi.com/products/category/jewelery');
-                        const json = await res.json();
-                        const mapped = json.map(p => ({
-                            id: p.id,
-                            nombre: p.title,
-                            precio_regular: p.price * 3.7, // Conversión simple a S/
-                            precio_rebajado: (p.price * 3.7 * 0.8).toFixed(2),
-                            categoria: "Carteras de Gala",
-                            descripcion: p.description,
-                            imagen: p.image
-                        }));
-                        this.saveAndSet(mapped, cacheKey, now);
-                    } finally {
-                        this.loading = false;
-                        setTimeout(() => lucide.createIcons(), 100);
-                    }
-                },
-
-                parseCSV(text) {
-                    const lines = text.trim().split('\n');
-                    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-                    return lines.slice(1).map((line, index) => {
-                        const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                        let obj = { id: index };
-                        headers.forEach((h, i) => {
-                            let val = cols[i]?.trim().replace(/^"|"$/g, '');
-                            obj[h] = (h.includes('precio')) ? parseFloat(val) : val;
-                        });
-                        return obj;
-                    });
-                },
-
-                saveAndSet(data, key, time) {
-                    localStorage.setItem(key, JSON.stringify({ time, data }));
-                    this.setProducts(data);
-                },
-
-                setProducts(data) {
-                    this.products = data;
-                    this.categories = [...new Set(data.map(p => p.categoria))];
-                },
-
-                get filteredProducts() {
-                    let items = this.products.filter(p => {
-                        const search = this.searchQuery.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                        const name = p.nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                        const desc = p.descripcion.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                        return (name.includes(search) || desc.includes(search)) && 
-                               (this.filterCategory === '' || p.categoria === this.filterCategory);
-                    });
-                    if (this.sortBy === 'low') items.sort((a,b) => (a.precio_rebajado || a.precio_regular) - (b.precio_rebajado || b.precio_regular));
-                    if (this.sortBy === 'high') items.sort((a,b) => (b.precio_rebajado || b.precio_regular) - (a.precio_rebajado || a.precio_regular));
-                    return items;
-                },
-
-                handleScroll() {
-                    let st = window.pageYOffset || document.documentElement.scrollTop;
-                    this.headerVisible = st < this.lastScroll || st < 50;
-                    this.lastScroll = st <= 0 ? 0 : st;
-                },
-
-                openProduct(p) {
-                    this.selectedProduct = p;
-                    this.productModal = true;
-                    setTimeout(() => lucide.createIcons(), 50);
-                },
-
-                addToCart(p) {
-                    const exists = this.cart.find(i => i.id === p.id);
-                    if (exists) exists.qty++;
-                    else this.cart.push({ ...p, qty: 1 });
-                    this.productModal = false;
-                    this.cartOpen = true;
-                },
-
-                updateQty(id, d) {
-                    const item = this.cart.find(i => i.id === id);
-                    if (item) {
-                        item.qty += d;
-                        if (item.qty <= 0) this.removeFromCart(id);
-                    }
-                },
-
-                removeFromCart(id) {
-                    this.cart = this.cart.filter(i => i.id !== id);
-                },
-
-                get cartCount() { return this.cart.reduce((s, i) => s + i.qty, 0); },
-                get cartTotal() { return this.cart.reduce((s, i) => s + ((i.precio_rebajado || i.precio_regular) * i.qty), 0).toFixed(2); },
-
-                sendWhatsApp() {
-                    let msg = `*Pedido - ${this.config.name}*\n\n`;
-                    this.cart.forEach(i => msg += `• ${i.qty}x ${i.nombre} (${this.config.currency}${i.precio_rebajado || i.precio_regular})\n`);
-                    msg += `\n*Total: ${this.config.currency}${this.cartTotal}*`;
-                    window.open(`https://api.whatsapp.com/send?phone=${this.config.whatsapp}&text=${encodeURIComponent(msg)}`, '_blank');
+            if (cached && (now - cached.time < CONFIG.CACHE_TIME)) {
+                allProducts = cached.data;
+                renderProducts(allProducts);
+                renderCategories();
+            } else {
+                try {
+                    const response = await fetch(CONFIG.SHEET_URL);
+                    const csvText = await response.text();
+                    allProducts = parseCSV(csvText);
+                    localStorage.setItem(cacheKey, JSON.stringify({time: now, data: allProducts}));
+                    renderProducts(allProducts);
+                    renderCategories();
+                } catch (e) {
+                    console.error("Error cargando datos reales, usando inventados.");
+                    loadMockData();
                 }
             }
         }
+
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            const result = [];
+            const headers = lines[0].split(',');
+            for (let i = 1; i < lines.length; i++) {
+                const obj = {};
+                const currentline = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); // Regex para comas en CSV
+                if (currentline.length < 2) continue;
+                obj.name = currentline[0]?.replace(/"/g, '');
+                obj.price = parseFloat(currentline[1]);
+                obj.salePrice = parseFloat(currentline[2]) || null;
+                obj.category = currentline[3]?.trim();
+                obj.description = currentline[4]?.replace(/"/g, '');
+                obj.image = currentline[5]?.trim();
+                obj.id = btoa(obj.name).substring(0, 8);
+                result.push(obj);
+            }
+            return result;
+        }
+
+        function loadMockData() {
+            allProducts = [
+                { id: '1', name: 'Cartera Elegance Negra', price: 150, salePrice: 120, category: 'Gala', description: 'Cartera de cuero genuino perfecta para eventos nocturnos.', image: '' },
+                { id: '2', name: 'Bolso Daily Beige', price: 89, salePrice: null, category: 'Casual', description: 'Espacioso y ligero para el día a día.', image: '' },
+                { id: '3', name: 'Mini Bag Red', price: 110, salePrice: 95, category: 'Mini', description: 'Color vibrante con cadena dorada.', image: '' }
+            ];
+            renderProducts(allProducts);
+            renderCategories();
+        }
+
+        // --- RENDERIZADO ---
+        function renderProducts(products) {
+            const container = document.getElementById('products-container');
+            container.innerHTML = '';
+            
+            products.forEach(p => {
+                const card = document.createElement('div');
+                card.className = `product-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 transition-all active:scale-95 cursor-pointer`;
+                
+                const discountTag = p.salePrice ? `<span class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full">OFERTA</span>` : '';
+                
+                const imgStyle = p.image ? `src="${p.image}"` : `style="background: hsl(${Math.random() * 360}, 70%, 80%)"`;
+
+                card.innerHTML = `
+                    <div class="relative aspect-square overflow-hidden bg-gray-100" onclick="openProduct('${p.id}')">
+                        ${discountTag}
+                        <img ${imgStyle} loading="lazy" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                    </div>
+                    <div class="p-3 flex flex-col justify-between flex-1">
+                        <div>
+                            <p class="text-[10px] uppercase text-gray-400 font-bold mb-1">${p.category}</p>
+                            <h3 class="text-sm font-semibold line-clamp-2 leading-tight">${p.name}</h3>
+                        </div>
+                        <div class="mt-2">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-pink-700">${CONFIG.CURRENCY}${p.salePrice || p.price}</span>
+                                ${p.salePrice ? `<span class="text-xs text-gray-400 line-through">${CONFIG.CURRENCY}${p.price}</span>` : ''}
+                            </div>
+                            <button onclick="addToCart(event, '${p.id}')" class="mt-2 w-full bg-gray-900 text-white text-xs py-2 rounded-lg font-medium flex items-center justify-center gap-1">
+                                <i data-lucide="plus" class="w-3 h-3"></i> Agregar
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function renderCategories() {
+            const cats = ['all', ...new Set(allProducts.map(p => p.category))];
+            const container = document.getElementById('category-list');
+            container.innerHTML = cats.map(c => `
+                <button onclick="filterCategory('${c}')" class="cat-btn whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-semibold transition
+                    ${currentFilter === c ? 'bg-pink-700 text-white' : 'bg-gray-200 text-gray-600'}">
+                    ${c === 'all' ? 'Todos' : c}
+                </button>
+            `).join('');
+        }
+
+        // --- FILTROS Y BÚSQUEDA ---
+        function setupSearch() {
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const filtered = allProducts.filter(p => {
+                    const matchName = p.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(term);
+                    const matchDesc = p.description.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(term);
+                    const matchCat = currentFilter === 'all' || p.category === currentFilter;
+                    return (matchName || matchDesc) && matchCat;
+                });
+                renderProducts(filtered);
+            });
+        }
+
+        function filterCategory(cat) {
+            currentFilter = cat;
+            renderCategories();
+            const filtered = cat === 'all' ? allProducts : allProducts.filter(p => p.category === cat);
+            renderProducts(filtered);
+        }
+
+        function setView(view) {
+            currentView = view;
+            const container = document.getElementById('products-container');
+            document.getElementById('btn-grid').classList.toggle('bg-white', view === 'grid');
+            document.getElementById('btn-list').classList.toggle('bg-white', view === 'list');
+            container.className = view === 'grid' ? 'product-grid' : 'list-view';
+        }
+
+        // --- CARRITO ---
+        function toggleCart() {
+            const drawer = document.getElementById('cart-drawer');
+            drawer.classList.toggle('translate-x-full');
+        }
+
+        function addToCart(e, id) {
+            e.stopPropagation();
+            const product = allProducts.find(p => p.id === id);
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({...product, qty: 1});
+            }
+            updateCartUI();
+            // Feedback visual simple
+            const btn = e.currentTarget;
+            const original = btn.innerHTML;
+            btn.innerHTML = "¡Añadido!";
+            btn.classList.replace('bg-gray-900', 'bg-green-600');
+            setTimeout(() => {
+                btn.innerHTML = original;
+                btn.classList.replace('bg-green-600', 'bg-gray-900');
+                lucide.createIcons();
+            }, 1000);
+        }
+
+        function updateCartUI() {
+            localStorage.setItem(`cart_${location.pathname}`, JSON.stringify(cart));
+            const count = cart.reduce((acc, item) => acc + item.qty, 0);
+            const badge = document.getElementById('cart-count');
+            badge.innerText = count;
+            badge.classList.toggle('hidden', count === 0);
+
+            const container = document.getElementById('cart-items');
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-gray-400"><i data-lucide="shopping-bag" class="mx-auto mb-2 opacity-20 w-12 h-12"></i><p>Tu carrito está vacío</p></div>`;
+            } else {
+                container.innerHTML = cart.map(item => `
+                    <div class="flex gap-4 border-b border-gray-50 pb-4">
+                        <div class="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                            <img src="${item.image}" class="w-full h-full object-cover" onerror="this.style.background='pink'">
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-sm font-bold">${item.name}</h4>
+                            <p class="text-xs text-pink-700 font-bold">${CONFIG.CURRENCY}${item.salePrice || item.price}</p>
+                            <div class="flex items-center gap-3 mt-2">
+                                <button onclick="changeQty('${item.id}', -1)" class="w-6 h-6 border rounded flex items-center justify-center">-</button>
+                                <span class="text-sm">${item.qty}</span>
+                                <button onclick="changeQty('${item.id}', 1)" class="w-6 h-6 border rounded flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                        <button onclick="removeFromCart('${item.id}')" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>
+                `).join('');
+            }
+
+            const total = cart.reduce((acc, item) => acc + ((item.salePrice || item.price) * item.qty), 0);
+            document.getElementById('cart-total').innerText = `${CONFIG.CURRENCY}${total.toFixed(2)}`;
+            lucide.createIcons();
+        }
+
+        function changeQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) return removeFromCart(id);
+                updateCartUI();
+            }
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(i => i.id !== id);
+            updateCartUI();
+        }
+
+        function sendOrder() {
+            if (cart.length === 0) return;
+            let text = `*Pedido de ${CONFIG.STORE_NAME}*\n--------------------------\n`;
+            cart.forEach(item => {
+                text += `• ${item.qty}x ${item.name} (${CONFIG.CURRENCY}${item.salePrice || item.price})\n`;
+            });
+            const total = document.getElementById('cart-total').innerText;
+            text += `--------------------------\n*Total: ${total}*`;
+            const url = `https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        // --- MODAL ---
+        function openProduct(id) {
+            const p = allProducts.find(x => x.id === id);
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `
+                <div class="aspect-square bg-gray-100">
+                    <img src="${p.image}" class="w-full h-full object-cover" onerror="this.style.background='pink'">
+                </div>
+                <div class="p-6">
+                    <span class="text-xs font-bold text-pink-700 uppercase tracking-widest">${p.category}</span>
+                    <h2 class="text-2xl font-bold mt-1">${p.name}</h2>
+                    <div class="flex items-center gap-3 my-4">
+                        <span class="text-2xl font-bold text-gray-900">${CONFIG.CURRENCY}${p.salePrice || p.price}</span>
+                        ${p.salePrice ? `<span class="text-lg text-gray-400 line-through">${CONFIG.CURRENCY}${p.price}</span>` : ''}
+                    </div>
+                    <p class="text-gray-600 leading-relaxed mb-6">${p.description}</p>
+                    <button onclick="addToCart(event, '${p.id}'); closeModal();" class="w-full bg-pink-700 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-pink-200">
+                        Añadir al carrito
+                    </button>
+                </div>
+            `;
+            document.getElementById('product-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // --- COMPORTAMIENTO HEADER ---
+        function setupHeaderScroll() {
+            let lastScroll = 0;
+            const header = document.getElementById('main-header');
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+                if (currentScroll <= 0) {
+                    header.classList.remove('header-hide');
+                    return;
+                }
+                if (currentScroll > lastScroll && !header.classList.contains('header-hide')) {
+                    header.classList.add('header-hide');
+                } else if (currentScroll < lastScroll && header.classList.contains('header-hide')) {
+                    header.classList.remove('header-hide');
+                }
+                lastScroll = currentScroll;
+            });
+        }
+
+        window.onload = init;
     </script>
 </body>
 </html>
