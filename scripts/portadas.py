@@ -14,7 +14,7 @@ from urllib.parse import urljoin
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # 1. REEMPLAZAR CON TU URL DE GOOGLE SHEETS (Publicar en la Web -> CSV)
-SHEET_CSV_URL = "TU_URL_DE_GOOGLE_SHEETS_AQUI"
+SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Z2C4BVz2pf5BzTj1pAtYBJydtyDgOd7itl9pF12cflFUXR26VaYxAPHARMjupx6t1g3brjMZZPhz/pub?gid=1526309505&single=true&output=csv"
 
 CSV_LOCAL_PATH = BASE_DIR / "data" / "DATOS.csv"
 CSV_TMP_PATH = BASE_DIR / "data" / "DATOS.tmp.csv"
