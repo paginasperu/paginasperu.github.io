@@ -1,39 +1,53 @@
-name: Actualizar OFICIAL.PE
+name: Actualizar Portadas Oficial.pe
 
 on:
   schedule:
-    - cron: '0 11 * * *' # 06:00 AM hora Perú (11:00 UTC)
-  workflow_dispatch:
+    # Se ejecuta a las 6:00 AM y 9:00 AM hora Perú (11:00 y 14:00 UTC)
+    - cron: '0 11,14 * * *'
+  workflow_dispatch: # Permite ejecución manual desde la pestaña Actions
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # Permiso esencial para que el bot haga el push al repositorio
 
     steps:
-      - name: Checkout del código
+      - name: Checkout del repositorio
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Descarga el historial completo para un rebase seguro
 
-      - name: Configurar entorno Python
+      - name: Configurar Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-          cache: 'pip'
+          cache: 'pip' # Acelera la ejecución diaria al no reinstalar todo de cero
 
       - name: Instalar dependencias
         run: |
           python -m pip install --upgrade pip
-          pip install pandas requests beautifulsoup4 Pillow pymupdf
+          pip install requests pandas beautifulsoup4 pillow pymupdf
 
       - name: Ejecutar motor de portadas
         run: python scripts/portadas.py
 
-      - name: Sincronizar cambios (Solo Datos)
+      - name: Configurar Git y Subir Cambios
         run: |
-          git config --global user.name 'OFICIAL-BOT'
-          git config --global user.email 'bot@oficial.pe'
-          # Solo añadimos las imágenes y el CSV actualizado
-          git add img/portadas/ data/portadas.csv
-          git commit -m "Automatización: Portadas del $(date +'%d/%m/%Y')" || echo "Sin cambios detectados"
-          git push
+          git config --global user.name "OficialBot"
+          git config --global user.email "bot@oficial.pe"
+          
+          # Agregamos archivos de forma tolerante (Fix Claude: evita error si no hay archivos)
+          git add data/DATOS.csv || true
+          git add img/portadas/*.jpg || true
+          
+          # Pull con rebase (Fix ChatGPT: evita conflictos si editas algo manualmente en el repo)
+          git pull --rebase origin main || true
+          
+          # Solo hacemos commit si hay cambios reales preparados (staged)
+          if git diff --staged --quiet; then
+            echo "Sin cambios detectados en las portadas. No hay nada que subir."
+          else
+            git commit -m "Auto-update: Portadas $(date +'%Y-%m-%d %H:%M')"
+            git push origin main
+          fi
