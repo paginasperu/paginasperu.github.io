@@ -1,0 +1,39 @@
+name: Actualizar OFICIAL.PE
+
+on:
+  schedule:
+    - cron: '0 11 * * *' # 06:00 AM hora Perú (11:00 UTC)
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar entorno Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas requests beautifulsoup4 Pillow pymupdf
+
+      - name: Ejecutar motor de portadas
+        run: python scripts/portadas.py
+
+      - name: Sincronizar cambios (Solo Datos)
+        run: |
+          git config --global user.name 'OFICIAL-BOT'
+          git config --global user.email 'bot@oficial.pe'
+          # Solo añadimos las imágenes y el CSV actualizado
+          git add img/portadas/ data/portadas.csv
+          git commit -m "Automatización: Portadas del $(date +'%d/%m/%Y')" || echo "Sin cambios detectados"
+          git push
