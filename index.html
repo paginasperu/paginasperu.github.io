@@ -3,121 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Plataforma de validación digital para marcas peruanas">
-    <title>OFICIAL.PE</title>
-    
-    <link rel="icon" href="https://raw.githubusercontent.com/paginasperu/paginasperu.github.io/refs/heads/main/logo.png">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-
+    <title>OFICIAL.PE | Portadas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" defer></script>
     <style>
-        /* RESET */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        /* CUERPO */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #F9F9F7;
-            color: #1a1a1a;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-        }
-
-        /* CONTENEDOR */
-        .container {
-            max-width: 700px;
-            width: 100%;
-            animation: fadeIn 1.5s ease-out forwards;
-            opacity: 0;
-        }
-
-        /* MARCA SUPERIOR */
-        .brand {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            color: #888;
-            margin-bottom: 40px;
-            font-weight: 500;
-        }
-
-        /* TÍTULO PRINCIPAL (H1) */
-        h1 {
-            font-size: 3rem; 
-            font-weight: 300; 
-            line-height: 1.2;
-            margin-bottom: 30px;
-            color: #111;
-            letter-spacing: -0.5px;
-        }
-
-        /* SUBTÍTULO */
-        p.subhead {
-            font-size: 1.25rem;
-            font-weight: 400;
-            color: #444;
-            line-height: 1.5;
-            margin-bottom: 50px;
-        }
+        :root { --bg: #000; --shimmer: #111; --text: #eee; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
-        /* ESTILO PARA ".oficial.pe" */
-        .highlight {
-            font-weight: 500;
-            color: #000;
+        header { padding: 25px 20px; text-align: center; position: sticky; top: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 1000; border-bottom: 1px solid #222; }
+        header h1 { font-size: 1rem; font-weight: 300; letter-spacing: 5px; margin: 0; color: #fff; text-transform: uppercase; }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 15px 20px 100px; }
+
+        .card { margin-bottom: 40px; }
+        .card-title { font-size: 0.75rem; color: #777; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; }
+
+        /* Contenedor con Proporción Fija */
+        .img-container { 
+            width: 100%; 
+            aspect-ratio: 3 / 4; 
+            background: var(--shimmer); 
+            position: relative; 
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        /* BOTÓN DE WHATSAPP */
-        .cta-button {
-            display: inline-block;
-            text-decoration: none;
-            font-size: 1rem;
-            color: #333;
-            border: 1px solid #ccc;
-            padding: 12px 25px;
-            border-radius: 50px;
-            transition: all 0.3s ease;
+        /* Shimmer Animado */
+        .shimmer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            animation: loading 1.6s infinite linear;
+            z-index: 1;
         }
+        @keyframes loading { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
-        .cta-button:hover {
-            background-color: #111;
-            color: #fff;
-            border-color: #111;
+        /* Imagen: 'contain' para no recortar titulares (Fix Claude) */
+        img { 
+            width: 100%; height: 100%; 
+            object-fit: contain; 
+            position: absolute; top: 0; left: 0;
+            opacity: 0; transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: opacity;
+            z-index: 2;
         }
+        img.loaded { opacity: 1; }
 
-        /* ANIMACIÓN */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* WhatsApp O2O */
+        .wsp-float {
+            position: fixed; bottom: 30px; right: 25px;
+            background: #25d366; color: white; width: 58px; height: 58px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6); text-decoration: none; z-index: 2000;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        /* MÓVIL */
-        @media (max-width: 768px) {
-            h1 { font-size: 2rem; }
-            p.subhead { font-size: 1.1rem; }
-        }
+        .wsp-float:active { transform: scale(0.85); }
     </style>
 </head>
 <body>
 
-    <main class="container">
-        <div class="brand">OFICIAL.PE</div>
+<header><h1>OFICIAL.PE</h1></header>
 
-        <h1>Plataforma de validación digital para marcas peruanas</h1>
+<div class="container" id="gallery">
+    </div>
 
-        <p class="subhead">
-            Si no es <span class="highlight">oficial.pe</span>, no es oficial
-        </p>
+<a href="https://wa.me/51950141414" class="wsp-float" target="_blank" aria-label="WhatsApp">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="white"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.588-5.946 0-6.556 5.332-11.888 11.888-11.888 3.176 0 6.161 1.237 8.404 3.48s3.48 5.228 3.48 8.404c0 6.556-5.332 11.888-11.888 11.888-2.003 0-3.963-.505-5.7-1.467l-6.103 1.692zm6.014-4.088c1.611.956 3.141 1.455 4.821 1.455 5.035 0 9.132-4.097 9.132-9.132 0-2.438-.949-4.731-2.67-6.453s-4.015-2.67-6.453-2.67c-5.035 0-9.132 4.097-9.132 9.132 0 1.78.499 3.391 1.488 4.903l-1.107 4.04 4.121-1.125z"/></svg>
+</a>
 
-        <a href="https://wa.me/51950141414" class="cta-button" target="_blank">
-            Validar mi marca
-        </a>
-    </main>
+<script>
+    const CSV_URL = 'data/portadas.csv';
+
+    function init() {
+        Papa.parse(CSV_URL, {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+                const gallery = document.getElementById('gallery');
+                const v = new Date().getTime();
+
+                results.data.forEach((row, index) => {
+                    if (row.Diario && row.Imagen) {
+                        const isEager = index < 2 ? 'eager' : 'lazy';
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        card.innerHTML = `
+                            <div class="card-title">${row.Diario}</div>
+                            <div class="img-container">
+                                <div class="shimmer"></div>
+                                <img src="${row.Imagen}?v=${v}" 
+                                     alt="${row.Diario}" 
+                                     loading="${isEager}"
+                                     onload="this.classList.add('loaded'); if(this.previousElementSibling) this.previousElementSibling.remove();"
+                                     onerror="this.style.display='none';">
+                            </div>
+                        `;
+                        gallery.appendChild(card);
+                    }
+                });
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+</script>
 
 </body>
 </html>
