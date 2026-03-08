@@ -108,8 +108,9 @@ def procesar_diario(row):
                 if not img_res: return None
                 img_data = img_res.content
 
-        # 2. VALIDACIÓN (1KB mín)
+        # 2. VALIDACIÓN (Filtro 1KB con alerta para el log)
         if len(img_data) < 1024:
+            print(f" [!] ALERTA: {nombre} < 1KB (posible placeholder o error). Saltando...")
             return None
             
         # 3. OPTIMIZACIÓN (1200px ancho)
