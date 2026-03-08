@@ -12,7 +12,7 @@ from urllib.parse import urljoin
 
 # --- CONFIGURACIÓN DE RUTAS ---
 BASE_DIR = Path(__file__).resolve().parent.parent
-CSV_PATH = BASE_DIR / "data" / "portadas.csv"
+CSV_PATH = BASE_DIR / "data" / "Datos - Portadas.csv"
 IMG_DIR = BASE_DIR / "img" / "portadas"
 IMG_DIR.mkdir(parents=True, exist_ok=True)
 
