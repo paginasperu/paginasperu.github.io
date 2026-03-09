@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extractor Expreso | OFICIAL.PE</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+        }
+        button {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: opacity 0.3s;
+        }
+        button:hover { opacity: 0.8; }
+        #resultado { margin-top: 20px; }
+        img { max-width: 100%; border-radius: 4px; display: none; margin-top: 15px; }
+        .loading { color: #666; font-style: italic; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Extractor de Portada</h2>
+    <p>Diario Expreso (Scraping Cliente)</p>
+    <button onclick="scrapearExpreso()">Obtener Portada</button>
+    
+    <div id="resultado">
+        <p class="loading" id="loader">Conectando con el servidor...</p>
+        <p id="url-text" style="word-break: break-all; font-size: 12px; color: #333;"></p>
+        <img id="img-portada" src="" alt="Portada del día">
+    </div>
+</div>
+
+<script>
+    async function scrapearExpreso() {
+        const urlObjetivo = 'https://www.expreso.com.pe';
+        const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(urlObjetivo)}`;
+        
+        const loader = document.getElementById('loader');
+        const imgElement = document.getElementById('img-portada');
+        const urlText = document.getElementById('url-text');
+
+        // Reset y Loading
+        loader.style.display = 'block';
+        imgElement.style.display = 'none';
+        urlText.innerText = "";
+
+        try {
+            const response = await fetch(proxy);
+            if (!response.ok) throw new Error("Error en la respuesta del proxy");
+            
+            const data = await response.json();
+            const html = data.contents;
+
+            // Procesar HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            // Selector específico: img con alt exacto
+            const img = doc.querySelector('img[alt="Diario expreso - Portada del día"]');
+
+            if (img) {
+                const portadaUrl = img.getAttribute('data-src');
+                
+                // Mostrar resultados
+                loader.style.display = 'none';
+                urlText.innerText = "URL: " + portadaUrl;
+                imgElement.src = portadaUrl;
+                imgElement.style.display = 'block';
+                
+                alert("✅ Portada encontrada con éxito");
+            } else {
+                loader.style.display = 'none';
+                alert("❌ No se encontró la imagen con el atributo alt indicado.");
+            }
+        } catch (error) {
+            loader.style.display = 'none';
+            console.error(error);
+            alert("⚠️ Error de CORS o conexión. Revisa la consola.");
+        }
+    }
+</script>
+
+</body>
+</html>
