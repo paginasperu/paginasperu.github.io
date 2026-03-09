@@ -2,61 +2,170 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OFICIAL.PE | Portadas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OFICIAL.PE</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" defer></script>
     <style>
-        :root { --bg: #050505; --text: #eee; --dim: #666; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; -webkit-font-smoothing: antialiased; }
-        header { padding: 20px; position: sticky; top: 0; background: rgba(5,5,5,0.8); backdrop-filter: blur(15px); border-bottom: 1px solid #151515; z-index: 1000; }
-        .header-content { max-width: 600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        h1 { font-size: 0.9rem; font-weight: 300; letter-spacing: 5px; text-transform: uppercase; margin: 0; }
-        .nav-link { font-size: 0.65rem; color: var(--dim); text-decoration: none; letter-spacing: 2px; border: 1px solid #222; padding: 7px 15px; border-radius: 4px; transition: 0.3s; }
-        .nav-link:hover { background: #fff; color: #000; }
-        .container { max-width: 600px; margin: 0 auto; padding: 30px 20px; }
-        .card { margin-bottom: 60px; animation: fadeIn 0.8s ease forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .card-title { font-size: 0.8rem; color: var(--dim); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 600; }
-        .img-container { width: 100%; background: #111; border-radius: 8px; overflow: hidden; position: relative; min-height: 200px; }
-        img { width: 100%; height: auto; display: block; opacity: 0; transition: opacity 1s; }
-        img.loaded { opacity: 1; }
-        footer { text-align: center; padding: 40px; opacity: 0.4; font-size: 0.6rem; letter-spacing: 2px; }
+        :root { --bg: #000; --text: #fff; --accent: #222; }
+        
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            margin: 0; 
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* CABECERA MINIMALISTA CON PILLS */
+        header { 
+            padding: 15px 0; 
+            position: sticky; 
+            top: 0; 
+            background: rgba(0,0,0,0.9); 
+            backdrop-filter: blur(10px); 
+            z-index: 1000;
+            border-bottom: 1px solid #111;
+        }
+        
+        .nav-container { 
+            display: flex; 
+            justify-content: center; 
+            gap: 12px; 
+        }
+        
+        .pill { 
+            font-size: 0.7rem; 
+            color: #fff; 
+            text-decoration: none; 
+            letter-spacing: 2px; 
+            border: 1px solid var(--accent); 
+            padding: 8px 22px; 
+            border-radius: 50px; 
+            transition: 0.3s;
+            background: transparent;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+        
+        .pill.active { 
+            background: #fff; 
+            color: #000; 
+            border-color: #fff; 
+        }
+        
+        .pill:hover:not(.active) { 
+            border-color: #666; 
+        }
+
+        /* CONTENEDOR DE PORTADAS */
+        .container { 
+            max-width: 900px; /* Ancho óptimo para lectura en PC */
+            margin: 0 auto; 
+        }
+        
+        .card { 
+            width: 100%; 
+            margin-bottom: 2px; /* Franja negra mínima entre portadas */
+            background: #000;
+        }
+        
+        .card img { 
+            width: 100%; 
+            height: auto; 
+            display: block; 
+            opacity: 0; 
+            transition: opacity 0.6s ease-in-out; 
+        }
+        
+        /* Aparece suavemente cuando termina de cargar */
+        .card img.loaded { 
+            opacity: 1; 
+        }
+
+        /* PIE DE PÁGINA */
+        footer { 
+            padding: 80px 0; 
+            text-align: center; 
+        }
+        
+        .contact-link { 
+            color: #444; 
+            text-decoration: none; 
+            font-size: 0.7rem; 
+            letter-spacing: 3px; 
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+        
+        .contact-link:hover { 
+            color: #fff; 
+        }
+
+        /* AJUSTE PARA MÓVIL (Full Width) */
+        @media (max-width: 600px) {
+            .container { padding: 0; }
+        }
     </style>
 </head>
 <body>
+
     <header>
-        <div class="header-content">
-            <h1>OFICIAL.PE</h1>
-            <a href="https://wa.me/51950141414" class="nav-link" target="_blank">WHATSAPP</a>
-        </div>
+        <nav class="nav-container">
+            <a href="#" class="pill active">PORTADAS</a>
+            <a href="https://wa.me/51950141414" target="_blank" class="pill">MENÚS</a>
+        </nav>
     </header>
-    <div class="container" id="gallery"></div>
-    <footer>© 2026 OFICIAL.PE | SIMPLICIDAD Y ELEGANCIA</footer>
+
+    <div class="container" id="gallery">
+        </div>
+
+    <footer>
+        <a href="https://wa.me/51950141414" target="_blank" class="contact-link">CONTACTAR</a>
+    </footer>
 
     <script>
         const CSV_URL = 'data/portadas.csv';
+        
         function init() {
+            // Configuración de PapaParse para leer el CSV generado por Python
             Papa.parse(CSV_URL, {
-                download: true, header: true, skipEmptyLines: true,
-                complete: function(results) { render(results.data); }
+                download: true, 
+                header: true, 
+                skipEmptyLines: true,
+                complete: function(results) { 
+                    render(results.data); 
+                },
+                error: function(err) { 
+                    console.error("Error cargando base de datos CSV:", err); 
+                }
             });
         }
+
         function render(data) {
             const gallery = document.getElementById('gallery');
-            const v = new Date().getTime(); // Cache-busting
+            const v = new Date().getTime(); // Cache-busting para forzar actualización diaria
+            
             data.forEach((row) => {
-                if (row.Diario && row.Imagen) {
+                // Solo procesar si existen los datos necesarios
+                if (row.Imagen) {
                     const card = document.createElement('div');
                     card.className = 'card';
+                    
+                    // loading="lazy" optimiza la carga en móviles (Sugerencia ChatGPT)
+                    // onload activa la transición de opacidad (Elegancia visual)
                     card.innerHTML = `
-                        <div class="card-title">${row.Diario}</div>
-                        <div class="img-container">
-                            <img src="${row.Imagen}?v=${v}" alt="${row.Diario}" onload="this.classList.add('loaded')">
-                        </div>`;
+                        <img loading="lazy" 
+                             src="${row.Imagen}?v=${v}" 
+                             alt="${row.Diario || 'Portada'}" 
+                             onload="this.classList.add('loaded')">`;
+                    
                     gallery.appendChild(card);
                 }
             });
         }
+
+        // Iniciar cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
