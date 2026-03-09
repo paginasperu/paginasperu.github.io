@@ -1,5 +1,5 @@
-requests
-pandas
-beautifulsoup4
-pillow
-pymupdf
+requests>=2.28
+pandas>=1.5
+beautifulsoup4>=4.11
+pillow>=9.0
+pymupdf>=1.21
