@@ -47,13 +47,11 @@ from io import BytesIO
 # 1. CONFIGURACIÓN DE RUTAS
 # ==========================================
 BASE_DIR = Path(__file__).resolve().parent.parent
-# URL pública del CSV de Google Sheets
 SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Z2C4BVz2pf5BzTj1pAtYBJydtyDgOd7itl9pF12cflFUXR26VaYxAPHARMjupx6t1g3brjMZZPhz/pub?gid=1526309505&single=true&output=csv"
 
 IMAGES_DIR = BASE_DIR / "images" / "portadas"
 DATA_FILE = BASE_DIR / "data" / "portadas.csv"
 
-# Asegurar que las carpetas existan antes de procesar
 IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
 
@@ -79,26 +77,19 @@ def formatear_url(url_plantilla):
     return url_plantilla
 
 def sanitizar_nombre(diario):
-    """Convierte nombres con tildes/espacios en nombres de archivo seguros."""
+    """Convierte nombres seguros para archivos."""
     if pd.isna(diario): return "desconocido"
     texto = str(diario).lower().strip()
-    # Eliminar acentos
     texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode('ascii')
-    # Solo caracteres alfanuméricos
     return re.sub(r'[^a-z0-9]', '', texto)
 
 def optimizar_imagen(contenido, ruta_destino):
-    """Aplica el tratamiento de imagen para que la web vuele (Pillow)."""
+    """Tratamiento Pillow para optimización JPEG progresiva."""
     try:
         img = Image.open(BytesIO(contenido))
-        # Forzar RGB (evita problemas con perfiles CMYK de impresión)
         if img.mode != 'RGB': 
             img = img.convert('RGB')
-        
-        # Redimensión proporcional a 1200px de ancho
         img.thumbnail((1200, 1600), Image.Resampling.LANCZOS)
-        
-        # Guardado Progresivo: La imagen carga de borrosa a nítida (mejor UX)
         img.save(ruta_destino, "JPEG", quality=85, optimize=True, progressive=True)
         return True
     except Exception as e:
@@ -111,63 +102,65 @@ def optimizar_imagen(contenido, ruta_destino):
 
 def ejecutar():
     session = requests.Session()
-    session.headers.update({'User-Agent': 'Mozilla/5.0'})
+    # User-Agent profesional para evitar bloqueos básicos
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+    })
     
     try:
         print(f"--- INICIO MOTOR OFICIAL.PE | {obtener_fecha_lima().strftime('%H:%M')} ---")
-        
-        # Carga de Base de Datos
         df = pd.read_csv(SHEET_URL)
         
-        # Validación Paranoica de Columnas
+        # Validación de Columnas Requeridas
         columnas_requeridas = ['Diario', 'URL', 'Posición']
         for col in columnas_requeridas:
             if col not in df.columns:
                 print(f"ERROR CRÍTICO: No se encontró la columna '{col}'.")
                 sys.exit(1)
 
-        # Ordenar según la prioridad definida en el Sheets
         df = df.sort_values(by='Posición')
         registros_exitosos = []
 
         for _, row in df.iterrows():
-            diario = row['Diario']
+            diario = str(row['Diario'])
             posicion = row['Posición']
             url_real = formatear_url(row['URL'])
             nombre_file = f"{sanitizar_nombre(diario)}.jpg"
             ruta_img = IMAGES_DIR / nombre_file
             
+            # --- MEJORA RECOMENDADA: HEADERS LOCALES POR PETICIÓN ---
+            headers_peticion = {}
+            if "peru21" in diario.lower():
+                headers_peticion["Referer"] = "https://peru21.pe/"
+
             print(f"Procesando [{posicion}]: {diario}...")
             
             try:
-                # Timeout: 5s para conectar, 25s para bajar la imagen
-                res = session.get(url_real, timeout=(5, 25))
+                # Se pasan los headers específicos solo a esta llamada
+                res = session.get(url_real, headers=headers_peticion, timeout=(5, 25))
                 
                 if res.status_code == 200:
-                    # Validar que sea una imagen y no un error HTML disfrazado
                     if 'image' not in res.headers.get('Content-Type', ''):
-                        print("   [!] El servidor no respondió con una imagen.")
+                        print("   [!] No es una imagen válida.")
                         continue
                     
-                    # Seguridad: Evitar archivos sospechosamente grandes
                     if len(res.content) > 10_000_000:
-                        print("   [!] Imagen excede el límite de 10MB.")
+                        print("   [!] Imagen demasiado grande (>10MB).")
                         continue
 
                     if optimizar_imagen(res.content, ruta_img):
                         registros_exitosos.append({
                             'Posición': posicion,
-                            'Diario': str(diario).upper(),
+                            'Diario': diario.upper(),
                             'Imagen': f"images/portadas/{nombre_file}"
                         })
-                        print(f"   [OK] Procesada con éxito.")
+                        print(f"   [OK] Procesada.")
                 else:
-                    print(f"   [!] No disponible (HTTP {res.status_code})")
+                    print(f"   [!] Error HTTP {res.status_code}")
             
             except Exception as e:
                 print(f"   [x] Error de conexión: {e}")
 
-        # Generar el archivo final para el index.html
         if registros_exitosos:
             pd.DataFrame(registros_exitosos).to_csv(DATA_FILE, index=False)
             print(f"\n--- ÉXITO: {len(registros_exitosos)} portadas actualizadas ---")
