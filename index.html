@@ -17,7 +17,6 @@
         .card { margin-bottom: 60px; animation: fadeIn 0.8s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .card-title { font-size: 0.8rem; color: var(--dim); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 600; }
-        /* Contenedor flexible para portadas de cualquier altura */
         .img-container { width: 100%; background: #111; border-radius: 8px; overflow: hidden; position: relative; min-height: 200px; }
         img { width: 100%; height: auto; display: block; opacity: 0; transition: opacity 1s; }
         img.loaded { opacity: 1; }
@@ -44,7 +43,7 @@
         }
         function render(data) {
             const gallery = document.getElementById('gallery');
-            const v = new Date().getTime();
+            const v = new Date().getTime(); // Cache-busting
             data.forEach((row) => {
                 if (row.Diario && row.Imagen) {
                     const card = document.createElement('div');
