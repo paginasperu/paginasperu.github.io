@@ -1,38 +1,48 @@
 <!DOCTYPE html>
 <html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>OFICIAL.PE | Extractor Forense Expreso</title>
+</head>
 <body style="font-family:monospace; padding:20px; background:#000; color:#0f0;">
-    <h3>Extractor Expreso (Red Resiliente de 5 Proxies)</h3>
-    <button onclick="scrap()" style="padding:10px; cursor:pointer; font-weight:bold;">Ejecutar Extracción</button>
-    <p id="out">Esperando...</p>
+
+    <h3>Extractor Expreso (Instrucción Exacta + Modo Forense)</h3>
+    <button onclick="scrap()" style="padding:10px; cursor:pointer; font-weight:bold; background:#0f0; border:none;">
+        EJECUTAR EXTRACCIÓN
+    </button>
+
+    <p id="out" style="margin-top:20px;">Esperando...</p>
+
+    <details style="margin-top:30px; color:#888;">
+        <summary>Ver HTML Crudo Extraído</summary>
+        <textarea id="raw-html" style="width:100%; height:200px; background:#111; color:#0f0; border:1px solid #333; margin-top:10px;"></textarea>
+    </details>
 
     <script>
         async function fetchConRespaldo(targetUrl) {
             const encodedUrl = encodeURIComponent(targetUrl);
-            
-            // Configuración de proxies con su método de respuesta
             const proxies = [
                 { url: `https://corsproxy.io/?${encodedUrl}`, type: 'text' },
                 { url: `https://api.allorigins.win/get?url=${encodedUrl}`, type: 'json' },
                 { url: `https://api.codetabs.com/v1/proxy?quest=${encodedUrl}`, type: 'text' },
-                { url: `https://thingproxy.freeboard.io/fetch/${targetUrl}`, type: 'text' }, // Algunos no requieren encode en el path
+                { url: `https://thingproxy.freeboard.io/fetch/${targetUrl}`, type: 'text' },
                 { url: `https://cors.bridged.cc/${encodedUrl}`, type: 'text' }
             ];
 
             for (let i = 0; i < proxies.length; i++) {
                 try {
-                    console.log(`Intentando Proxy ${i + 1}: ${proxies[i].url}`);
+                    console.log(`Intentando Proxy ${i + 1}...`);
                     const res = await fetch(proxies[i].url);
+                    if (!res.ok) throw new Error(`Error ${res.status}`);
                     
-                    if (!res.ok) throw new Error(`Status ${res.status}`);
-
                     if (proxies[i].type === 'json') {
                         const data = await res.json();
-                        return data.contents; // Formato específico de AllOrigins
+                        return data.contents;
                     } else {
                         return await res.text();
                     }
                 } catch (e) {
-                    console.warn(`Proxy ${i + 1} falló: ${e.message}`);
+                    console.warn(`Proxy ${i + 1} falló.`);
                     if (i === proxies.length - 1) throw new Error("Los 5 proxies fallaron.");
                 }
             }
@@ -40,28 +50,51 @@
 
         async function scrap() {
             const out = document.getElementById('out');
+            const debugText = document.getElementById('raw-html');
             const target = 'https://www.expreso.com.pe';
-            out.innerHTML = "Consultando red de respaldo...";
             
+            out.innerHTML = "Consultando red de proxies...";
+            debugText.value = "";
+
             try {
                 const html = await fetchConRespaldo(target);
+                debugText.value = html; // Guardamos el HTML para inspección manual
+
                 const doc = new DOMParser().parseFromString(html, 'text/html');
                 
-                // INSTRUCCIÓN EXACTA SOLICITADA
-                const img = doc.querySelector('img[alt="Diario expreso - Portada del día"]');
+                // --- DIAGNÓSTICO PARA EL USUARIO ---
+                const todasLasImgs = Array.from(doc.querySelectorAll('img'));
+                // Buscamos cualquier imagen que tenga un alt similar por si hay errores de tipeo
+                const similitud = todasLasImgs.find(i => 
+                    i.alt.toLowerCase().includes("expreso") || 
+                    i.alt.toLowerCase().includes("portada")
+                );
+
+                // --- INSTRUCCIÓN EXACTA ---
+                const selectorExacto = 'img[alt="Diario expreso - Portada del día"]';
+                const img = doc.querySelector(selectorExacto);
 
                 if (img) {
                     const src = img.getAttribute('data-src');
                     if (src) {
-                        out.innerHTML = `¡Éxito!<br>URL: ${src}<br><br><img src="${src}" width="300" style="border:1px solid #0f0;">`;
+                        out.innerHTML = `<span style="color:#fff; background:green; padding:5px;">¡ÉXITO!</span><br><br>
+                                        <b>URL:</b> ${src}<br><br>
+                                        <img src="${src}" width="350" style="border:2px solid #0f0;">`;
                     } else {
-                        out.innerHTML = "<span style='color:orange'>[!] Alt hallado, pero falta atributo 'data-src'.</span>";
+                        out.innerHTML = `<span style="color:orange;">[!] Alt encontrado, pero el atributo 'data-src' está vacío o no existe.</span>`;
                     }
                 } else {
-                    out.innerHTML = "<span style='color:red'>[!] No se encontró el alt exacto. Revisa si el diario cambió el texto hoy.</span>";
+                    let logHTML = similitud 
+                        ? `<br><br><b>Lo que el proxy encontró realmente:</b><br>
+                           <code style="color:yellow;">alt="${similitud.alt}"</code><br>
+                           <span style="color:#888;">(Compara el texto anterior con tu instrucción para ver si hay diferencias)</span>`
+                        : `<br><br>No se detectó ninguna imagen con la palabra "Portada" en el HTML original.`;
+                    
+                    out.innerHTML = `<span style="color:red;">[!] No se encontró el alt exacto.</span>${logHTML}`;
                 }
+
             } catch (e) {
-                out.innerHTML = `<span style='color:red'>ERROR FINAL: ${e.message}</span>`;
+                out.innerHTML = `<span style="color:red;">ERROR CRÍTICO: ${e.message}</span>`;
             }
         }
     </script>
