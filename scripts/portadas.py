@@ -102,7 +102,6 @@ def optimizar_imagen(contenido, ruta_destino):
 
 def ejecutar():
     session = requests.Session()
-    # User-Agent profesional para evitar bloqueos básicos
     session.headers.update({
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
     })
@@ -111,7 +110,6 @@ def ejecutar():
         print(f"--- INICIO MOTOR OFICIAL.PE | {obtener_fecha_lima().strftime('%H:%M')} ---")
         df = pd.read_csv(SHEET_URL)
         
-        # Validación de Columnas Requeridas
         columnas_requeridas = ['Diario', 'URL', 'Posición']
         for col in columnas_requeridas:
             if col not in df.columns:
@@ -128,16 +126,10 @@ def ejecutar():
             nombre_file = f"{sanitizar_nombre(diario)}.jpg"
             ruta_img = IMAGES_DIR / nombre_file
             
-            # --- MEJORA RECOMENDADA: HEADERS LOCALES POR PETICIÓN ---
-            headers_peticion = {}
-            if "peru21" in diario.lower():
-                headers_peticion["Referer"] = "https://peru21.pe/"
-
             print(f"Procesando [{posicion}]: {diario}...")
             
             try:
-                # Se pasan los headers específicos solo a esta llamada
-                res = session.get(url_real, headers=headers_peticion, timeout=(5, 25))
+                res = session.get(url_real, timeout=(5, 25))
                 
                 if res.status_code == 200:
                     if 'image' not in res.headers.get('Content-Type', ''):
