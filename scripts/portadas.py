@@ -60,7 +60,7 @@ def obtener_mejor_img(soup, instruccion, url_base):
             img_tag = link_issuu.find("img")
         if not img_tag: instruccion_low = "og:image"
 
-    # Rama 2: SRC QUE CONTENGA (Fix El Diez)
+    # Rama 2: SRC QUE CONTENGA (Fix para El Diez solicitado por Claude)
     if "src que contenga" in instruccion_low:
         match = re.search(r'src que contenga "([^"]*)"', instruccion_raw, re.I)
         if match:
