@@ -1,4 +1,4 @@
-name: Portadas
+name: Actualizar Portadas
 on:
   schedule:
     - cron: '0 11 * * *' # 6:00 AM hora Perú (UTC-5)
