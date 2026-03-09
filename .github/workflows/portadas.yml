@@ -1,0 +1,32 @@
+name: Actualización 6AM Perú
+on:
+  schedule:
+    - cron: '0 11 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Instalar Dependencias
+        run: pip install pandas requests Pillow
+
+      - name: Ejecutar Script de Portadas
+        run: python portadas.py
+
+      - name: Sincronizar Cambios
+        run: |
+          git config --global user.name "OFICIAL.PE Bot"
+          git config --global user.email "bot@oficial.pe"
+          # Cambio sugerido: Apuntar a la carpeta para evitar errores de archivo no encontrado
+          git add img/portadas/ data/portadas.csv
+          git commit -m "Portadas del día $(date +'%d-%m-%Y')" || exit 0
+          git push
