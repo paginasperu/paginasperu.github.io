@@ -1,8 +1,8 @@
 name: Portadas
 on:
   schedule:
-    - cron: '0 11 * * *'
-  workflow_dispatch:
+    - cron: '0 11 * * *' # 6:00 AM hora Perú (UTC-5)
+  workflow_dispatch:      # Permite ejecución manual desde la pestaña Actions
 
 jobs:
   build:
@@ -20,13 +20,15 @@ jobs:
         run: pip install pandas requests Pillow
 
       - name: Ejecutar Script de Portadas
-        run: python portadas.py
+        # Se especifica la carpeta scripts
+        run: python scripts/portadas.py
 
       - name: Sincronizar Cambios
         run: |
           git config --global user.name "OFICIAL.PE Bot"
           git config --global user.email "bot@oficial.pe"
-          # Cambio sugerido: Apuntar a la carpeta para evitar errores de archivo no encontrado
+          # Asegura que existan las carpetas antes del add
+          mkdir -p img/portadas data
           git add img/portadas/ data/portadas.csv
-          git commit -m "Portadas del día $(date +'%d-%m-%Y')" || exit 0
+          git commit -m "Portadas actualizadas $(date +'%d-%m-%Y')" || echo "Sin cambios"
           git push
