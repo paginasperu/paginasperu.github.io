@@ -1,4 +1,4 @@
-name: Actualización 6AM Perú
+name: Portadas
 on:
   schedule:
     - cron: '0 11 * * *'
