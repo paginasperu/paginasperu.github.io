@@ -2,30 +2,30 @@
 <html lang="es" prefix="og: https://ogp.me/ns#">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#000000">
     <title>OFICIAL.PE | Directorio web</title>
-    <meta property="og:title" content="OFICIAL.PE | Directorio web">
-    <meta name="twitter:title" content="OFICIAL.PE | Directorio Web">
     
+    <link rel="canonical" href="https://oficial.pe/">
     <meta name="description" content="Directorio web peruano de negocios, descuentos, promociones, novedades y más.">
-    <meta property="og:description" content="Directorio web peruano de negocios, descuentos, promociones, novedades y más.">
-    <meta name="twitter:description" content="Directorio web peruano de negocios, descuentos, promociones, novedades y más.">
+    <meta name="robots" content="index, follow">
 
+    <meta property="og:title" content="OFICIAL.PE | Directorio web">
+    <meta property="og:type" content="website">
+    <meta property="og:description" content="Directorio web peruano de negocios, descuentos, promociones, novedades y más.">
+    <meta property="og:url" content="https://oficial.pe/">
     <meta property="og:image" content="https://oficial.pe/images/preview.jpg?v=1">
     <meta property="og:image:secure_url" content="https://oficial.pe/images/preview.jpg?v=1">
-    <meta name="twitter:image" content="https://oficial.pe/images/preview.jpg?v=1">
-    
-    <meta name="robots" content="index, follow">
-    <meta property="og:type" content="website">
     <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:url" content="https://oficial.pe/">
     <meta property="og:locale" content="es_PE">
+
     <meta name="twitter:card" content="summary_large_image">
-    
-    <link rel="canonical" href="https://oficial.pe/">
+    <meta name="twitter:title" content="OFICIAL.PE | Directorio Web">
+    <meta name="twitter:description" content="Directorio web peruano de negocios, descuentos, promociones, novedades y más.">
+    <meta name="twitter:image" content="https://oficial.pe/images/preview.jpg?v=1">
+
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://raw.githubusercontent.com">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" defer></script>
@@ -34,12 +34,39 @@
         :root { --bg: #000; --text: #fff; --accent: #111; }
         body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
         
-        header { padding: 15px 0; position: sticky; top: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); z-index: 1000; border-bottom: 1px solid var(--accent); }
-        .nav-container { display: flex; justify-content: center; gap: 12px; }
-        .pill { font-size: 0.7rem; color: #fff; text-decoration: none; letter-spacing: 2px; border: 1px solid #222; padding: 8px 22px; border-radius: 50px; text-transform: uppercase; font-weight: 500; }
-        .pill.active { background: #fff; color: #000; }
+        header { 
+            padding: 15px 0; 
+            position: fixed; 
+            top: 0; 
+            width: 100%;
+            background: rgba(0,0,0,0.9); 
+            backdrop-filter: blur(10px); 
+            z-index: 1000; 
+            border-bottom: 1px solid var(--accent); 
+            transition: transform 0.3s ease-in-out;
+            will-change: transform; /* Optimización para navegadores */
+        }
+        .header-hidden { transform: translateY(-100%); }
 
-        #gallery { max-width: 850px; margin: 0 auto; transition: max-width 0.4s ease-in-out; cursor: zoom-in; }
+        .nav-container { display: flex; justify-content: center; gap: 25px; }
+        
+        .pill { 
+            font-size: 0.7rem; 
+            color: #666; 
+            text-decoration: none; 
+            letter-spacing: 2px; 
+            padding: 8px 0; 
+            text-transform: uppercase; 
+            font-weight: 500; 
+            transition: color 0.3s;
+        }
+        .pill.active { 
+            color: #fff; 
+            border-bottom: 2px solid #fff; 
+        }
+
+        /* Espacio superior para que el header fixed no tape el contenido */
+        #gallery { max-width: 850px; margin: 80px auto 0; transition: max-width 0.4s ease-in-out; cursor: zoom-in; }
         #gallery.zoomed { max-width: 1200px; cursor: zoom-out; }
 
         .card { width: 100%; margin-bottom: 25px; background: #000; }
@@ -50,11 +77,11 @@
         footer { padding: 80px 0; text-align: center; opacity: 0.5; }
         .contact-link { color: #fff; text-decoration: none; font-size: 0.7rem; letter-spacing: 3px; }
         
-        @media (max-width: 600px) { #gallery { padding: 0; } }
+        @media (max-width: 600px) { #gallery { padding: 0; margin-top: 70px; } }
     </style>
 </head>
 <body>
-    <header>
+    <header id="main-header">
         <nav class="nav-container">
             <a href="#" class="pill active">PORTADAS</a>
             <a href="https://oficial.pe/menus" class="pill">MENÚS</a>
@@ -70,8 +97,21 @@
     <script>
         const CSV_URL = 'data/portadas.csv';
         const g = document.getElementById('gallery');
+        const header = document.getElementById('main-header');
         
         g.onclick = () => g.classList.toggle('zoomed');
+
+        // Scroll dinámico: Oculta al bajar, muestra al subir
+        let lastScrollY = window.scrollY;
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                header.classList.add('header-hidden');
+            } else {
+                header.classList.remove('header-hidden');
+            }
+            lastScrollY = currentScrollY;
+        }, { passive: true });
 
         function init() {
             Papa.parse(CSV_URL, {
@@ -82,7 +122,6 @@
         }
 
         function render(data) {
-            // Optimización de caché: v=2026-03-09 (Sugerencia ChatGPT)
             const v = new Date().toISOString().slice(0,10); 
             data.forEach((row, index) => {
                 if (row.Imagen) {
