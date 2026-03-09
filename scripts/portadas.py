@@ -13,14 +13,14 @@ from urllib.parse import urljoin
 # --- CONFIGURACIÓN DE RUTAS Y NUBE ---
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# 1. REEMPLAZAR CON TU URL DE GOOGLE SHEETS (Publicar en la Web -> CSV)
+# URL DE TU GOOGLE SHEETS (Publicar en la Web -> CSV)
 SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Z2C4BVz2pf5BzTj1pAtYBJydtyDgOd7itl9pF12cflFUXR26VaYxAPHARMjupx6t1g3brjMZZPhz/pub?gid=1526309505&single=true&output=csv"
 
 CSV_LOCAL_PATH = BASE_DIR / "data" / "DATOS.csv"
 CSV_TMP_PATH = BASE_DIR / "data" / "DATOS.tmp.csv"
 IMG_DIR = BASE_DIR / "img" / "portadas"
 
-# ASEGURAR DIRECTORIOS (Incluso si no existen en el repo)
+# ASEGURAR DIRECTORIOS
 CSV_LOCAL_PATH.parent.mkdir(parents=True, exist_ok=True)
 IMG_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -40,7 +40,7 @@ def extraer_de_pdf(pdf_url):
     try:
         doc = fitz.open(stream=res.content, filetype="pdf")
         page = doc.load_page(0)
-        zoom = 150 / 72  # 150 DPI exactos
+        zoom = 150 / 72 
         pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom))
         img = Image.open(BytesIO(pix.tobytes()))
         return img
@@ -49,25 +49,37 @@ def extraer_de_pdf(pdf_url):
         return None
 
 def obtener_mejor_img(soup, instruccion, url_base):
-    instruccion = str(instruccion).lower().strip()
+    instruccion_raw = str(instruccion)
+    instruccion_low = instruccion_raw.lower().strip()
     img_tag = None
 
-    if "issuu" in instruccion:
+    # Rama 1: ISSUU
+    if "issuu" in instruccion_low:
         link_issuu = soup.find("a", href=re.compile(r"issuu\.com", re.I))
         if link_issuu:
             img_tag = link_issuu.find("img")
-        if not img_tag: instruccion = "og:image"
+        if not img_tag: instruccion_low = "og:image"
 
-    if "alt=" in instruccion:
-        match = re.search(r'alt="([^"]*)"', instruccion, re.I)
+    # Rama 2: SRC QUE CONTENGA (Fix El Diez)
+    if "src que contenga" in instruccion_low:
+        match = re.search(r'src que contenga "([^"]*)"', instruccion_raw, re.I)
+        if match:
+            valor = match.group(1)
+            img_tag = soup.find("img", src=re.compile(re.escape(valor), re.I))
+
+    # Rama 3: ALT con REGEX
+    if "alt=" in instruccion_low:
+        match = re.search(r'alt="([^"]*)"', instruccion_raw, re.I)
         val_alt = match.group(1) if match else ""
         if val_alt:
             img_tag = soup.find("img", alt=re.compile(re.escape(val_alt), re.I))
 
-    if "class=" in instruccion or "." in instruccion or "#" in instruccion:
-        selector = instruccion.replace("class=", "")
+    # Rama 4: CLASS / SELECTOR
+    if not img_tag and ("class=" in instruccion_low or "." in instruccion_low or "#" in instruccion_low):
+        selector = instruccion_raw.replace("class=", "")
         img_tag = soup.select_one(selector)
 
+    # JERARQUÍA MAESTRA (srcset > data-src > src)
     if img_tag:
         srcset = img_tag.get("srcset") or img_tag.get("data-srcset")
         if srcset:
@@ -83,7 +95,8 @@ def obtener_mejor_img(soup, instruccion, url_base):
             if src and not src.startswith('data:image'):
                 return urljoin(url_base, src)
 
-    if instruccion == "og:image" or not img_tag:
+    # Rama FINAL: OG:IMAGE
+    if instruccion_low == "og:image" or not img_tag:
         meta = soup.find("meta", property="og:image")
         if meta and meta.get("content"):
             return urljoin(url_base, meta["content"])
@@ -129,8 +142,7 @@ def procesar_diario(row):
     return None
 
 def main():
-    print(f"--- MOTOR OFICIAL.PE V7.2: SINCRONIZACIÓN NUBE ---")
-    
+    print(f"--- MOTOR OFICIAL.PE V7.3: SINCRONIZACIÓN NUBE ---")
     df = None
     for attempt in range(3):
         try:
