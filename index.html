@@ -1,49 +1,67 @@
 <!DOCTYPE html>
 <html lang="es">
-<body style="font-family:monospace; padding:20px;">
-    <h3>Expreso: Portada del día</h3>
-    <button onclick="scrap()">Obtener URL</button>
-    
+<body style="font-family:monospace; padding:20px; background:#000; color:#0f0;">
+    <h3>Extractor Expreso (Red Resiliente de 5 Proxies)</h3>
+    <button onclick="scrap()" style="padding:10px; cursor:pointer; font-weight:bold;">Ejecutar Extracción</button>
     <p id="out">Esperando...</p>
-    
-    <details>
-        <summary>Ver HTML capturado (Debug)</summary>
-        <textarea id="debug" style="width:100%; height:200px; margin-top:10px;"></textarea>
-    </details>
 
     <script>
+        async function fetchConRespaldo(targetUrl) {
+            const encodedUrl = encodeURIComponent(targetUrl);
+            
+            // Configuración de proxies con su método de respuesta
+            const proxies = [
+                { url: `https://corsproxy.io/?${encodedUrl}`, type: 'text' },
+                { url: `https://api.allorigins.win/get?url=${encodedUrl}`, type: 'json' },
+                { url: `https://api.codetabs.com/v1/proxy?quest=${encodedUrl}`, type: 'text' },
+                { url: `https://thingproxy.freeboard.io/fetch/${targetUrl}`, type: 'text' }, // Algunos no requieren encode en el path
+                { url: `https://cors.bridged.cc/${encodedUrl}`, type: 'text' }
+            ];
+
+            for (let i = 0; i < proxies.length; i++) {
+                try {
+                    console.log(`Intentando Proxy ${i + 1}: ${proxies[i].url}`);
+                    const res = await fetch(proxies[i].url);
+                    
+                    if (!res.ok) throw new Error(`Status ${res.status}`);
+
+                    if (proxies[i].type === 'json') {
+                        const data = await res.json();
+                        return data.contents; // Formato específico de AllOrigins
+                    } else {
+                        return await res.text();
+                    }
+                } catch (e) {
+                    console.warn(`Proxy ${i + 1} falló: ${e.message}`);
+                    if (i === proxies.length - 1) throw new Error("Los 5 proxies fallaron.");
+                }
+            }
+        }
+
         async function scrap() {
             const out = document.getElementById('out');
-            const debug = document.getElementById('debug');
-            out.innerText = "Buscando...";
-            debug.value = "";
+            const target = 'https://www.expreso.com.pe';
+            out.innerHTML = "Consultando red de respaldo...";
             
             try {
-                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://www.expreso.com.pe')}`);
-                if (!res.ok) throw new Error("Fallo en el Proxy");
-                
-                const data = await res.json(); // Corregido: eliminada asignación doble
-                const html = data.contents;
-                
-                // Mostramos el HTML capturado para inspeccionar
-                debug.value = html;
-
+                const html = await fetchConRespaldo(target);
                 const doc = new DOMParser().parseFromString(html, 'text/html');
                 
-                // Buscamos cualquier imagen que mencione "Portada"
-                const img = Array.from(doc.querySelectorAll('img')).find(i => 
-                    (i.alt && i.alt.toLowerCase().includes("portada")) || 
-                    (i.dataset.src && i.dataset.src.toLowerCase().includes("portada"))
-                );
+                // INSTRUCCIÓN EXACTA SOLICITADA
+                const img = doc.querySelector('img[alt="Diario expreso - Portada del día"]');
 
                 if (img) {
-                    const src = img.getAttribute('data-src') || img.src;
-                    out.innerHTML = `<b style="color:green">¡Éxito!</b><br>URL: ${src}<br><img src="${src}" width="300">`;
+                    const src = img.getAttribute('data-src');
+                    if (src) {
+                        out.innerHTML = `¡Éxito!<br>URL: ${src}<br><br><img src="${src}" width="300" style="border:1px solid #0f0;">`;
+                    } else {
+                        out.innerHTML = "<span style='color:orange'>[!] Alt hallado, pero falta atributo 'data-src'.</span>";
+                    }
                 } else {
-                    out.innerHTML = `<b style="color:orange">No se halló la imagen.</b> Revisa el HTML abajo.`;
+                    out.innerHTML = "<span style='color:red'>[!] No se encontró el alt exacto. Revisa si el diario cambió el texto hoy.</span>";
                 }
             } catch (e) {
-                out.innerHTML = `<b style="color:red">Error:</b> ${e.message}`;
+                out.innerHTML = `<span style='color:red'>ERROR FINAL: ${e.message}</span>`;
             }
         }
     </script>
