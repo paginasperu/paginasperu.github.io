@@ -3,243 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OFICIAL.PE | Portadas de Diarios Peruanos</title>
+    <title>OFICIAL.PE | Portadas</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" defer></script>
     <style>
-        :root {
-            --bg: #050505;
-            --card-bg: #0a0a0a;
-            --shimmer: #111;
-            --text-main: #eee;
-            --text-dim: #666;
-            --accent: #ffffff;
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* Header Minimalista */
-        header {
-            padding: 20px;
-            position: sticky;
-            top: 0;
-            background: rgba(5, 5, 5, 0.8);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            z-index: 1000;
-            border-bottom: 1px solid #151515;
-        }
-
-        .header-content {
-            max-width: 600px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        header h1 {
-            font-size: 0.9rem;
-            font-weight: 300;
-            letter-spacing: 5px;
-            margin: 0;
-            text-transform: uppercase;
-        }
-
-        .nav-link {
-            font-size: 0.65rem;
-            color: var(--text-dim);
-            text-decoration: none;
-            letter-spacing: 2px;
-            border: 1px solid #222;
-            padding: 7px 15px;
-            border-radius: 4px;
-            transition: 0.3s ease;
-        }
-
-        .nav-link:hover, .nav-link:active {
-            background: #fff;
-            color: #000;
-            border-color: #fff;
-        }
-
-        /* Contenedor de Galería */
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 30px 20px 80px;
-        }
-
-        .card {
-            margin-bottom: 50px;
-            animation: fadeIn 0.8s ease forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 15px;
-        }
-
-        .card-title {
-            font-size: 0.8rem;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-weight: 600;
-        }
-
-        /* Contenedor de Imagen con Shimmer */
-        .img-container {
-            width: 100%;
-            aspect-ratio: 3 / 4;
-            background: var(--shimmer);
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-
-        .shimmer {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
-            animation: loading 2s infinite linear;
-            z-index: 1;
-        }
-
-        @keyframes loading {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* Mantiene la proporción sin recortar */
-            position: absolute;
-            top: 0; left: 0;
-            opacity: 0;
-            transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 2;
-        }
-
-        img.loaded {
-            opacity: 1;
-        }
-
-        footer {
-            text-align: center;
-            padding: 50px 20px;
-            border-top: 1px solid #111;
-            opacity: 0.4;
-        }
-
-        footer p {
-            font-size: 0.6rem;
-            letter-spacing: 2px;
-            margin: 0;
-        }
-
-        /* Mobile Optimization */
-        @media (max-width: 480px) {
-            header h1 { font-size: 0.8rem; letter-spacing: 3px; }
-            .container { padding-top: 20px; }
-        }
+        :root { --bg: #050505; --text: #eee; --dim: #666; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; -webkit-font-smoothing: antialiased; }
+        header { padding: 20px; position: sticky; top: 0; background: rgba(5,5,5,0.8); backdrop-filter: blur(15px); border-bottom: 1px solid #151515; z-index: 1000; }
+        .header-content { max-width: 600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        h1 { font-size: 0.9rem; font-weight: 300; letter-spacing: 5px; text-transform: uppercase; margin: 0; }
+        .nav-link { font-size: 0.65rem; color: var(--dim); text-decoration: none; letter-spacing: 2px; border: 1px solid #222; padding: 7px 15px; border-radius: 4px; transition: 0.3s; }
+        .nav-link:hover { background: #fff; color: #000; }
+        .container { max-width: 600px; margin: 0 auto; padding: 30px 20px; }
+        .card { margin-bottom: 60px; animation: fadeIn 0.8s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .card-title { font-size: 0.8rem; color: var(--dim); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 600; }
+        /* Contenedor flexible para portadas de cualquier altura */
+        .img-container { width: 100%; background: #111; border-radius: 8px; overflow: hidden; position: relative; min-height: 200px; }
+        img { width: 100%; height: auto; display: block; opacity: 0; transition: opacity 1s; }
+        img.loaded { opacity: 1; }
+        footer { text-align: center; padding: 40px; opacity: 0.4; font-size: 0.6rem; letter-spacing: 2px; }
     </style>
 </head>
 <body>
+    <header>
+        <div class="header-content">
+            <h1>OFICIAL.PE</h1>
+            <a href="https://wa.me/51950141414" class="nav-link" target="_blank">WHATSAPP</a>
+        </div>
+    </header>
+    <div class="container" id="gallery"></div>
+    <footer>© 2026 OFICIAL.PE | SIMPLICIDAD Y ELEGANCIA</footer>
 
-<header>
-    <div class="header-content">
-        <h1>OFICIAL.PE</h1>
-        <a href="https://wa.me/51950141414" class="nav-link" target="_blank">WHATSAPP</a>
-    </div>
-</header>
-
-<div class="container" id="gallery">
-    </div>
-
-<footer>
-    <p>© 2026 OFICIAL.PE | SIMPLICIDAD Y ELEGANCIA</p>
-</footer>
-
-<script>
-    // Ruta al archivo generado por el script de Python
-    const CSV_URL = 'data/DATOS.csv';
-
-    function init() {
-        Papa.parse(CSV_URL, {
-            download: true,
-            header: true,
-            skipEmptyLines: true,
-            complete: function(results) {
-                renderGallery(results.data);
-            },
-            error: function(err) {
-                console.error("Error cargando el CSV:", err);
-            }
-        });
-    }
-
-    function renderGallery(data) {
-        const gallery = document.getElementById('gallery');
-        // Cache busting para evitar que el navegador muestre imágenes viejas
-        const timestamp = new Date().getTime();
-
-        data.forEach((row, index) => {
-            // Verificamos que existan datos en las columnas clave
-            if (row.Diario && row.Imagen) {
-                const card = document.createElement('div');
-                card.className = 'card';
-                
-                // Las primeras 2 imágenes se cargan con prioridad (eager)
-                const loadingStrategy = index < 2 ? 'eager' : 'lazy';
-
-                card.innerHTML = `
-                    <div class="card-header">
-                        <div class="card-title">${row.Diario}</div>
-                    </div>
-                    <div class="img-container">
-                        <div class="shimmer"></div>
-                        <img 
-                            src="${row.Imagen}?v=${timestamp}" 
-                            alt="Portada de ${row.Diario}" 
-                            loading="${loadingStrategy}"
-                            onload="imageLoaded(this)"
-                            onerror="this.parentElement.parentElement.remove()"
-                        >
-                    </div>
-                `;
-                gallery.appendChild(card);
-            }
-        });
-    }
-
-    function imageLoaded(img) {
-        img.classList.add('loaded');
-        // Removemos el shimmer una vez que la imagen es visible
-        const shimmer = img.previousElementSibling;
-        if (shimmer && shimmer.classList.contains('shimmer')) {
-            shimmer.remove();
+    <script>
+        const CSV_URL = 'data/portadas.csv';
+        function init() {
+            Papa.parse(CSV_URL, {
+                download: true, header: true, skipEmptyLines: true,
+                complete: function(results) { render(results.data); }
+            });
         }
-    }
-
-    document.addEventListener('DOMContentLoaded', init);
-</script>
-
+        function render(data) {
+            const gallery = document.getElementById('gallery');
+            const v = new Date().getTime();
+            data.forEach((row) => {
+                if (row.Diario && row.Imagen) {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div class="card-title">${row.Diario}</div>
+                        <div class="img-container">
+                            <img src="${row.Imagen}?v=${v}" alt="${row.Diario}" onload="this.classList.add('loaded')">
+                        </div>`;
+                    gallery.appendChild(card);
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>
