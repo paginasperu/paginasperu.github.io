@@ -9,6 +9,7 @@ from PIL import Image
 from io import BytesIO
 import fitz  # PyMuPDF
 from urllib.parse import urljoin
+from datetime import datetime
 
 # --- CONFIGURACIÓN DE RUTAS Y NUBE ---
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,6 +26,25 @@ CSV_LOCAL_PATH.parent.mkdir(parents=True, exist_ok=True)
 IMG_DIR.mkdir(parents=True, exist_ok=True)
 
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+
+def formatear_url(url_template):
+    """
+    NUEVA FUNCIÓN V7.4: Reemplaza marcadores por valores de fecha actual.
+    Soporta: {YYYY}, {YY}, {MM}, {M}, {DD}, {D}
+    """
+    hoy = datetime.now()
+    datos = {
+        "{YYYY}": hoy.strftime("%Y"),
+        "{YY}": hoy.strftime("%y"),
+        "{MM}": hoy.strftime("%m"),
+        "{M}": str(hoy.month),
+        "{DD}": hoy.strftime("%d"),
+        "{D}": str(hoy.day)
+    }
+    url_final = url_template
+    for marcador, valor in datos.items():
+        url_final = url_final.replace(marcador, valor)
+    return url_final
 
 def peticion_segura(url, reintentos=3):
     for i in range(reintentos):
@@ -60,7 +80,7 @@ def obtener_mejor_img(soup, instruccion, url_base):
             img_tag = link_issuu.find("img")
         if not img_tag: instruccion_low = "og:image"
 
-    # Rama 2: SRC QUE CONTENGA (Fix para El Diez solicitado por Claude)
+    # Rama 2: SRC QUE CONTENGA (Fix para El Diez)
     if "src que contenga" in instruccion_low:
         match = re.search(r'src que contenga "([^"]*)"', instruccion_raw, re.I)
         if match:
@@ -106,11 +126,17 @@ def obtener_mejor_img(soup, instruccion, url_base):
 def guardar_imagen(img, nombre_diario):
     filename = f"{nombre_diario.lower().replace(' ', '_')}.jpg"
     filepath = IMG_DIR / filename
+    
+    # Soporte completo de modos (RGB, RGBA, P, CMYK)
     if img.mode != 'RGB': img = img.convert('RGB')
+    
+    # Redimensionamiento profesional a 1200px
     if img.width != 1200:
         new_h = int(img.height * 1200 / img.width)
         img = img.resize((1200, new_h), Image.Resampling.LANCZOS)
-    img.save(filepath, "JPEG", quality=85, optimize=True)
+    
+    # Guardado optimizado y progresivo
+    img.save(filepath, "JPEG", quality=85, optimize=True, progressive=True)
     return f"img/portadas/{filename}"
 
 def procesar_diario(row):
@@ -119,7 +145,20 @@ def procesar_diario(row):
     instruccion = row.get('Instrucción') or row.get('Instruccion') or 'og:image'
     
     if not diario or not url: return None
-        
+    
+    # APLICAR FORMATEO DE FECHA SI LA INSTRUCCIÓN LO PIDE
+    if "Formatear fecha actual" in instruccion:
+        url = formatear_url(url)
+        # Si la instrucción es SOLO formatear, se trata como descarga directa
+        if instruccion.strip() == "Formatear fecha actual":
+            img_res = peticion_segura(url)
+            if img_res:
+                try:
+                    img = Image.open(BytesIO(img_res.content))
+                    return guardar_imagen(img, diario)
+                except: return None
+            return None
+
     res = peticion_segura(url)
     if not res: return None
     soup = BeautifulSoup(res.text, 'html.parser')
@@ -142,7 +181,7 @@ def procesar_diario(row):
     return None
 
 def main():
-    print(f"--- MOTOR OFICIAL.PE V7.3: SINCRONIZACIÓN NUBE ---")
+    print(f"--- MOTOR OFICIAL.PE V7.4: SINCRONIZACIÓN NUBE ---")
     df = None
     for attempt in range(3):
         try:
