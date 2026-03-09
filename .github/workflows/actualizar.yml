@@ -4,30 +4,30 @@ on:
   schedule:
     # Se ejecuta a las 6:00 AM y 9:00 AM hora Perú (11:00 y 14:00 UTC)
     - cron: '0 11,14 * * *'
-  workflow_dispatch: # Permite ejecución manual desde la pestaña Actions
+  workflow_dispatch: # Permite ejecución manual
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Permiso esencial para que el bot haga el push al repositorio
+      contents: write
 
     steps:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Descarga el historial completo para un rebase seguro
+          fetch-depth: 0
 
       - name: Configurar Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-          cache: 'pip' # Acelera la ejecución diaria al no reinstalar todo de cero
+          cache: 'pip' # Detectará el requirements.txt automáticamente
 
       - name: Instalar dependencias
         run: |
           python -m pip install --upgrade pip
-          pip install requests pandas beautifulsoup4 pillow pymupdf
+          pip install -r requirements.txt
 
       - name: Ejecutar motor de portadas
         run: python scripts/portadas.py
@@ -37,16 +37,13 @@ jobs:
           git config --global user.name "OficialBot"
           git config --global user.email "bot@oficial.pe"
           
-          # Agregamos archivos de forma tolerante (Fix Claude: evita error si no hay archivos)
           git add data/DATOS.csv || true
           git add img/portadas/*.jpg || true
           
-          # Pull con rebase (Fix ChatGPT: evita conflictos si editas algo manualmente en el repo)
           git pull --rebase origin main || true
           
-          # Solo hacemos commit si hay cambios reales preparados (staged)
           if git diff --staged --quiet; then
-            echo "Sin cambios detectados en las portadas. No hay nada que subir."
+            echo "Sin cambios detectados."
           else
             git commit -m "Auto-update: Portadas $(date +'%Y-%m-%d %H:%M')"
             git push origin main
