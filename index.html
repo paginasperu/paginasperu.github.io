@@ -3,38 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OFICIAL.PE | Portadas del Perú</title>
+    <meta name="theme-color" content="#000000">
+    <title>OFICIAL.PE | Directorio web</title>
     
-    <meta name="description" content="Portadas de los principales diarios del Perú actualizadas cada mañana. Simplicidad y elegancia.">
+    <meta name="description" content="Portadas de los principales diarios del Perú actualizadas diariamente. Simplicidad y elegancia.">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="OFICIAL.PE | Portadas de Hoy">
-    <meta property="og:description" content="Consulta las portadas de hoy de forma rápida y sin publicidad.">
     <meta property="og:image" content="https://oficial.pe/images/preview.jpg">
     <meta property="og:url" content="https://oficial.pe">
-    <meta property="og:type" content="website">
 
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://raw.githubusercontent.com">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" defer></script>
     
     <style>
         :root { --bg: #000; --text: #fff; --accent: #111; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, system-ui, sans-serif; margin: 0; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+        
         header { padding: 15px 0; position: sticky; top: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); z-index: 1000; border-bottom: 1px solid var(--accent); }
         .nav-container { display: flex; justify-content: center; gap: 12px; }
-        .pill { font-size: 0.7rem; color: #fff; text-decoration: none; letter-spacing: 2px; border: 1px solid #222; padding: 8px 22px; border-radius: 50px; transition: 0.3s; text-transform: uppercase; font-weight: 500; }
-        .pill.active { background: #fff; color: #000; border-color: #fff; }
-        .pill:hover:not(.active) { border-color: #666; }
-        .container { max-width: 850px; margin: 0 auto; }
-        .card { width: 100%; margin-bottom: 2px; background: #000; }
-        .card img { width: 100%; height: auto; display: block; opacity: 0; transition: opacity 0.5s ease; }
+        .pill { font-size: 0.7rem; color: #fff; text-decoration: none; letter-spacing: 2px; border: 1px solid #222; padding: 8px 22px; border-radius: 50px; text-transform: uppercase; font-weight: 500; }
+        .pill.active { background: #fff; color: #000; }
+
+        #gallery { max-width: 850px; margin: 0 auto; transition: max-width 0.4s ease-in-out; cursor: zoom-in; }
+        #gallery.zoomed { max-width: 1200px; cursor: zoom-out; }
+
+        .card { width: 100%; margin-bottom: 25px; background: #000; }
+        .card img { width: 100%; height: auto; display: block; opacity: 0; transition: opacity 0.6s ease; }
         .card img.loaded { opacity: 1; }
-        .error-msg { text-align: center; padding: 60px 20px; color: #444; font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; }
-        footer { padding: 80px 0; text-align: center; }
-        .contact-link { color: #444; text-decoration: none; font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; }
-        .contact-link:hover { color: #fff; }
-        @media (max-width: 600px) { .container { padding: 0; } }
+
+        .error-msg { text-align: center; padding: 60px; color: #444; text-transform: uppercase; font-size: 0.7rem; }
+        footer { padding: 80px 0; text-align: center; opacity: 0.5; }
+        .contact-link { color: #fff; text-decoration: none; font-size: 0.7rem; letter-spacing: 3px; }
+        
+        @media (max-width: 600px) { #gallery { padding: 0; } }
     </style>
 </head>
 <body>
@@ -44,31 +46,37 @@
             <a href="https://oficial.pe/menus" class="pill">MENÚS</a>
         </nav>
     </header>
-    <div class="container" id="gallery"></div>
+
+    <div id="gallery"></div>
+
     <footer>
         <a href="https://wa.me/51950141414" target="_blank" class="contact-link">CONTACTAR</a>
     </footer>
+
     <script>
         const CSV_URL = 'data/portadas.csv';
+        const g = document.getElementById('gallery');
+        
+        g.onclick = () => g.classList.toggle('zoomed');
+
         function init() {
             Papa.parse(CSV_URL, {
                 download: true, header: true, skipEmptyLines: true,
-                complete: function(results) { render(results.data); },
-                error: function(err) { 
-                    document.getElementById('gallery').innerHTML = "<div class='error-msg'>Temporalmente no disponible</div>";
-                }
+                complete: (r) => render(r.data),
+                error: () => g.innerHTML = "<div class='error-msg'>Temporalmente no disponible</div>"
             });
         }
+
         function render(data) {
-            const gallery = document.getElementById('gallery');
-            const v = new Date().getTime(); 
+            // Optimización de caché: v=2026-03-09 (Sugerencia ChatGPT)
+            const v = new Date().toISOString().slice(0,10); 
             data.forEach((row, index) => {
                 if (row.Imagen) {
                     const card = document.createElement('div');
                     card.className = 'card';
-                    const strategy = index < 3 ? 'eager' : 'lazy';
-                    card.innerHTML = `<img loading="${strategy}" src="${row.Imagen}?v=${v}" alt="Portada de ${row.Diario || 'Diario Peruano'}" onload="this.classList.add('loaded')">`;
-                    gallery.appendChild(card);
+                    const s = index < 3 ? 'eager' : 'lazy';
+                    card.innerHTML = `<img loading="${s}" src="${row.Imagen}?v=${v}" alt="Portada de ${row.Diario}" onload="this.classList.add('loaded')">`;
+                    g.appendChild(card);
                 }
             });
         }
