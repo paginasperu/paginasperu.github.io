@@ -1,34 +1,49 @@
 <!DOCTYPE html>
 <html lang="es">
-<body>
+<body style="font-family:monospace; padding:20px;">
     <h3>Expreso: Portada del día</h3>
     <button onclick="scrap()">Obtener URL</button>
-    <p id="out"></p>
+    
+    <p id="out">Esperando...</p>
+    
+    <details>
+        <summary>Ver HTML capturado (Debug)</summary>
+        <textarea id="debug" style="width:100%; height:200px; margin-top:10px;"></textarea>
+    </details>
 
     <script>
         async function scrap() {
             const out = document.getElementById('out');
+            const debug = document.getElementById('debug');
             out.innerText = "Buscando...";
+            debug.value = "";
             
             try {
-                // El proxy permite saltar el CORS
                 const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://www.expreso.com.pe')}`);
-                const data = await response = await res.json();
-                const doc = new DOMParser().parseFromString(data.contents, 'text/html');
+                if (!res.ok) throw new Error("Fallo en el Proxy");
+                
+                const data = await res.json(); // Corregido: eliminada asignación doble
+                const html = data.contents;
+                
+                // Mostramos el HTML capturado para inspeccionar
+                debug.value = html;
 
-                // Selector flexible para encontrar la portada
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                
+                // Buscamos cualquier imagen que mencione "Portada"
                 const img = Array.from(doc.querySelectorAll('img')).find(i => 
-                    i.alt.includes("Portada") || i.dataset.src?.includes("portada")
+                    (i.alt && i.alt.toLowerCase().includes("portada")) || 
+                    (i.dataset.src && i.dataset.src.toLowerCase().includes("portada"))
                 );
 
                 if (img) {
                     const src = img.getAttribute('data-src') || img.src;
-                    out.innerHTML = `URL: ${src}<br><img src="${src}" width="300">`;
+                    out.innerHTML = `<b style="color:green">¡Éxito!</b><br>URL: ${src}<br><img src="${src}" width="300">`;
                 } else {
-                    out.innerText = "No se halló la imagen.";
+                    out.innerHTML = `<b style="color:orange">No se halló la imagen.</b> Revisa el HTML abajo.`;
                 }
             } catch (e) {
-                out.innerText = "Error de conexión.";
+                out.innerHTML = `<b style="color:red">Error:</b> ${e.message}`;
             }
         }
     </script>
