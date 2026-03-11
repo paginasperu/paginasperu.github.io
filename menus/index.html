@@ -14,11 +14,13 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
 
+        /* CABECERA */
         header { padding: 20px 0; background: var(--header); }
         .nav-container { display: flex; justify-content: center; gap: 30px; }
         .pill { font-size: 0.7rem; color: #888; text-decoration: none; letter-spacing: 2px; padding: 8px 0; text-transform: uppercase; font-weight: 600; border-bottom: 2px solid transparent; transition: 0.3s; }
         .pill.active { color: #fff; border-bottom: 2px solid #fff; }
 
+        /* FILTROS CON SCROLL HORIZONTAL */
         .filter-zone { background: #fff; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
         .filter-bar { 
             display: flex; gap: 10px; padding: 12px 20px; 
@@ -30,14 +32,19 @@
 
         select { padding: 10px 16px; border: 1px solid #ddd; border-radius: 25px; font-size: 0.85rem; color: #444; background: #fff; cursor: pointer; outline: none; }
 
+        /* GALERÍA */
         #gallery { padding: 20px; max-width: 1100px; margin: 0 auto; column-count: 1; column-gap: 20px; opacity: 0; transition: opacity 0.5s; }
         @media (min-width: 600px) { #gallery { column-count: 2; } }
         @media (min-width: 1100px) { #gallery { column-count: 3; } }
 
-        .card { break-inside: avoid; margin-bottom: 25px; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.03); cursor: zoom-in; }
-        .card img { width: 100%; display: block; }
+        /* CARDS */
+        .card { break-inside: avoid; margin-bottom: 25px; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.03); }
         
-        .info { padding: 20px; cursor: default; }
+        /* Solo la imagen tiene el cursor de zoom */
+        .card img { width: 100%; display: block; cursor: zoom-in; transition: opacity 0.2s; }
+        .card img:hover { opacity: 0.95; }
+        
+        .info { padding: 20px; }
         .info .category { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.8px; margin-bottom: 4px; }
         .info h3 { font-size: 1.1rem; font-weight: 600; color: #111; margin-bottom: 4px; }
         .info .details { font-size: 0.8rem; color: #666; margin-bottom: 15px; line-height: 1.4; }
@@ -54,6 +61,7 @@
         .wa-btn::before { content: ""; width: 8px; height: 8px; background: #25D366; border-radius: 50%; }
         .wa-btn:active { background: #e8f5f3; transform: scale(0.96); }
 
+        /* MODAL CON ANIMACIÓN SUAVE */
         #modal { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.95); z-index: 2000; cursor: zoom-out;
@@ -101,7 +109,8 @@
     </footer>
 
     <script>
-        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Z2C4BVz2pf5BzTj1pAtYBJydtyDgOd7itl9pF12cflFUXR26VaYxAPHARMjupx6t1g3brjMZZPhz/pub?gid=2057424831&single=true&output=csv';
+        // Ruta local para máxima velocidad, consistente con portadas.csv
+        const CSV_URL = '../data/menus.csv';
         let masterData = [];
 
         function init() {
@@ -112,7 +121,8 @@
                     setupFilters();
                     render();
                     document.getElementById('gallery').style.opacity = '1';
-                }
+                },
+                error: (err) => console.error("Error cargando CSV local:", err)
             });
         }
 
@@ -136,23 +146,25 @@
 
             const g = document.getElementById('gallery');
             g.innerHTML = '';
+            
+            // Cache por día para las imágenes
             const version = new Date().toISOString().slice(0,10); 
 
             data.forEach((row, index) => {
                 if (!row.Imagen) return;
                 
-                // Fallback de seguridad para WhatsApp
+                // Blindaje para datos vacíos
                 const phone = (row.WhatsApp || '').replace(/\s/g, '');
                 const card = document.createElement('div');
                 card.className = 'card';
                 const imgSrc = `../images/menus/${row.Imagen}.jpg?v=${version}`;
                 
-                card.onclick = (e) => {
-                    if (!e.target.closest('.wa-btn')) openZoom(imgSrc);
-                };
-
+                // Estructura limpia: el onclick de zoom va SOLO en la img
                 card.innerHTML = `
-                    <img src="${imgSrc}" loading="${index < 4 ? 'eager' : 'lazy'}" alt="${row.Restaurante}">
+                    <img src="${imgSrc}" 
+                         loading="${index < 4 ? 'eager' : 'lazy'}" 
+                         onclick="openZoom('${imgSrc}')" 
+                         alt="${row.Restaurante}">
                     <div class="info">
                         <div class="category">${row.Categoría}</div>
                         <h3>${row.Restaurante}</h3>
