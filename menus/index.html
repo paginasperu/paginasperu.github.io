@@ -10,17 +10,31 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" defer></script>
     
     <style>
-        :root { --bg: #fcfcfc; --header: #000; --text: #222; --muted: #777; --border: #eee; --wa: #128C7E; }
+        :root { --bg: #fcfcfc; --header: #000; --text: #222; --muted: #777; --border: #eee; --wa: #128C7E; --accent: #111; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
 
-        /* CABECERA */
-        header { padding: 20px 0; background: var(--header); }
+        /* HEADER: Adaptado exactamente a Portadas */
+        header { 
+            padding: 20px 0; 
+            background: var(--header); 
+            border-bottom: 1px solid var(--accent); /* Igual al border de Portadas */
+        }
         .nav-container { display: flex; justify-content: center; gap: 30px; }
-        .pill { font-size: 0.7rem; color: #888; text-decoration: none; letter-spacing: 2px; padding: 8px 0; text-transform: uppercase; font-weight: 600; border-bottom: 2px solid transparent; transition: 0.3s; }
+        .pill { 
+            font-size: 0.75rem; /* Subido de 0.7 para igualar Portadas */
+            color: #bbb; 
+            text-decoration: none; 
+            letter-spacing: 2px; 
+            padding: 10px 0; /* Subido de 8px para igualar Portadas */
+            text-transform: uppercase; 
+            font-weight: 600; 
+            transition: 0.3s;
+            border-bottom: 2px solid transparent;
+        }
         .pill.active { color: #fff; border-bottom: 2px solid #fff; }
 
-        /* FILTROS CON SCROLL HORIZONTAL */
+        /* FILTROS */
         .filter-zone { background: #fff; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
         .filter-bar { 
             display: flex; gap: 10px; padding: 12px 20px; 
@@ -32,15 +46,12 @@
 
         select { padding: 10px 16px; border: 1px solid #ddd; border-radius: 25px; font-size: 0.85rem; color: #444; background: #fff; cursor: pointer; outline: none; }
 
-        /* GALERÍA */
+        /* GALERÍA MASONRY */
         #gallery { padding: 20px; max-width: 1100px; margin: 0 auto; column-count: 1; column-gap: 20px; opacity: 0; transition: opacity 0.5s; }
         @media (min-width: 600px) { #gallery { column-count: 2; } }
         @media (min-width: 1100px) { #gallery { column-count: 3; } }
 
-        /* CARDS */
         .card { break-inside: avoid; margin-bottom: 25px; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.03); }
-        
-        /* Solo la imagen tiene el cursor de zoom */
         .card img { width: 100%; display: block; cursor: zoom-in; transition: opacity 0.2s; }
         .card img:hover { opacity: 0.95; }
         
@@ -59,18 +70,16 @@
             border-radius: 20px; transition: 0.2s;
         }
         .wa-btn::before { content: ""; width: 8px; height: 8px; background: #25D366; border-radius: 50%; }
-        .wa-btn:active { background: #e8f5f3; transform: scale(0.96); }
 
-        /* MODAL CON ANIMACIÓN SUAVE */
+        /* MODAL */
         #modal { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.95); z-index: 2000; cursor: zoom-out;
             opacity: 0; visibility: hidden; transition: 0.2s ease;
             display: flex; justify-content: center; align-items: center;
         }
-        #modal img { max-width: 95%; max-height: 92vh; border-radius: 4px; transform: scale(0.95); transition: 0.2s ease; }
         #modal.active { opacity: 1; visibility: visible; }
-        #modal.active img { transform: scale(1); }
+        #modal img { max-width: 95%; max-height: 92vh; border-radius: 4px; }
 
         footer { padding: 80px 0; text-align: center; }
         .contact-link { color: var(--muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 3px; font-weight: 600; }
@@ -92,24 +101,20 @@
             <select id="f-categoria"><option value="">Categoría</option></select>
             <select id="f-orden">
                 <option value="default">Recientes</option>
-                <option value="asc">Precio Menor</option>
-                <option value="desc">Precio Mayor</option>
+                <option value="asc">Precio menor</option>
+                <option value="desc">Precio mayor</option>
             </select>
         </div>
     </div>
 
     <div id="gallery"></div>
-
-    <div id="modal" onclick="this.classList.remove('active')">
-        <img src="" alt="Zoom">
-    </div>
+    <div id="modal" onclick="this.classList.remove('active')"><img src="" alt="Zoom"></div>
 
     <footer>
         <a href="https://wa.me/51950141414" target="_blank" rel="noopener" class="contact-link">CONTACTO</a>
     </footer>
 
     <script>
-        // Ruta local para máxima velocidad, consistente con portadas.csv
         const CSV_URL = '../data/menus.csv';
         let masterData = [];
 
@@ -121,8 +126,7 @@
                     setupFilters();
                     render();
                     document.getElementById('gallery').style.opacity = '1';
-                },
-                error: (err) => console.error("Error cargando CSV local:", err)
+                }
             });
         }
 
@@ -146,25 +150,17 @@
 
             const g = document.getElementById('gallery');
             g.innerHTML = '';
-            
-            // Cache por día para las imágenes
             const version = new Date().toISOString().slice(0,10); 
 
             data.forEach((row, index) => {
                 if (!row.Imagen) return;
-                
-                // Blindaje para datos vacíos
                 const phone = (row.WhatsApp || '').replace(/\s/g, '');
                 const card = document.createElement('div');
                 card.className = 'card';
                 const imgSrc = `../images/menus/${row.Imagen}.jpg?v=${version}`;
                 
-                // Estructura limpia: el onclick de zoom va SOLO en la img
                 card.innerHTML = `
-                    <img src="${imgSrc}" 
-                         loading="${index < 4 ? 'eager' : 'lazy'}" 
-                         onclick="openZoom('${imgSrc}')" 
-                         alt="${row.Restaurante}">
+                    <img src="${imgSrc}" loading="${index < 4 ? 'eager' : 'lazy'}" onclick="openZoom('${imgSrc}')" alt="${row.Restaurante}">
                     <div class="info">
                         <div class="category">${row.Categoría}</div>
                         <h3>${row.Restaurante}</h3>
@@ -175,9 +171,7 @@
                         </div>
                         <div class="footer-card">
                             <div class="price">S/ ${(parseFloat(row['Precio menú completo'])||0).toFixed(2)}</div>
-                            <a href="https://wa.me/51${phone}" target="_blank" rel="noopener" class="wa-btn">
-                                WhatsApp
-                            </a>
+                            <a href="https://wa.me/51${phone}" target="_blank" rel="noopener" class="wa-btn">WhatsApp</a>
                         </div>
                     </div>
                 `;
