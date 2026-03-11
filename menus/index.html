@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,48 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MENÚS | OFICIAL.PE</title>
     <link rel="icon" type="image/png" href="../images/favicon.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 
     <style>
-        :root { --bg: #000; --text: #fff; --gray: #bbb; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, system-ui, sans-serif; }
+        :root { --bg: #f9f9f9; --text: #111; --gray: #777; --border: #eee; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); font-family: -apple-system, system-ui, sans-serif; color: var(--text); }
         
-        /* HEADER: Estático y minimalista (Como portadas) */
-        header { padding: 40px 20px 20px; text-align: center; background: var(--bg); }
-        .nav-container { display: flex; justify-content: center; gap: 25px; }
-        .pill { color: var(--gray); text-decoration: none; font-size: 0.85rem; font-weight: 600; padding-bottom: 6px; border-bottom: 2px solid transparent; transition: 0.3s; }
+        /* HEADER ESTÁTICO (Consistencia con Portadas) */
+        header { padding: 25px 20px 15px; text-align: center; background: #000; }
+        .nav-container { display: flex; justify-content: center; gap: 20px; }
+        .pill { color: #bbb; text-decoration: none; font-size: 0.85rem; font-weight: 600; padding-bottom: 4px; border-bottom: 2px solid transparent; transition: 0.2s; }
         .pill.active { color: #fff; border-bottom-color: #fff; }
 
-        /* CONTROLES */
-        .controls { padding: 15px; display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid #111; scrollbar-width: none; }
-        .controls::-webkit-scrollbar { display: none; }
-        select { background: #000; color: #fff; border: 1px solid #222; padding: 10px; border-radius: 5px; font-size: 0.8rem; outline: none; cursor: pointer; }
+        /* FILTROS STICKY (Solo los filtros se quedan arriba) */
+        .filter-bar { 
+            position: sticky; top: 0; z-index: 1000;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            border-bottom: 1px solid #ddd; padding: 12px; 
+            display: flex; justify-content: center; 
+        }
+        .filter-container { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; max-width: 1200px; }
+        select { background: #fff; border: 1px solid #ccc; padding: 8px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; outline: none; }
 
-        /* GALERÍA */
-        #gallery { display: grid; grid-template-columns: 1fr; gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; }
-        @media (min-width: 768px) { #gallery { grid-template-columns: repeat(3, 1fr); } }
+        /* GALERÍA MASONRY CON PLACEHOLDERS */
+        #gallery { 
+            padding: 20px; max-width: 1200px; margin: 0 auto; 
+            column-count: 1; column-gap: 20px; 
+            opacity: 0; transition: opacity 0.5s ease; 
+        }
+        @media (min-width: 600px) { #gallery { column-count: 2; } }
+        @media (min-width: 1000px) { #gallery { column-count: 3; } }
 
-        /* CARD */
-        .card { background: #000; border: 1px solid #111; border-radius: 8px; overflow: hidden; }
-        .card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; cursor: pointer; display: block; opacity: 0; transition: opacity 0.4s; }
+        .card { 
+            break-inside: avoid; margin-bottom: 20px; background: #fff; 
+            border-radius: 12px; overflow: hidden; border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: transform 0.3s ease;
+        }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+        
+        /* Placeholder gris mientras carga la imagen */
+        .img-container { background: #eee; width: 100%; min-height: 200px; position: relative; }
+        .card img { width: 100%; height: auto; display: block; cursor: zoom-in; opacity: 0; transition: opacity 0.3s; }
         .card img.loaded { opacity: 1; }
         
         .info { padding: 18px; }
-        .info h3 { font-size: 1rem; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
-        .info .price { font-size: 1.3rem; font-weight: 800; margin: 12px 0; color: #fff; }
-        .info .meta { font-size: 0.75rem; color: #666; line-height: 1.6; }
+        .info .category { font-size: 0.6rem; font-weight: 800; color: #aaa; text-transform: uppercase; letter-spacing: 1.2px; }
+        .info h3 { font-size: 1.05rem; margin: 4px 0; color: #000; }
+        .info .price { font-size: 1.4rem; font-weight: 900; margin: 10px 0; color: #000; }
+        
+        .btn-wa { 
+            display: block; background: #000; color: #fff; text-align: center; 
+            padding: 12px; border-radius: 8px; text-decoration: none; 
+            font-weight: 700; font-size: 0.85rem; transition: 0.2s; 
+        }
+        .btn-wa:hover { background: #333; }
 
-        /* BOTÓN WHATSAPP (Blanco/Negro minimalista) */
-        .btn-wa { display: block; margin-top: 15px; background: #fff; color: #000; padding: 12px; border-radius: 4px; text-decoration: none; font-weight: 800; font-size: 0.8rem; text-align: center; transition: 0.2s; }
-        .btn-wa:hover { opacity: 0.9; }
+        /* MODAL */
+        #modal { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.97); display: none; 
+            justify-content: center; align-items: center; z-index: 2000; padding: 10px;
+        }
+        #modal img { max-width: 100%; max-height: 95vh; object-fit: contain; box-shadow: 0 0 40px rgba(0,0,0,0.5); transition: transform 0.3s ease; }
+        #modal.active { display: flex; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* ZOOM (Lógica Portadas) */
-        #gallery.zoomed { grid-template-columns: 1fr !important; padding: 10px; }
-        #gallery.zoomed .card { border: none; }
-        #gallery.zoomed img { aspect-ratio: auto; object-fit: contain; max-height: 95vh; border-radius: 0; }
-        #gallery.zoomed .info { display: none; }
-
-        footer { padding: 60px; text-align: center; border-top: 1px solid #111; font-size: 0.7rem; letter-spacing: 3px; color: #333; }
+        footer { padding: 60px; text-align: center; color: #ccc; font-size: 0.7rem; letter-spacing: 4px; }
     </style>
 </head>
 <body>
@@ -59,47 +83,50 @@
         </nav>
     </header>
 
-    
-
-    <div class="controls">
-        <select id="f-distrito"><option value="">Distritos</option></select>
-        <select id="f-tipo"><option value="">Tipos</option></select>
-        <select id="f-categoria"><option value="">Categorías</option></select>
-        <select id="f-orden">
-            <option value="default">Recientes</option>
-            <option value="asc">Precio: Menor a mayor</option>
-            <option value="desc">Precio: Mayor a menor</option>
-            <option value="az">Nombre: A-Z</option>
-        </select>
+    <div class="filter-bar">
+        <div class="filter-container">
+            <select id="f-distrito" aria-label="Filtrar por Distrito"><option value="">Distrito</option></select>
+            <select id="f-tipo" aria-label="Filtrar por Tipo"><option value="">Tipo</option></select>
+            <select id="f-categoria" aria-label="Filtrar por Categoría"><option value="">Categoría</option></select>
+            <select id="f-orden" aria-label="Ordenar resultados">
+                <option value="default">Recientes</option>
+                <option value="asc">S/ Menor a mayor</option>
+                <option value="desc">S/ Mayor a menor</option>
+            </select>
+        </div>
     </div>
+
+    
 
     <div id="gallery"></div>
 
-    <footer>OFICIAL.PE • LIMA PERÚ</footer>
+    <div id="modal" onclick="this.classList.remove('active')">
+        <img src="" alt="Vista ampliada del menú">
+    </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <footer>OFICIAL.PE • LIMA</footer>
+
     <script>
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Z2C4BVz2pf5BzTj1pAtYBJydtyDgOd7itl9pF12cflFUXR26VaYxAPHARMjupx6t1g3brjMZZPhz/pub?gid=2057424831&single=true&output=csv';
-        let menusMaster = [];
-
-        const gallery = document.getElementById('gallery');
-        gallery.onclick = () => gallery.classList.toggle('zoomed');
+        let masterData = [];
 
         async function init() {
             Papa.parse(CSV_URL, {
                 download: true, header: true, skipEmptyLines: true,
                 complete: (r) => {
-                    menusMaster = r.data;
-                    const getU = (c) => [...new Set(menusMaster.map(i => i[c]))].filter(Boolean).sort();
-                    
-                    // Llenado de filtros dinámicos
-                    getU('Distrito').forEach(d => document.getElementById('f-distrito').add(new Option(d, d)));
-                    getU('Tipo').forEach(t => document.getElementById('f-tipo').add(new Option(t, t)));
-                    getU('Categoría').forEach(c => document.getElementById('f-categoria').add(new Option(c, c)));
-                    
+                    masterData = r.data;
+                    setupFilters();
                     render();
+                    document.getElementById('gallery').style.opacity = '1';
                 }
             });
+        }
+
+        function setupFilters() {
+            const getU = (c) => [...new Set(masterData.map(i => i[c]))].filter(Boolean).sort();
+            getU('Distrito').forEach(d => document.getElementById('f-distrito').add(new Option(d, d)));
+            getU('Tipo').forEach(t => document.getElementById('f-tipo').add(new Option(t, t)));
+            getU('Categoría').forEach(c => document.getElementById('f-categoria').add(new Option(c, c)));
         }
 
         function render() {
@@ -108,59 +135,57 @@
             const cV = document.getElementById('f-categoria').value;
             const oV = document.getElementById('f-orden').value;
 
-            let data = menusMaster.filter(i => 
-                (!dV || i.Distrito === dV) && 
-                (!tV || i.Tipo === tV) && 
-                (!cV || i.Categoría === cV)
-            );
+            let data = masterData.filter(i => (!dV || i.Distrito === dV) && (!tV || i.Tipo === tV) && (!cV || i.Categoría === cV));
 
-            // Ordenación Matemática
             if (oV === 'asc') data.sort((a,b) => (parseFloat(a['Precio menú completo'])||0) - (parseFloat(b['Precio menú completo'])||0));
             if (oV === 'desc') data.sort((a,b) => (parseFloat(b['Precio menú completo'])||0) - (parseFloat(a['Precio menú completo'])||0));
-            if (oV === 'az') data.sort((a,b) => a.Restaurante.localeCompare(b.Restaurante));
 
-            gallery.innerHTML = '';
-            const v = new Date().getHours(); // Cache busting cada hora
+            const g = document.getElementById('gallery');
+            g.innerHTML = '';
+            const v = new Date().getHours();
 
             data.forEach((row, index) => {
                 if (!row.Imagen) return;
-                
                 const card = document.createElement('div');
                 card.className = 'card';
-                
-                // Optimización: eager para los primeros 3 (ChatGPT hint)
-                const loadingType = index < 3 ? 'eager' : 'lazy';
+                const imgSrc = `../images/menus/${row.Imagen}.jpg?v=${v}`;
                 
                 card.innerHTML = `
-                    <img loading="${loadingType}" 
-                         src="../images/menus/${row.Imagen}.jpg?v=${v}" 
-                         alt="Menú ${row.Tipo} de ${row.Restaurante}"
-                         onload="this.classList.add('loaded')">
+                    <div class="img-container">
+                        <img src="${imgSrc}" 
+                             loading="${index < 4 ? 'eager' : 'lazy'}" 
+                             onclick="openZoom('${imgSrc}')" 
+                             alt="Menú de ${row.Restaurante}"
+                             onload="this.classList.add('loaded')">
+                    </div>
                     <div class="info">
+                        <div class="category">${row.Categoría}</div>
                         <h3>${row.Restaurante}</h3>
-                        <p style="color:#666; font-size:0.75rem; text-transform:uppercase">${row.Tipo} • ${row.Distrito}</p>
+                        <div class="details">${row.Tipo} • ${row.Distrito}</div>
                         <div class="price">S/ ${(parseFloat(row['Precio menú completo'])||0).toFixed(2)}</div>
-                        <div class="meta">
-                            <span>📍 ${row.Dirección}</span><br>
-                            <span>🛵 Delivery: ${row.Delivery || 'Consultar'}</span><br>
-                            <span>🍴 ${row.Categoría}</span>
+                        <div class="meta" style="font-size:0.7rem; color:#999; margin-bottom:15px">
+                            📍 ${row.Dirección}<br>
+                            🛵 Delivery: ${row.Delivery || 'Consultar'}
                         </div>
                         <a href="https://wa.me/51${row.WhatsApp.replace(/\s/g,'')}" 
                            target="_blank" 
                            class="btn-wa" 
-                           onclick="event.stopPropagation()">PEDIR AHORA</a>
+                           aria-label="Pedir ahora en ${row.Restaurante}">PEDIR AHORA</a>
                     </div>
                 `;
-                gallery.appendChild(card);
+                g.appendChild(card);
             });
         }
 
-        // Eventos de control
-        document.querySelectorAll('select').forEach(s => {
-            s.onclick = (e) => e.stopPropagation();
-            s.onchange = render;
-        });
+        function openZoom(src) {
+            const m = document.getElementById('modal');
+            m.querySelector('img').src = src;
+            m.classList.add('active');
+        }
 
+        window.onkeydown = (e) => { if(e.key === "Escape") document.getElementById('modal').classList.remove('active'); };
+        document.querySelectorAll('select').forEach(s => s.onchange = render);
+        
         init();
     </script>
 </body>
