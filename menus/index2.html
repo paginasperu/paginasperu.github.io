@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MENÚS | OFICIAL.PE</title>
+    
+    <link rel="icon" type="image/png" href="../images/favicon.png">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" defer></script>
+    
+    <style>
+        /* 1. VARIABLES E IDENTIDAD VISUAL DE COMIDA */
+        :root { 
+            --bg-food: #f9f9f9; /* Fondo claro para resaltar la comida */
+            --header-black: #000; 
+            --card-bg: #fff;
+            --text-main: #111;
+            --text-muted: #888;
+            --border: #eee;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            background: var(--bg-food); 
+            color: var(--text-main); 
+            font-family: -apple-system, system-ui, sans-serif; 
+            overflow-x: hidden;
+        }
+
+        /* 2. CABECERA CALCADA DE INDEX.HTML */
+        header { 
+            padding: 20px 0; 
+            background: var(--header-black); 
+            border-bottom: 1px solid #111;
+        }
+        .nav-container { display: flex; justify-content: center; gap: 30px; }
+        .pill { 
+            font-size: 0.75rem; 
+            color: #bbb; 
+            text-decoration: none; 
+            letter-spacing: 2px; 
+            padding: 10px 0; 
+            text-transform: uppercase; 
+            font-weight: 600; 
+            transition: 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .pill:hover { color: #fff; }
+        .pill.active { color: #fff; border-bottom: 2px solid #fff; }
+
+        /* 3. FILTROS ESTILO MOCKUP */
+        .filter-bar { 
+            background: #fff; 
+            padding: 15px; 
+            border-bottom: 1px solid var(--border); 
+            display: flex; 
+            justify-content: center; 
+            gap: 10px; 
+            flex-wrap: wrap; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        select { 
+            padding: 8px 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            background: #fff; 
+            font-size: 0.8rem; 
+            color: #444;
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* 4. GALERÍA MASONRY (Pinterest) */
+        #gallery { 
+            padding: 20px; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            column-count: 1; 
+            column-gap: 20px; 
+            opacity: 0; 
+            transition: opacity 0.5s ease; 
+        }
+        @media (min-width: 600px) { #gallery { column-count: 2; } }
+        @media (min-width: 1000px) { #gallery { column-count: 3; } }
+
+        /* 5. FICHAS TÉCNICAS (Cards) */
+        .card { 
+            break-inside: avoid; 
+            margin-bottom: 20px; 
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            overflow: hidden; 
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+        .card:hover { transform: translateY(-4px); }
+        .card img { width: 100%; display: block; cursor: zoom-in; }
+        
+        .info { padding: 18px; }
+        .info .category { font-size: 0.6rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .info h3 { font-size: 1.1rem; margin: 5px 0; color: #000; letter-spacing: -0.5px; }
+        .info .details { font-size: 0.8rem; color: #666; margin-bottom: 12px; line-height: 1.4; }
+        .info .price { font-size: 1.4rem; font-weight: 900; color: #000; margin-bottom: 15px; }
+        
+        .btn-wa { 
+            display: block; background: #000; color: #fff; text-align: center; 
+            padding: 12px; border-radius: 8px; text-decoration: none; 
+            font-weight: 700; font-size: 0.85rem; transition: 0.2s; 
+        }
+        .btn-wa:hover { background: #333; }
+
+        /* 6. LIGHTBOX (ZOOM UX) */
+        #modal { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.95); display: none; 
+            justify-content: center; align-items: center; z-index: 2000; 
+            cursor: zoom-out;
+        }
+        #modal img { max-width: 95%; max-height: 90vh; border-radius: 4px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        #modal.active { display: flex; }
+
+        /* 7. FOOTER MINIMALISTA */
+        footer { padding: 80px 0; text-align: center; }
+        .contact-link { color: var(--text-muted); text-decoration: none; font-size: 0.7rem; letter-spacing: 3px; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="nav-container">
+            <a href="../" class="pill">PORTADAS</a>
+            <a href="#" class="pill active">MENÚS</a>
+        </nav>
+    </header>
+
+    <div class="filter-bar">
+        <select id="f-distrito"><option value="">Distrito</option></select>
+        <select id="f-tipo"><option value="">Tipo</option></select>
+        <select id="f-categoria"><option value="">Categoría</option></select>
+        <select id="f-orden">
+            <option value="default">Recientes</option>
+            <option value="asc">S/ Menor a mayor</option>
+            <option value="desc">S/ Mayor a menor</option>
+        </select>
+    </div>
+
+    <div id="gallery"></div>
+
+    <div id="modal" onclick="this.classList.remove('active')">
+        <img src="" alt="Zoom">
+    </div>
+
+    <footer>
+        <a href="https://wa.me/51950141414" target="_blank" class="contact-link">CONTACTO</a>
+    </footer>
+
+    <script>
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9Z2C4BVz2pf5BzTj1pAtYBJydtyDgOd7itl9pF12cflFUXR26VaYxAPHARMjupx6t1g3brjMZZPhz/pub?gid=2057424831&single=true&output=csv';
+        let masterData = [];
+
+        function init() {
+            Papa.parse(CSV_URL, {
+                download: true, header: true, skipEmptyLines: true,
+                complete: (r) => {
+                    masterData = r.data;
+                    setupFilters();
+                    render();
+                    document.getElementById('gallery').style.opacity = '1';
+                }
+            });
+        }
+
+        function setupFilters() {
+            const getU = (col) => [...new Set(masterData.map(i => i[col]))].filter(Boolean).sort();
+            getU('Distrito').forEach(d => document.getElementById('f-distrito').add(new Option(d, d)));
+            getU('Tipo').forEach(t => document.getElementById('f-tipo').add(new Option(t, t)));
+            getU('Categoría').forEach(c => document.getElementById('f-categoria').add(new Option(c, c)));
+        }
+
+        function render() {
+            const dV = document.getElementById('f-distrito').value;
+            const tV = document.getElementById('f-tipo').value;
+            const cV = document.getElementById('f-categoria').value;
+            const oV = document.getElementById('f-orden').value;
+
+            let data = masterData.filter(i => (!dV || i.Distrito === dV) && (!tV || i.Tipo === tV) && (!cV || i.Categoría === cV));
+
+            if (oV === 'asc') data.sort((a,b) => (parseFloat(a['Precio menú completo'])||0) - (parseFloat(b['Precio menú completo'])||0));
+            if (oV === 'desc') data.sort((a,b) => (parseFloat(b['Precio menú completo'])||0) - (parseFloat(a['Precio menú completo'])||0));
+
+            const g = document.getElementById('gallery');
+            g.innerHTML = '';
+            const v = new Date().getHours();
+
+            data.forEach((row, index) => {
+                if (!row.Imagen) return;
+                const card = document.createElement('div');
+                card.className = 'card';
+                const imgSrc = `../images/menus/${row.Imagen}.jpg?v=${v}`;
+                
+                card.innerHTML = `
+                    <img src="${imgSrc}" loading="${index < 4 ? 'eager' : 'lazy'}" onclick="openZoom('${imgSrc}')" alt="${row.Restaurante}">
+                    <div class="info">
+                        <div class="category">${row.Categoría}</div>
+                        <h3>${row.Restaurante}</h3>
+                        <div class="details">${row.Tipo} • ${row.Distrito}<br>📍 ${row.Dirección}</div>
+                        <div class="price">S/ ${(parseFloat(row['Precio menú completo'])||0).toFixed(2)}</div>
+                        <a href="https://wa.me/51${row.WhatsApp.replace(/\s/g,'')}" target="_blank" class="btn-wa">PEDIR AHORA</a>
+                    </div>
+                `;
+                g.appendChild(card);
+            });
+        }
+
+        function openZoom(src) {
+            const modal = document.getElementById('modal');
+            modal.querySelector('img').src = src;
+            modal.classList.add('active');
+        }
+
+        document.querySelectorAll('select').forEach(s => s.onchange = render);
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
