@@ -1,0 +1,20 @@
+[
+  {
+    "distrito": "Breña",
+    "negocio": "La Choza Náutica",
+    "estado": "Visible",
+    "servicios": ["Menu", "Delivery"]
+  },
+  {
+    "distrito": "Lince",
+    "negocio": "Sabor Peruano",
+    "estado": "Valioso",
+    "servicios": ["Menu"]
+  },
+  {
+    "distrito": "La Perla",
+    "negocio": "Punto Mar",
+    "estado": "Visitado",
+    "servicios": ["Ceviche", "Duo Marino"]
+  }
+]
