@@ -99,41 +99,131 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: white;
             flex-direction: column;
             align-items: center;
+            overflow-y: auto;
+            z-index: 1000;
         }
 
+        #vista-contenido.fondo-negro { background: #000; }
+        #vista-contenido.fondo-blanco { background: #fff; }
+
         .btn-volver {
-            align-self: flex-start;
-            margin: 1.5rem;
-            background: #e8f0fe;
-            border: none;
-            font-size: 2rem;
+            align-self: center;
+            margin: 1.5rem auto;
+            background: rgba(128, 128, 128, 0.2);
+            border: 1px solid rgba(128, 128, 128, 0.3);
             cursor: pointer;
-            color: #202124;
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            z-index: 1100;
         }
 
+        .fondo-negro .btn-volver { color: #fff; border-color: rgba(255,255,255,0.3); }
+        .fondo-blanco .btn-volver { color: #000; border-color: rgba(0,0,0,0.3); }
+
         .btn-volver:hover {
-            background: #d2e3fc;
+            background: rgba(128, 128, 128, 0.3);
+            transform: scale(1.1);
+        }
+
+        .btn-volver svg {
+            width: 24px;
+            height: 24px;
         }
 
         #display {
-            max-width: 90%;
-            margin-top: 1rem;
-            text-align: center;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 15px 40px 15px;
         }
 
-        #display img {
-            max-width: 100%;
-            margin-top: 1rem;
+        /* Estilo Masonry para Menús */
+        .masonry-grid {
+            column-count: 3;
+            column-gap: 15px;
+            width: 100%;
+        }
+
+        .masonry-item {
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 15px;
+            cursor: zoom-in;
+            transition: transform 0.2s;
+        }
+
+        .masonry-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .masonry-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+        }
+
+        /* Portadas (estilo original) */
+        .portadas-grid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .portada-item {
+            width: 100%;
+            max-width: 1200px;
+            margin-bottom: 1rem;
+        }
+
+        .portada-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Overlay para zoom */
+        #overlay-zoom {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+
+        #overlay-zoom img {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .masonry-grid {
+                column-count: 2;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .masonry-grid {
+                column-count: 1;
+            }
         }
 
         /* Responsive */
@@ -219,11 +309,19 @@
         </div>
     </div>
 
-    <a href="https://wa.me/tunumero" class="contact">Contacto</a>
+    <a href="https://wa.me/51950141414" class="contact" target="_blank" rel="noopener noreferrer">Contacto</a>
 
     <div id="vista-contenido">
-        <button class="btn-volver" onclick="cerrar()">←</button>
+        <button class="btn-volver" onclick="cerrar()" aria-label="Cerrar">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
         <div id="display"></div>
+    </div>
+
+    <div id="overlay-zoom" onclick="this.style.display='none'">
+        <img src="" alt="Zoom">
     </div>
 
     <script>
@@ -233,14 +331,75 @@
         // Capitalizar primera letra
         document.getElementById('fecha-actual').innerText = fecha.charAt(0).toUpperCase() + fecha.slice(1);
 
+        const imagenes = {
+            'Portadas': [
+                'correo.jpg', 'elcomercio.jpg', 'eldiez.jpg', 'elperuano.jpg', 
+                'elpopular.jpg', 'expreso.jpg', 'extra.jpg', 'lanoticia.jpg', 
+                'larazon.jpg', 'larepublica.jpg', 'libero.jpg', 'ojo.jpg', 
+                'peru21.jpg', 'trome.jpg'
+            ],
+            'Menús': ['1.jpg', '2.jpg', '3.jpg']
+        };
+
         function verContenido(tipo) {
-            document.getElementById('vista-contenido').style.display = 'flex';
-            // Aquí cargarías tus imágenes reales
-            document.getElementById('display').innerHTML = `<h2>${tipo} de hoy</h2><p>(Carga de imagen aquí)</p>`;
+            const vista = document.getElementById('vista-contenido');
+            const display = document.getElementById('display');
+            
+            vista.style.display = 'flex';
+            display.innerHTML = '';
+            
+            // Configurar fondo según tipo
+            if (tipo === 'Portadas') {
+                vista.className = 'fondo-negro';
+                display.className = 'portadas-grid';
+            } else {
+                vista.className = 'fondo-blanco';
+                display.className = 'masonry-grid';
+            }
+            
+            const folder = tipo === 'Portadas' ? 'portadas' : 'menus';
+            let lista = !!imagenes[tipo] ? [...imagenes[tipo]] : [];
+            
+            // Si es menú, repetir 3 veces para rellenar
+            if (tipo === 'Menús') {
+                lista = [...lista, ...lista, ...lista];
+            }
+            
+            if (lista.length === 0) {
+                display.innerHTML += '<p>No hay imágenes disponibles para esta sección.</p>';
+                return;
+            }
+
+            lista.forEach(imgName => {
+                const item = document.createElement('div');
+                item.className = tipo === 'Portadas' ? 'portada-item' : 'masonry-item';
+                
+                const img = document.createElement('img');
+                img.src = `images/${folder}/${imgName}`;
+                img.alt = `${tipo} - ${imgName}`;
+                img.loading = 'lazy';
+                
+                if (tipo === 'Menús') {
+                    item.onclick = (e) => {
+                        e.stopPropagation();
+                        const overlay = document.getElementById('overlay-zoom');
+                        overlay.querySelector('img').src = img.src;
+                        overlay.style.display = 'flex';
+                    };
+                }
+                
+                item.appendChild(img);
+                display.appendChild(item);
+            });
+
+            vista.scrollTop = 0;
         }
 
         function cerrar() {
-            document.getElementById('vista-contenido').style.display = 'none';
+            const vista = document.getElementById('vista-contenido');
+            vista.style.display = 'none';
+            // Limpiar clases para que no se mezclen fondos al reabrir
+            vista.className = '';
         }
     </script>
 </body>

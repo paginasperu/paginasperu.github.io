@@ -1,4 +1,12 @@
-Restaurante,Tipo,Precio menú completo,Precio solo segundo,Precio para llevar,Imagen,Entradas,Segundos,Dirección,Distrito,Coordenadas,WhatsApp,Categoría
-ANTOJITOS DNICOLASA,Menú económico,12.00,11.00,13.50,1,,,AV JUAN PABLO FERNANDINI 1035,BREÑA,"-12.068651790906099, -77.05030835771208",944526734,Criollo
-LA COCINA DE TATI,Menú dieta,15.00,14.00,,2,,,JR PACHACUTEC 2108,LINCE,"-12.083035374269473, -77.04572240722723",959131904,Criollo
-LA COCINA DE TATI,Menú económico,14.00,13.00,,3,,,JR PACHACUTEC 2108,LINCE,"-12.083035374269473, -77.04572240722723",959131904,Criollo
+restaurante_etiqueta,tipo,precio_menu_completo,precio_solo_segundo,precio_para_llevar,activo,nombre,fuente,direccion,distrito,coordenadas,whatsapp,categoria
+antojitosdnicolasa,Económico,12.0,11.0,13.5,1,ANTOJITOS DNICOLASA,https://www.facebook.com/profile.php?id=100084469870746,Av. Juan Pablo Fernandini 1035,Breña,"-12.068651790906099, -77.05030835771208",944526734,Criollo
+lacocinadetati,Dieta,15.0,14.0,,1,LA COCINA DE TATI,https://www.facebook.com/LACOCINADETATII,Jr. Pachacutec 2108,Lince,"-12.083035374269473, -77.04572240722723",959131904,Criollo
+lacocinadetati,Económico,14.0,13.0,,1,LA COCINA DE TATI,https://www.facebook.com/LACOCINADETATII,Jr. Pachacutec 2108,Lince,"-12.083035374269473, -77.04572240722723",959131904,Criollo
+elmanchay,Ejecutivo,12.0,10.0,13.0,0,EL MANCHAY,,Av. Central 123,Breña,"-12.06, -77.05",900111222,Criollo
+pollorock,Dieta,15.0,13.0,16.0,0,POLLO ROCK,,Av. La Marina 202,La Perla,"-12.06, -77.10",900999000,Brasa
+pollorock,Económico,18.0,16.0,19.0,0,POLLO ROCK,,Av. La Marina 202,La Perla,"-12.06, -77.10",900999000,Brasa
+pollorock,Ejecutivo,45.0,40.0,47.0,0,POLLO ROCK,,Av. La Marina 202,La Perla,"-12.06, -77.10",900999000,Brasa
+puntomar,Económico,20.0,18.0,21.0,0,PUNTO MAR,,Jr. Huallaga 456,Lince,"-12.08, -77.04",900333444,Marina
+lasazondepepe,Económico,8.0,7.0,9.0,0,LA SAZON DE PEPE,,Av. Arica 789,Breña,"-12.06, -77.05",900555666,Menú
+wokexpress,Dieta,14.0,12.0,15.0,0,WOK EXPRESS,,Calle Las Limas 101,San Miguel,"-12.07, -77.08",900777888,Chifa
+wokexpress,Ejecutivo,16.0,14.0,17.0,0,WOK EXPRESS,,Calle Las Limas 101,San Miguel,"-12.07, -77.08",900777888,Chifa
