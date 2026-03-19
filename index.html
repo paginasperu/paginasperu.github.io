@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Portadas y Menús - oficial.pe</title>
     <meta name="description" content="Consulta las portadas de los principales diarios y menús del día en Lima.">
+    <!-- Iconos de marca en carpeta /images/brand -->
+    <link rel="apple-touch-icon" href="images/brand/favicon-app.png"> <!-- Icono para pantalla de inicio (con fondo sólido) -->
+    <link rel="icon" type="image/png" href="images/brand/favicon.png"> <!-- Icono para la pestaña del navegador (transparente) -->
+    
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -24,7 +28,11 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+            -webkit-tap-highlight-color: transparent; /* Elimina el destello azul en mobile */
+        }
+        
+        a, button, select {
+            outline: none; /* Elimina recuadros de enfoque por defecto */
         }
 
         html, body {
@@ -48,8 +56,8 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 2rem;
-            min-height: calc(100vh - 80px);
+            padding: 1rem;
+            min-height: calc(100vh - 120px);
         }
 
         #fecha-actual {
@@ -354,24 +362,42 @@
         }
 
         .ficha-header {
-            padding: 24px;
+            padding: 20px;
             background: #f8fafc;
             border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .ficha-title {
             font-size: 1.25rem;
             font-weight: 800;
             color: var(--text-main);
-            margin-bottom: 4px;
             text-transform: uppercase;
         }
 
+        .ficha-tags {
+            display: flex;
+            gap: 6px;
+        }
+
+        .tag-pill {
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 99px;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        .tag-local { background: #eff6ff; color: #2563eb; }
+        .tag-delivery { background: #f0fdf4; color: #16a34a; }
+
         .ficha-body {
-            padding: 24px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
         }
 
         .ficha-row { display: flex; flex-direction: column; gap: 4px; }
@@ -629,14 +655,20 @@
             });
         };
 
+        const getCacheBust = () => {
+            const d = new Date();
+            return `?v=${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+        };
+
         const renderPortadas = () => {
             const display = document.getElementById('display');
             display.innerHTML = '<div class="portadas-grid"></div>';
             const grid = display.querySelector('.portadas-grid');
+            const cb = getCacheBust();
             portadasData.forEach(p => {
                 const item = document.createElement('div');
                 item.className = 'portada-item';
-                item.innerHTML = `<img src="images/portadas/${p.img}" alt="${p.nombre}" loading="lazy" onerror="this.parentElement.style.display='none'">`;
+                item.innerHTML = `<img src="images/portadas/${p.img}${cb}" alt="${p.nombre}" loading="lazy" onclick="verSoloImagen('images/portadas/${p.img}${cb}')" onerror="this.parentElement.style.display='none'">`;
                 grid.appendChild(item);
             });
         };
@@ -669,11 +701,12 @@
                 return;
             }
 
+            const cb = getCacheBust();
             filtered.forEach(m => {
                 const item = document.createElement('div');
                 item.className = 'masonry-item';
                 const img = document.createElement('img');
-                img.src = `images/menus/${m.img}`;
+                img.src = `images/menus/${m.img}${cb}`;
                 img.alt = m.restaurante;
                 img.onclick = () => verFicha(m);
                 img.onerror = () => item.style.display = 'none';
@@ -681,8 +714,8 @@
                 const actions = document.createElement('div');
                 actions.className = 'item-actions';
                 actions.innerHTML = `
-                    <a href="https://wa.me/51${m.whatsapp}" target="_blank" class="btn-mini btn-wa">WhatsApp</a>
-                    <a href="${m.mapa || '#'}" target="_blank" class="btn-mini btn-map" style="${!m.mapa ? 'opacity:0.3;pointer-events:none':''}">Ubicación</a>
+                    <a href="https://wa.me/51${m.whatsapp}" target="_blank" rel="noopener noreferrer" class="btn-mini btn-wa">WhatsApp</a>
+                    <a href="${m.mapa || '#'}" target="_blank" rel="noopener noreferrer" class="btn-mini btn-map" style="${!m.mapa ? 'opacity:0.3;pointer-events:none':''}">Ubicación</a>
                 `;
                 item.appendChild(img);
                 item.appendChild(actions);
@@ -695,25 +728,74 @@
             const img = document.getElementById('zoom-img');
             const container = document.getElementById('ficha-container');
             
-            img.src = `images/menus/${m.img}`;
+            const cb = getCacheBust();
+            img.src = `images/menus/${m.img}${cb}`;
             
             const waFormat = m.whatsapp.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
             const condiciones = m.delivery_condiciones ? ` (${m.delivery_condiciones.toLowerCase()})` : '';
             const cobertura = m.delivery_cobertura + condiciones;
             
-            container.innerHTML = `
-                <div class="ficha-header"><div class="ficha-title">${m.restaurante}</div></div>
-                <div class="ficha-body">
-                    <div class="ficha-row"><span class="ficha-label">WhatsApp</span><span class="ficha-value">${waFormat}</span></div>
-                    <div class="ficha-row"><span class="ficha-label">Dirección</span><span class="ficha-value">${m.direccion} (${m.distrito})</span></div>
-                    <div class="ficha-row"><span class="ficha-label">Cobertura</span><span class="ficha-value">${cobertura || 'Consultar'}</span></div>
+            // Formato Dirección - Distrito dinámico
+            const addressParts = [m.direccion, m.distrito].filter(p => p.trim());
+            const addressDisplay = addressParts.join(' - ');
+            
+            // Lógica de Etiquetas y Filas
+            const hasLocal = !!m.direccion;
+            const hasDelivery = !!m.delivery_cobertura;
+            
+            let tagsHTML = '';
+            if (hasLocal) tagsHTML += '<span class="tag-pill tag-local">LOCAL</span>';
+            if (hasDelivery) tagsHTML += '<span class="tag-pill tag-delivery">DELIVERY</span>';
+            
+            let rowsHTML = `
+                <div class="ficha-row">
+                    <span class="ficha-label">WhatsApp</span>
+                    <span class="ficha-value">${waFormat}</span>
                 </div>
             `;
             
-            overlay.style.display = 'flex';
+            if (hasLocal) {
+                rowsHTML += `
+                    <div class="ficha-row">
+                        <span class="ficha-label">Dirección</span>
+                        <span class="ficha-value">${addressDisplay}</span>
+                    </div>
+                `;
+            } else if (hasDelivery) {
+                rowsHTML += `<div class="ficha-row"><span class="ficha-value" style="color:var(--text-muted);font-style:italic;">Atención solo por delivery</span></div>`;
+            }
             
-            // Forzar el scroll al inicio después de mostrar
+            if (hasDelivery) {
+                rowsHTML += `
+                    <div class="ficha-row">
+                        <span class="ficha-label">Cobertura de delivery</span>
+                        <span class="ficha-value">${cobertura}</span>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = `
+                <div class="ficha-header">
+                    <div class="ficha-title">${m.restaurante}</div>
+                    <div class="ficha-tags">${tagsHTML}</div>
+                </div>
+                <div class="ficha-body">${rowsHTML}</div>
+            `;
+
+
+            
+            overlay.style.display = 'flex';
             setTimeout(() => { overlay.scrollTop = 0; }, 10);
+        };
+
+        const verSoloImagen = (src) => {
+            const overlay = document.getElementById('overlay-zoom');
+            const img = document.getElementById('zoom-img');
+            const container = document.getElementById('ficha-container');
+            overlay.scrollTop = 0;
+            img.src = src;
+            container.innerHTML = ''; // Sin ficha para portadas
+            overlay.style.display = 'flex';
         };
 
 
@@ -765,6 +847,7 @@
         window.addEventListener('resize', handleRoute);
         document.getElementById('filtro-distrito').addEventListener('change', (e) => { activeFilters.distrito = e.target.value; renderMenus(); });
         document.getElementById('filtro-entrega').addEventListener('change', (e) => { activeFilters.entrega = e.target.value; renderMenus(); });
+        document.getElementById('orden-precio-desktop').addEventListener('change', (e) => { activeFilters.orden = e.target.value; renderMenus(); });
         renderFecha(); cargarDatos();
     </script>
 </body>
