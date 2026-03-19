@@ -11,6 +11,7 @@
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         :root {
             --primary: #1967d2;
@@ -582,6 +583,19 @@
     </div>
 
     <script>
+        // Único punto de control para errores críticos (Bypass manual)
+        const VERSION_MANUAL = "1.0.1"; 
+
+        const getCacheBust = (esImagen = false) => {
+            const d = new Date();
+            const fecha = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+            const tiempo = `${String(d.getHours()).padStart(2,'0')}`;
+            
+            // Si es imagen: Cache por día. Si es CSV: Cache por hora.
+            const temporal = esImagen ? fecha : `${fecha}${tiempo}`;
+            return `?v=${VERSION_MANUAL}-${temporal}`;
+        };
+
         let menusData = [];
         let portadasData = [];
         let activeFilters = { distrito: '', entrega: '', orden: 'asc' };
@@ -592,47 +606,41 @@
             document.getElementById('fecha-actual').innerText = fechaTxt.charAt(0).toUpperCase() + fechaTxt.slice(1);
         };
 
-        const parseCSVLine = (text) => {
-            const result = [];
-            let current = '';
-            let inQuotes = false;
-            for (let i = 0; i < text.length; i++) {
-                const char = text[i];
-                if (char === '"') inQuotes = !inQuotes;
-                else if (char === ',' && !inQuotes) { result.push(current.trim()); current = ''; }
-                else current += char;
-            }
-            result.push(current.trim());
-            return result;
-        };
-
         const cargarDatos = async () => {
             try {
-                const respPortadas = await fetch('data/portadas.csv');
+                const cbCSV = getCacheBust(false); 
+                
+                // Cargar Portadas
+                const respPortadas = await fetch(`data/portadas.csv${cbCSV}`, { cache: 'no-cache' });
                 const textPortadas = await respPortadas.text();
-                portadasData = textPortadas.split('\n').slice(1).filter(l => l.trim()).map(linea => {
-                    const cols = parseCSVLine(linea);
-                    const nombre = cols[0] || '';
+                const jsonPortadas = Papa.parse(textPortadas, { header: true, skipEmptyLines: true }).data;
+                
+                portadasData = jsonPortadas.map(row => {
+                    const nombre = row.diario || '';
                     const id = nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '');
                     return { id, nombre, img: `${id}.webp` };
                 });
 
-                const respMenus = await fetch('data/menus.csv');
+                // Cargar Menús
+                const respMenus = await fetch(`data/menus.csv${cbCSV}`, { cache: 'no-cache' });
                 const textMenus = await respMenus.text();
-                menusData = textMenus.split('\n').slice(1).filter(l => l.trim()).map(linea => {
-                    const cols = parseCSVLine(linea);
+                const jsonMenus = Papa.parse(textMenus, { header: true, skipEmptyLines: true }).data;
+                
+                menusData = jsonMenus.map(row => {
                     return {
-                        restaurante: cols[0] || '',
-                        etiqueta: cols[1] || '',
-                        activo: cols[2] === '1',
-                        whatsapp: cols[3] || '',
-                        direccion: cols[4] || '',
-                        distrito: cols[5] || '',
-                        mapa: cols[6] || '',
-                        precio: parseFloat(cols[8]) || 0,
-                        delivery_cobertura: cols[11] || '',
-                        delivery_condiciones: cols[12] || '',
-                        img: `${cols[1]}.webp`
+                        restaurante: row.restaurante || '',
+                        etiqueta: row.etiqueta || '',
+                        activo: row.activo === '1',
+                        whatsapp: row.whatsapp || '',
+                        whatsapp_limpio: (row.whatsapp || '').replace(/\D/g, ''),
+                        direccion: row.direccion || '',
+                        distrito: row.distrito || '',
+                        mapa: row.mapa || '',
+                        precio: parseFloat(row.precio_completo) || 0,
+                        precio_formateado: (parseFloat(row.precio_completo) || 0).toFixed(2),
+                        delivery_cobertura: row.delivery_cobertura || '',
+                        delivery_condiciones: row.delivery_condiciones || '',
+                        img: `${row.etiqueta}.webp`
                     };
                 }).filter(m => m.activo);
 
@@ -655,20 +663,16 @@
             });
         };
 
-        const getCacheBust = () => {
-            const d = new Date();
-            return `?v=${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-        };
-
         const renderPortadas = () => {
             const display = document.getElementById('display');
             display.innerHTML = '<div class="portadas-grid"></div>';
             const grid = display.querySelector('.portadas-grid');
-            const cb = getCacheBust();
-            portadasData.forEach(p => {
+            const cbImg = getCacheBust(true);
+            portadasData.forEach((p, index) => {
+                const loading = index < 4 ? 'eager' : 'lazy';
                 const item = document.createElement('div');
                 item.className = 'portada-item';
-                item.innerHTML = `<img src="images/portadas/${p.img}${cb}" alt="${p.nombre}" loading="lazy" onerror="this.parentElement.style.display='none'">`;
+                item.innerHTML = `<img src="images/portadas/${p.img}${cbImg}" alt="${p.nombre}" loading="${loading}" onerror="this.parentElement.style.display='none'">`;
                 grid.appendChild(item);
             });
         };
@@ -701,20 +705,22 @@
                 return;
             }
 
-            const cb = getCacheBust();
-            filtered.forEach(m => {
+            const cbImg = getCacheBust(true);
+            filtered.forEach((m, index) => {
+                const loading = index < 4 ? 'eager' : 'lazy';
                 const item = document.createElement('div');
                 item.className = 'masonry-item';
                 const img = document.createElement('img');
-                img.src = `images/menus/${m.img}${cb}`;
+                img.src = `images/menus/${m.img}${cbImg}`;
                 img.alt = m.restaurante;
+                img.loading = loading;
                 img.onclick = () => verFicha(m);
                 img.onerror = () => item.style.display = 'none';
                 
                 const actions = document.createElement('div');
                 actions.className = 'item-actions';
                 actions.innerHTML = `
-                    <a href="https://wa.me/51${m.whatsapp}" target="_blank" rel="noopener noreferrer" class="btn-mini btn-wa">WhatsApp</a>
+                    <a href="https://wa.me/51${m.whatsapp_limpio}" target="_blank" rel="noopener noreferrer" class="btn-mini btn-wa">WhatsApp</a>
                     <a href="${m.mapa || '#'}" target="_blank" rel="noopener noreferrer" class="btn-mini btn-map" style="${!m.mapa ? 'opacity:0.3;pointer-events:none':''}">Ubicación</a>
                 `;
                 item.appendChild(img);
@@ -728,8 +734,8 @@
             const img = document.getElementById('zoom-img');
             const container = document.getElementById('ficha-container');
             
-            const cb = getCacheBust();
-            img.src = `images/menus/${m.img}${cb}`;
+            const cbImg = getCacheBust(true);
+            img.src = `images/menus/${m.img}${cbImg}`;
             
             const waFormat = m.whatsapp.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
             const condiciones = m.delivery_condiciones ? ` (${m.delivery_condiciones.toLowerCase()})` : '';
