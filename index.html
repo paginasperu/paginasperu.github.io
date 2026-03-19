@@ -840,7 +840,13 @@
                     entrOpt.textContent = isMobile ? 'Entrega' : 'Tipo de entrega';
                     renderMenus();
                 }
-            } else { home.style.display = 'flex'; footer.style.display = 'block'; content.style.display = 'none'; }
+            } else {
+                // Limpiar URL al volver a home (estético)
+                if (window.location.hash !== '') {
+                    history.replaceState(null, null, window.location.pathname);
+                }
+                home.style.display = 'flex'; footer.style.display = 'block'; content.style.display = 'none'; 
+            }
         };
 
         window.addEventListener('hashchange', handleRoute);
