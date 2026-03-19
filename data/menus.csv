@@ -1,6 +1,6 @@
-restaurante,etiqueta,activo,fuente,no_actualizado,notas,whatsapp,direccion,distrito,mapa,coordenadas,precio_completo,precio_segundo,precio_para_llevar,delivery_cobertura,delivery_condiciones,dias_de_atencion,hora_de_inicio,hora_de_fin,lugar,entradas,segundos
-ANTOJITOS DNICOLASA,antojitosdnicolasa,1,https://www.facebook.com/profile.php?id=100084469870746,,Publica tarde,920177231,Av. Juan Pablo Fernandini 1035,Breña,https://maps.app.goo.gl/VYRPjX4nN5kggT1j8,"-12.068651790906099, -77.05030835771208",12.00,11.00,13.50,,,,,,,,
-LA COCINA DE TATI,lacocinadetati,1,https://www.facebook.com/LACOCINADETATII,,Publica temprano,959131904,Jr. Pachacutec 2108,Lince,https://maps.app.goo.gl/EEF62keZb5p9d4Ev6,"-12.083035374269473, -77.04572240722723",15.00,14.00,,Lince,Gratis a zonas cercanas,"LU, MA, MI, JU, VI, SA",7:30,,,,
-LA MAGDA,lamagda,1,https://www.facebook.com/profile.php?id=61579508417451,,,976207518,Tomas Ramsey 120,Magdalena,https://maps.app.goo.gl/ZHQWQrvC8gjW1Cw29,"-12.088618436180166, -77.06465234232586",17.00,,,Magdalena,Consultar condiciones,,,,,,
-JUANITA,juanita,1,https://www.facebook.com/RestauranteDeJuanita,,Publica tarde,913157163,Av. Jose Leal 927,Lince,https://maps.app.goo.gl/bK7TdFcBGKRAstkw9,"-12.085647360699824, -77.04243791349398",15.00,,,Lince,Gratis,,,,,,
-ARTURO,arturo,1,https://whatsapp.com/channel/0029VasbBdBEquiIm5hugb0k,,Publica temprano,916979683,,,,,13.00,,,"Breña, Jesús María, Pueblo libre",,,,,,,
+restaurante,etiqueta,activo,whatsapp,direccion,distrito,mapa,coordenadas,precio_completo,precio_segundo,precio_para_llevar,delivery_cobertura,delivery_condiciones,dias_de_atencion,hora_de_inicio,hora_de_fin,lugar,entradas,segundos
+ANTOJITOS DNICOLASA,antojitosdnicolasa,1,920177231,Av. Juan Pablo Fernandini 1035,Breña,https://maps.app.goo.gl/VYRPjX4nN5kggT1j8,"-12.068651790906099, -77.05030835771208",12.00,11.00,13.50,,,,,,,,
+LA COCINA DE TATI,lacocinadetati,1,959131904,Jr. Pachacutec 2108,Lince,https://maps.app.goo.gl/EEF62keZb5p9d4Ev6,"-12.083035374269473, -77.04572240722723",15.00,14.00,,Lince,Gratis a zonas cercanas,"LU, MA, MI, JU, VI, SA",7:30,,,,
+LA MAGDA,lamagda,1,976207518,Tomas Ramsey 120,Magdalena,https://maps.app.goo.gl/ZHQWQrvC8gjW1Cw29,"-12.088618436180166, -77.06465234232586",17.00,,,Magdalena,Consultar condiciones,,,,,,
+JUANITA,juanita,1,913157163,Av. Jose Leal 927,Lince,https://maps.app.goo.gl/bK7TdFcBGKRAstkw9,"-12.085647360699824, -77.04243791349398",15.00,,,Lince,Gratis,,,,,,
+ARTURO,arturo,1,916979683,,,,,13.00,,,"Breña, Jesús María, Pueblo libre",,,,,,,
