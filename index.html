@@ -17,24 +17,30 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            overflow: hidden;
-            position: relative;
+            min-height: 100dvh;
+            margin: 0;
+        }
+
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
         }
 
         #fecha-actual {
             font-size: 16px;
-            padding-top: 2rem;
             color: #64748b;
             text-align: center;
+            margin-bottom: 2.5rem;
         }
 
         .container {
             display: flex;
             gap: 40px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            z-index: 10;
         }
 
         .button-wrapper {
@@ -57,6 +63,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
 
         .button-card:hover {
@@ -76,15 +83,28 @@
             font-weight: 500;
         }
 
-        .contact {
+        .badge {
             position: absolute;
-            bottom: 3rem;
-            left: 50%;
-            transform: translateX(-50%);
+            top: -10px;
+            right: -10px;
+            background: #1967d2;
+            color: white;
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(25, 103, 210, 0.3);
+            letter-spacing: 0.5px;
+        }
+
+        .contact {
             color: #5f6368;
             text-decoration: none;
             font-size: 0.9rem;
             transition: color 0.2s;
+            padding: 2.5rem 0;
+            text-align: center;
+            width: 100%;
         }
 
         .contact:hover {
@@ -98,7 +118,8 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 100vh;
+            height: 100dvh;
             flex-direction: column;
             align-items: center;
             overflow-y: auto;
@@ -280,32 +301,35 @@
     </style>
 </head>
 <body>
-    <div id="fecha-actual"></div>
+    <div class="main-wrapper">
+        <div id="fecha-actual"></div>
 
-    <div class="container">
-        <div class="button-wrapper" onclick="verContenido('Portadas')">
-            <div class="button-card">
-                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                    <polyline points="10 9 9 9 8 9"></polyline>
-                </svg>
+        <div class="container">
+            <div class="button-wrapper" onclick="verContenido('Portadas')">
+                <div class="button-card">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                </div>
+                <span class="button-text">Portadas</span>
             </div>
-            <span class="button-text">Portadas</span>
-        </div>
 
-        <div class="button-wrapper" onclick="verContenido('Menús')">
-            <div class="button-card">
-                <svg class="icon" viewBox="0 0 24 24">
-                    <!-- Tenedor -->
-                    <path d="M11,9H9V2H7V9H5V2H3V9c0,2.12,1.66,3.84,3.75,3.97V22h2.5V12.97C11.34,12.84,13,11.12,13,9V2h-2V9z" fill="currentColor"/>
-                    <!-- Cuchillo -->
-                    <path d="M16,6v8h2.5v8H21V2C18.24,2,16,4.24,16,6z" fill="currentColor"/>
-                </svg>
+            <div class="button-wrapper" onclick="verContenido('Menús')">
+                <div class="button-card">
+                    <span class="badge">Nuevo</span>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <!-- Tenedor -->
+                        <path d="M11,9H9V2H7V9H5V2H3V9c0,2.12,1.66,3.84,3.75,3.97V22h2.5V12.97C11.34,12.84,13,11.12,13,9V2h-2V9z" fill="currentColor"/>
+                        <!-- Cuchillo -->
+                        <path d="M16,6v8h2.5v8H21V2C18.24,2,16,4.24,16,6z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="button-text">Menús</span>
             </div>
-            <span class="button-text">Menús</span>
         </div>
     </div>
 
