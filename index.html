@@ -2,116 +2,152 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portadas y Menús</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Portadas y Menús - oficial.pe</title>
+    <meta name="description" content="Consulta las portadas de los principales diarios y menús del día en Lima.">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #1967d2;
+            --primary-hover: #1557b0;
+            --bg-light: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --header-height: 60px;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: #f5f5f5;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            min-height: 100dvh;
+        html, body {
+            height: 100%;
             margin: 0;
         }
 
-        .main-wrapper {
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* --- VISTA PRINCIPAL (HOME) --- */
+        .home-view {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            width: 100%;
+            padding: 2rem;
+            min-height: calc(100vh - 80px);
         }
 
         #fecha-actual {
-            font-size: 16px;
-            color: #64748b;
-            text-align: center;
-            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            font-weight: 400;
         }
 
         .container {
             display: flex;
-            gap: 40px;
-            z-index: 10;
+            gap: 2.5rem;
+            width: 100%;
+            justify-content: center;
+            max-width: 800px;
         }
 
-        .button-wrapper {
+        .button-link {
+            text-decoration: none;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
-            cursor: pointer;
+            gap: 1rem;
+            flex: 1;
+            max-width: 280px;
         }
 
         .button-card {
-            background-color: #e8f0fe;
-            border-radius: 16px;
-            padding: 50px 60px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            border: none;
-            text-decoration: none;
+            background: var(--white);
+            border-radius: 24px;
+            width: 100%;
+            aspect-ratio: 1/1;
+            max-width: 220px;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
             position: relative;
+            border: 1px solid rgba(0,0,0,0.03);
         }
 
-        .button-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        .button-link:first-child .button-card { background: #eff6ff; }
+        .button-link:last-child .button-card { background: #fdf2f8; }
+
+        .button-link:hover .button-card {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
         }
 
         .icon {
-            width: 56px;
-            height: 56px;
-            color: #1967d2;
+            width: 40%;
+            height: 40%;
+            stroke-width: 1.5;
         }
 
+        .button-link:first-child .icon { color: #2563eb; }
+        .button-link:last-child .icon { color: #db2777; }
+
         .button-text {
-            font-size: 18px;
-            color: #202124;
-            font-weight: 500;
+            font-size: 1.25rem;
+            color: var(--text-main);
+            font-weight: 600;
         }
 
         .badge {
             position: absolute;
-            top: -10px;
-            right: -10px;
-            background: #1967d2;
+            top: -12px;
+            right: -12px;
+            background: #ef4444;
             color: white;
-            font-size: 0.7rem;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-weight: 600;
-            box-shadow: 0 2px 8px rgba(25, 103, 210, 0.3);
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-weight: 700;
+            box-shadow: 0 4px 6px rgba(239, 68, 68, 0.3);
+            text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
+        .footer {
+            width: 100%;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: auto;
+        }
+
         .contact {
-            color: #5f6368;
+            color: var(--text-muted);
             text-decoration: none;
             font-size: 0.9rem;
             transition: color 0.2s;
-            padding: 2.5rem 0;
-            text-align: center;
-            width: 100%;
+            display: inline-block;
         }
 
-        .contact:hover {
-            color: #202124;
-        }
+        .contact:hover { color: var(--primary); }
 
-        /* Vista de contenido */
+        /* --- VISTA DE CONTENIDO --- */
         #vista-contenido {
             display: none;
             position: fixed;
@@ -119,193 +155,335 @@
             left: 0;
             width: 100%;
             height: 100vh;
-            height: 100dvh;
-            flex-direction: column;
-            align-items: center;
-            overflow-y: auto;
+            background: var(--bg-light);
             z-index: 1000;
+            flex-direction: column;
         }
 
-        #vista-contenido.fondo-negro { background: #000; }
-        #vista-contenido.fondo-blanco { background: #fff; }
-
-        .btn-volver {
-            align-self: center;
-            margin: 1.5rem auto;
-            background: rgba(128, 128, 128, 0.2);
-            border: 1px solid rgba(128, 128, 128, 0.3);
-            cursor: pointer;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
+        .content-header {
+            background: var(--white);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            padding: 0.5rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1100;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
-            flex-shrink: 0;
-            z-index: 1100;
+            box-shadow: var(--shadow-sm);
+            height: var(--header-height);
         }
 
-        .fondo-negro .btn-volver { color: #fff; border-color: rgba(255,255,255,0.3); }
-        .fondo-blanco .btn-volver { color: #000; border-color: rgba(0,0,0,0.3); }
-
-        .btn-volver:hover {
-            background: rgba(128, 128, 128, 0.3);
-            transform: scale(1.1);
-        }
-
-        .btn-volver svg {
-            width: 24px;
-            height: 24px;
-        }
-
-        #display {
-            max-width: 1200px;
+        .header-wrapper {
+            display: flex;
+            align-items: center;
             width: 100%;
-            margin: 0 auto;
-            padding: 0 15px 40px 15px;
+            max-width: 1100px;
+            gap: 10px;
         }
 
-        /* Estilo Masonry para Menús */
+        .desktop-filters {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .btn-back {
+            background: #f1f5f9;
+            border: none;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            flex-shrink: 0;
+        }
+
+        .select-filter {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 5 3 3 3-3'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 28px;
+        }
+
+        .select-filter:hover { border-color: #cbd5e1; }
+
+        .btn-registrar {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            display: block;
+            text-decoration: none;
+        }
+
+        .btn-plus-mobile { display: none; }
+        .mobile-sort-btn { display: none; }
+
+        @media (max-width: 900px) {
+            .header-wrapper { gap: 6px; justify-content: space-between; }
+            .content-header { padding: 0.5rem 0.6rem; }
+            #orden-precio-desktop { display: none; }
+            .mobile-sort-btn { display: flex; }
+            .btn-registrar { display: none; }
+            .btn-plus-mobile { display: flex; }
+            .select-filter { 
+                padding: 7.5px 6px; 
+                font-size: 0.8rem; 
+                border-radius: 8px;
+                flex: 1;
+                min-width: 0;
+                background-position: right 4px center;
+                padding-right: 18px;
+            }
+        }
+
+        .mobile-sort-btn, .btn-plus-mobile {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            color: var(--text-main);
+        }
+
+        .btn-plus-mobile {
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        #content-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 0.5rem 3rem 0.5rem;
+            width: 100%;
+        }
+
+        .content-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
         .masonry-grid {
-            column-count: 3;
-            column-gap: 15px;
+            columns: 3 320px;
+            column-gap: 12px;
             width: 100%;
         }
 
         .masonry-item {
-            display: inline-block;
-            width: 100%;
-            margin-bottom: 15px;
-            cursor: zoom-in;
-            transition: transform 0.2s;
-        }
-
-        .masonry-item:hover {
-            transform: translateY(-5px);
+            break-inside: avoid;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            background: white;
+            border: 1px solid #edf2f7;
+            display: flex;
+            flex-direction: column;
         }
 
         .masonry-item img {
             width: 100%;
             height: auto;
             display: block;
-            border-radius: 8px;
+            cursor: zoom-in;
         }
 
-        /* Portadas (estilo original) */
+        .item-actions {
+            display: flex;
+            padding: 10px;
+            gap: 8px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .btn-mini {
+            flex: 1;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 8px 4px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .btn-wa { background: #25d366; color: white; }
+        .btn-map { background: #4285f4; color: white; }
+        .btn-mini:hover { opacity: 0.85; }
+        .icon-mini { width: 14px; height: 14px; }
+
+        .ficha-modal {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            margin-bottom: 20px;
+        }
+
+        .ficha-header {
+            padding: 24px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .ficha-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .ficha-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .ficha-row { display: flex; flex-direction: column; gap: 4px; }
+        .ficha-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .ficha-value { font-size: 1rem; color: var(--text-main); font-weight: 500; }
+
         .portadas-grid {
             display: flex;
             flex-direction: column;
+            gap: 1rem;
             align-items: center;
-            width: 100%;
         }
 
         .portada-item {
             width: 100%;
-            max-width: 1200px;
-            margin-bottom: 1rem;
+            max-width: 900px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
         }
 
-        .portada-item img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
+        .portada-item img { width: 100%; height: auto; display: block; }
 
-        /* Overlay para zoom */
+        /* Overlay Zoom y Ficha */
         #overlay-zoom {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.94);
             z-index: 2000;
             justify-content: center;
+            align-items: flex-start;
+            padding: 40px 15px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            cursor: pointer;
+        }
+
+        .btn-close-modal {
+            position: absolute;
+            top: 0;
+            right: -60px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
             align-items: center;
-            cursor: zoom-out;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2100;
+            backdrop-filter: blur(8px);
+            font-size: 1.2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        #overlay-zoom img {
-            max-width: 95%;
-            max-height: 95%;
-            object-fit: contain;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
-        }
-
-        /* Responsive */
         @media (max-width: 900px) {
-            .masonry-grid {
-                column-count: 2;
+            .btn-close-modal {
+                position: fixed;
+                top: 15px;
+                right: 15px;
             }
         }
+
+        .modal-content-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            cursor: default;
+        }
+
+        #zoom-img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+
+
+        .content-dark { background: #0f172a !important; }
+        .content-dark .content-header { background: #1e293b; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .content-dark .btn-back { background: rgba(255,255,255,0.1); color: white; }
+        .content-dark #title-standalone { display: block; color: white; font-weight: 700; width: 100%; font-size: 1.1rem;}
 
         @media (max-width: 600px) {
-            .masonry-grid {
-                column-count: 1;
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                gap: 20px;
-            }
-
-            .button-card {
-                padding: 35px 45px;
-            }
-
-            .icon {
-                width: 48px;
-                height: 48px;
-            }
-
-            .button-text {
-                font-size: 16px;
-            }
-
-            #fecha-actual {
-                font-size: 14px;
-                margin-bottom: 2rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                gap: 15px;
-            }
-
-            .button-card {
-                padding: 30px 40px;
-            }
-
-            .icon {
-                width: 40px;
-                height: 40px;
-            }
-
-            .button-text {
-                font-size: 15px;
-            }
-
-            #fecha-actual {
-                font-size: 13px;
-            }
-
-            .contact {
-                font-size: 0.85rem;
-            }
+            .container { flex-direction: column; align-items: center; gap: 1rem;}
+            .button-card { max-width: 160px; }
+            .button-text { font-size: 1.1rem; }
+            .ficha-modal { width: 100%; }
         }
     </style>
 </head>
 <body>
-    <div class="main-wrapper">
+    <div class="home-view" id="home-view">
         <div id="fecha-actual"></div>
-
         <div class="container">
-            <div class="button-wrapper" onclick="verContenido('Portadas')">
+            <a href="#portadas" class="button-link">
                 <div class="button-card">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -316,115 +494,278 @@
                     </svg>
                 </div>
                 <span class="button-text">Portadas</span>
-            </div>
-
-            <div class="button-wrapper" onclick="verContenido('Menús')">
+            </a>
+            <a href="#menus" class="button-link">
                 <div class="button-card">
                     <span class="badge">Nuevo</span>
                     <svg class="icon" viewBox="0 0 24 24">
-                        <!-- Tenedor -->
                         <path d="M11,9H9V2H7V9H5V2H3V9c0,2.12,1.66,3.84,3.75,3.97V22h2.5V12.97C11.34,12.84,13,11.12,13,9V2h-2V9z" fill="currentColor"/>
-                        <!-- Cuchillo -->
                         <path d="M16,6v8h2.5v8H21V2C18.24,2,16,4.24,16,6z" fill="currentColor"/>
                     </svg>
                 </div>
                 <span class="button-text">Menús</span>
-            </div>
+            </a>
         </div>
     </div>
 
-    <a href="https://wa.me/51950141414" class="contact" target="_blank" rel="noopener noreferrer">Contacto</a>
+    <footer class="footer">
+        <a href="https://wa.me/51950141414" class="contact" target="_blank" rel="noopener noreferrer">Contacto</a>
+    </footer>
 
     <div id="vista-contenido">
-        <button class="btn-volver" onclick="cerrar()" aria-label="Cerrar">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-        </button>
-        <div id="display"></div>
+        <header class="content-header">
+            <div class="header-wrapper">
+                <button class="btn-back" onclick="location.hash=''" aria-label="Volver">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </button>
+                <div id="title-standalone" style="display:none; flex: 1; text-align: center;">Sección</div>
+                <div class="desktop-filters" id="menu-filters">
+                    <select id="filtro-distrito" class="select-filter">
+                        <option value="">Todos los distritos</option>
+                    </select>
+                    <select id="filtro-entrega" class="select-filter">
+                        <option value="">Tipo de entrega</option>
+                        <option value="local">Atención en local</option>
+                        <option value="delivery">Servicio de delivery</option>
+                    </select>
+                    <select id="orden-precio-desktop" class="select-filter">
+                        <option value="asc">Menor precio</option>
+                        <option value="desc">Mayor precio</option>
+                    </select>
+                    <button class="mobile-sort-btn" onclick="cicloOrden()" id="btn-ordenar-mobile">
+                        <svg id="orden-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 8l4-4 4 4M7 4v16M13 12h3M13 16h5M13 20h7"/>
+                        </svg>
+                    </button>
+                    <button class="btn-plus-mobile" onclick="registrarMenu()">+</button>
+                    <button class="btn-registrar" onclick="registrarMenu()" style="margin-left: auto;">Registrar menú</button>
+                </div>
+            </div>
+        </header>
+        <div id="content-body">
+            <div class="content-container" id="display"></div>
+        </div>
     </div>
 
-    <div id="overlay-zoom" onclick="this.style.display='none'">
-        <img src="" alt="Zoom">
+    <div id="overlay-zoom" onclick="closeModal(event)">
+        <div class="modal-content-wrapper" onclick="event.stopPropagation()">
+            <button class="btn-close-modal" onclick="closeModal(event)" aria-label="Cerrar">✕</button>
+            <img src="" id="zoom-img" alt="Vista ampliada">
+            <div id="ficha-container" class="ficha-modal"></div>
+        </div>
     </div>
 
     <script>
-        // Fecha automática con año
-        const opciones = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-        const fecha = new Date().toLocaleDateString('es-PE', opciones);
-        // Capitalizar primera letra
-        document.getElementById('fecha-actual').innerText = fecha.charAt(0).toUpperCase() + fecha.slice(1);
+        let menusData = [];
+        let portadasData = [];
+        let activeFilters = { distrito: '', entrega: '', orden: 'asc' };
 
-        const imagenes = {
-            'Portadas': [
-                'correo.jpg', 'elcomercio.jpg', 'eldiez.jpg', 'elperuano.jpg', 
-                'elpopular.jpg', 'expreso.jpg', 'extra.jpg', 'lanoticia.jpg', 
-                'larazon.jpg', 'larepublica.jpg', 'libero.jpg', 'ojo.jpg', 
-                'peru21.jpg', 'trome.jpg'
-            ],
-            'Menús': ['1.jpg', '2.jpg', '3.jpg']
+        const renderFecha = () => {
+            const opciones = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            const fechaTxt = new Date().toLocaleDateString('es-PE', opciones);
+            document.getElementById('fecha-actual').innerText = fechaTxt.charAt(0).toUpperCase() + fechaTxt.slice(1);
         };
 
-        function verContenido(tipo) {
-            const vista = document.getElementById('vista-contenido');
+        const parseCSVLine = (text) => {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (char === '"') inQuotes = !inQuotes;
+                else if (char === ',' && !inQuotes) { result.push(current.trim()); current = ''; }
+                else current += char;
+            }
+            result.push(current.trim());
+            return result;
+        };
+
+        const cargarDatos = async () => {
+            try {
+                const respPortadas = await fetch('data/portadas.csv');
+                const textPortadas = await respPortadas.text();
+                portadasData = textPortadas.split('\n').slice(1).filter(l => l.trim()).map(linea => {
+                    const cols = parseCSVLine(linea);
+                    const nombre = cols[0] || '';
+                    const id = nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '');
+                    return { id, nombre, img: `${id}.webp` };
+                });
+
+                const respMenus = await fetch('data/menus.csv');
+                const textMenus = await respMenus.text();
+                menusData = textMenus.split('\n').slice(1).filter(l => l.trim()).map(linea => {
+                    const cols = parseCSVLine(linea);
+                    return {
+                        restaurante: cols[0] || '',
+                        etiqueta: cols[1] || '',
+                        activo: cols[2] === '1',
+                        whatsapp: cols[3] || '',
+                        direccion: cols[4] || '',
+                        distrito: cols[5] || '',
+                        mapa: cols[6] || '',
+                        precio: parseFloat(cols[8]) || 0,
+                        delivery_cobertura: cols[11] || '',
+                        delivery_condiciones: cols[12] || '',
+                        img: `${cols[1]}.webp`
+                    };
+                }).filter(m => m.activo);
+
+                poblarDistritos();
+                handleRoute();
+            } catch (err) { console.error("Error cargando archivos CSV", err); }
+        };
+
+        const poblarDistritos = () => {
+            const select = document.getElementById('filtro-distrito');
+            const distritos = new Set();
+            menusData.forEach(m => {
+                if (m.distrito) distritos.add(m.distrito);
+                if (m.delivery_cobertura) m.delivery_cobertura.split(',').forEach(d => distritos.add(d.trim()));
+            });
+            Array.from(distritos).filter(d => d).sort().forEach(dist => {
+                const opt = document.createElement('option');
+                opt.value = dist; opt.textContent = dist;
+                select.appendChild(opt);
+            });
+        };
+
+        const renderPortadas = () => {
             const display = document.getElementById('display');
-            
-            vista.style.display = 'flex';
-            display.innerHTML = '';
-            
-            // Configurar fondo según tipo
-            if (tipo === 'Portadas') {
-                vista.className = 'fondo-negro';
-                display.className = 'portadas-grid';
-            } else {
-                vista.className = 'fondo-blanco';
-                display.className = 'masonry-grid';
+            display.innerHTML = '<div class="portadas-grid"></div>';
+            const grid = display.querySelector('.portadas-grid');
+            portadasData.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'portada-item';
+                item.innerHTML = `<img src="images/portadas/${p.img}" alt="${p.nombre}" loading="lazy" onerror="this.parentElement.style.display='none'">`;
+                grid.appendChild(item);
+            });
+        };
+
+        const renderMenus = () => {
+            const display = document.getElementById('display');
+            display.innerHTML = '<div class="masonry-grid"></div>';
+            const grid = display.querySelector('.masonry-grid');
+            let filtered = [...menusData];
+
+            if (activeFilters.distrito) {
+                const search = activeFilters.distrito.toLowerCase();
+                filtered = filtered.filter(m => m.distrito.toLowerCase() === search || m.delivery_cobertura.toLowerCase().includes(search));
             }
-            
-            const folder = tipo === 'Portadas' ? 'portadas' : 'menus';
-            let lista = !!imagenes[tipo] ? [...imagenes[tipo]] : [];
-            
-            // Si es menú, repetir 3 veces para rellenar
-            if (tipo === 'Menús') {
-                lista = [...lista, ...lista, ...lista];
+
+            if (activeFilters.entrega) {
+                filtered = filtered.filter(m => {
+                    if (activeFilters.entrega === 'local') return !!m.distrito;
+                    if (activeFilters.entrega === 'delivery') return m.delivery_cobertura.length > 0;
+                    return true;
+                });
             }
-            
-            if (lista.length === 0) {
-                display.innerHTML += '<p>No hay imágenes disponibles para esta sección.</p>';
+
+            if (activeFilters.orden) {
+                filtered.sort((a, b) => activeFilters.orden === 'asc' ? a.precio - b.precio : b.precio - a.precio);
+            }
+
+            if (filtered.length === 0) {
+                display.innerHTML = '<div style="text-align:center; padding: 4rem 1rem; color: var(--text-muted);">No se encontraron menús.</div>';
                 return;
             }
 
-            lista.forEach(imgName => {
+            filtered.forEach(m => {
                 const item = document.createElement('div');
-                item.className = tipo === 'Portadas' ? 'portada-item' : 'masonry-item';
-                
+                item.className = 'masonry-item';
                 const img = document.createElement('img');
-                img.src = `images/${folder}/${imgName}`;
-                img.alt = `${tipo} - ${imgName}`;
-                img.loading = 'lazy';
+                img.src = `images/menus/${m.img}`;
+                img.alt = m.restaurante;
+                img.onclick = () => verFicha(m);
+                img.onerror = () => item.style.display = 'none';
                 
-                if (tipo === 'Menús') {
-                    item.onclick = (e) => {
-                        e.stopPropagation();
-                        const overlay = document.getElementById('overlay-zoom');
-                        overlay.querySelector('img').src = img.src;
-                        overlay.style.display = 'flex';
-                    };
-                }
-                
+                const actions = document.createElement('div');
+                actions.className = 'item-actions';
+                actions.innerHTML = `
+                    <a href="https://wa.me/51${m.whatsapp}" target="_blank" class="btn-mini btn-wa">WhatsApp</a>
+                    <a href="${m.mapa || '#'}" target="_blank" class="btn-mini btn-map" style="${!m.mapa ? 'opacity:0.3;pointer-events:none':''}">Ubicación</a>
+                `;
                 item.appendChild(img);
-                display.appendChild(item);
+                item.appendChild(actions);
+                grid.appendChild(item);
             });
+        };
 
-            vista.scrollTop = 0;
-        }
+        const verFicha = (m) => {
+            const overlay = document.getElementById('overlay-zoom');
+            const img = document.getElementById('zoom-img');
+            const container = document.getElementById('ficha-container');
+            
+            img.src = `images/menus/${m.img}`;
+            
+            const waFormat = m.whatsapp.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+            const condiciones = m.delivery_condiciones ? ` (${m.delivery_condiciones.toLowerCase()})` : '';
+            const cobertura = m.delivery_cobertura + condiciones;
+            
+            container.innerHTML = `
+                <div class="ficha-header"><div class="ficha-title">${m.restaurante}</div></div>
+                <div class="ficha-body">
+                    <div class="ficha-row"><span class="ficha-label">WhatsApp</span><span class="ficha-value">${waFormat}</span></div>
+                    <div class="ficha-row"><span class="ficha-label">Dirección</span><span class="ficha-value">${m.direccion} (${m.distrito})</span></div>
+                    <div class="ficha-row"><span class="ficha-label">Cobertura</span><span class="ficha-value">${cobertura || 'Consultar'}</span></div>
+                </div>
+            `;
+            
+            overlay.style.display = 'flex';
+            
+            // Forzar el scroll al inicio después de mostrar
+            setTimeout(() => { overlay.scrollTop = 0; }, 10);
+        };
 
-        function cerrar() {
-            const vista = document.getElementById('vista-contenido');
-            vista.style.display = 'none';
-            // Limpiar clases para que no se mezclen fondos al reabrir
-            vista.className = '';
-        }
+
+        const closeModal = (e) => { document.getElementById('overlay-zoom').style.display = 'none'; }
+        const cicloOrden = () => {
+            activeFilters.orden = (activeFilters.orden === 'asc') ? 'desc' : 'asc';
+            const icon = document.getElementById('orden-icon');
+            if (activeFilters.orden === 'asc') {
+                // Icono Menor a Mayor: Flecha Arriba + Barras (bajadas para alinearse abajo y dar espacio arriba)
+                icon.innerHTML = '<path d="M3 8l4-4 4 4M7 4v16M13 12h3M13 16h5M13 20h7"/>';
+            } else {
+                // Icono Mayor a Menor: Flecha Abajo + Barras (subidas para alinearse arriba y dar espacio abajo)
+                icon.innerHTML = '<path d="M3 16l4 4 4-4M7 20V4M13 4h7M13 8h5M13 12h3"/>';
+            }
+            document.getElementById('orden-precio-desktop').value = activeFilters.orden;
+            renderMenus();
+        };
+
+        const registrarMenu = () => {
+            window.open('https://wa.me/51950141414?text=Hola,%20vengo%20de%20oficial.pe%20y%20deseo%20registrar%20un%20menú', '_blank');
+        };
+
+        const handleRoute = () => {
+            const hash = window.location.hash;
+            const home = document.getElementById('home-view');
+            const footer = document.querySelector('.footer');
+            const content = document.getElementById('vista-contenido');
+            const filters = document.getElementById('menu-filters');
+            const titleS = document.getElementById('title-standalone');
+            const distOpt = document.querySelector('#filtro-distrito option:first-child');
+            const entrOpt = document.querySelector('#filtro-entrega option:first-child');
+
+            if (hash === '#portadas' || hash === '#menus') {
+                home.style.display = 'none'; footer.style.display = 'none'; content.style.display = 'flex';
+                if (hash === '#portadas') {
+                    titleS.textContent = 'Portadas'; titleS.style.display = 'block'; content.classList.add('content-dark');
+                    filters.style.display = 'none'; renderPortadas();
+                } else {
+                    titleS.style.display = 'none'; content.classList.remove('content-dark'); filters.style.display = 'flex';
+                    const isMobile = window.innerWidth < 900;
+                    distOpt.textContent = isMobile ? 'Distrito' : 'Todos los distritos';
+                    entrOpt.textContent = isMobile ? 'Entrega' : 'Tipo de entrega';
+                    renderMenus();
+                }
+            } else { home.style.display = 'flex'; footer.style.display = 'block'; content.style.display = 'none'; }
+        };
+
+        window.addEventListener('hashchange', handleRoute);
+        window.addEventListener('resize', handleRoute);
+        document.getElementById('filtro-distrito').addEventListener('change', (e) => { activeFilters.distrito = e.target.value; renderMenus(); });
+        document.getElementById('filtro-entrega').addEventListener('change', (e) => { activeFilters.entrega = e.target.value; renderMenus(); });
+        renderFecha(); cargarDatos();
     </script>
 </body>
 </html>
