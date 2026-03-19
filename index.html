@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portadas y Menús - oficial.pe</title>
     <meta name="description" content="Consulta las portadas de los principales diarios y menús del día en Lima.">
     <!-- Iconos de marca en carpeta /images/brand -->
@@ -668,7 +668,7 @@
             portadasData.forEach(p => {
                 const item = document.createElement('div');
                 item.className = 'portada-item';
-                item.innerHTML = `<img src="images/portadas/${p.img}${cb}" alt="${p.nombre}" loading="lazy" onclick="verSoloImagen('images/portadas/${p.img}${cb}')" onerror="this.parentElement.style.display='none'">`;
+                item.innerHTML = `<img src="images/portadas/${p.img}${cb}" alt="${p.nombre}" loading="lazy" onerror="this.parentElement.style.display='none'">`;
                 grid.appendChild(item);
             });
         };
