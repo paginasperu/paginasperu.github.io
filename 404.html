@@ -3,6 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script>
+      (function() {
+        const links = {
+            
+            "wa": "https://wa.me/51950141414",
+            "ig": "https://www.instagram.com/oficial.pe_",
+            "tt": "https://www.tiktok.com/@oficial.pe_",
+            "mapa": "https://maps.app.goo.gl/64j7gMR3SiLfdUu46"
+          
+        };
+
+        const slug = decodeURIComponent(
+          window.location.pathname.replace(/^\/+|\/+$/g, "")
+        );
+
+        if (!slug) return;
+
+        const target = links[slug];
+        if (target) window.location.replace(target);
+      })();
+    </script>
+
     <meta name="description" content="Página no encontrada - OFICIAL.PE">
     <title>404 - No encontrado | OFICIAL.PE</title>
     
@@ -13,10 +36,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 
     <style>
-        /* RESET */
+        /* Tu CSS actual se mantiene igual... */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        /* CUERPO */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #F9F9F7;
@@ -28,16 +49,12 @@
             text-align: center;
             padding: 20px;
         }
-
-        /* CONTENEDOR */
         .container {
             max-width: 700px;
             width: 100%;
             animation: fadeIn 1.5s ease-out forwards;
             opacity: 0;
         }
-
-        /* TÍTULO PRINCIPAL (H1) */
         h1 {
             font-size: 3rem; 
             font-weight: 300; 
@@ -46,8 +63,6 @@
             color: #111;
             letter-spacing: -0.5px;
         }
-
-        /* SUBTÍTULO */
         p.subhead {
             font-size: 1.25rem;
             font-weight: 400;
@@ -55,8 +70,6 @@
             line-height: 1.5;
             margin-bottom: 50px;
         }
-        
-        /* CÓDIGO DE ERROR */
         .error-code {
             display: block;
             font-size: 1rem;
@@ -64,8 +77,6 @@
             margin-bottom: 10px;
             font-weight: 500;
         }
-
-        /* BOTÓN DE RETORNO */
         .cta-button {
             display: inline-block;
             text-decoration: none;
@@ -76,20 +87,15 @@
             border-radius: 50px;
             transition: all 0.3s ease;
         }
-
         .cta-button:hover {
             background-color: #111;
             color: #fff;
             border-color: #111;
         }
-
-        /* ANIMACIÓN */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        /* MÓVIL */
         @media (max-width: 768px) {
             h1 { font-size: 2rem; }
             p.subhead { font-size: 1.1rem; }
@@ -97,21 +103,15 @@
     </style>
 </head>
 <body>
-
     <main class="container">
-
         <span class="error-code">ERROR 404</span>
-        
         <h1>Esta dirección no es válida</h1>
-
         <p class="subhead">
             El enlace que buscas no existe o ha dejado de ser oficial
         </p>
-
         <a href="/" class="cta-button">
             Volver al inicio
         </a>
     </main>
-
 </body>
 </html>
