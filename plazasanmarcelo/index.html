@@ -1,1 +1,988 @@
-...
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plaza San Marcelo — Directorio de Tiendas</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0d1b2a;
+    --navy-mid: #1a2e44;
+    --navy-light: #263d56;
+    --gold: #b8973a;
+    --gold-light: #d4af5a;
+    --gold-pale: #f5eedc;
+    --cream: #f9f6f0;
+    --white: #ffffff;
+    --text-dark: #0d1b2a;
+    --text-mid: #3a4d5e;
+    --text-muted: #7a8fa0;
+    --border: #ddd6c8;
+    --shadow: 0 2px 20px rgba(13,27,42,0.08);
+    --shadow-hover: 0 8px 40px rgba(13,27,42,0.15);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--navy);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--navy-light);
+  }
+
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+    gap: 2rem;
+  }
+
+  .logo {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .logo-main {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--gold-light);
+    letter-spacing: 0.04em;
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    font-weight: 300;
+    color: var(--text-muted);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .search-wrap {
+    flex: 1;
+    max-width: 480px;
+    position: relative;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  #search {
+    width: 100%;
+    padding: 10px 16px 10px 42px;
+    background: var(--navy-mid);
+    border: 1px solid var(--navy-light);
+    border-radius: 8px;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  #search::placeholder { color: var(--text-muted); }
+  #search:focus { border-color: var(--gold); }
+
+  .header-count {
+    font-size: 13px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .header-count span {
+    color: var(--gold-light);
+    font-weight: 500;
+  }
+
+  /* FILTERS */
+  .filters-bar {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0;
+  }
+
+  .filters-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    height: 54px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .filters-inner::-webkit-scrollbar { display: none; }
+
+  .filters-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+    margin-right: 4px;
+  }
+
+  .filter-btn {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-mid);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.18s;
+  }
+
+  .filter-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .filter-btn.active {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: var(--gold-light);
+    font-weight: 500;
+  }
+
+  /* HERO STRIP */
+  .hero-strip {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, #1e3a5a 100%);
+    padding: 3rem 2rem;
+    text-align: center;
+    border-bottom: 3px solid var(--gold);
+  }
+
+  .hero-strip h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 500;
+    color: var(--white);
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+  }
+
+  .hero-strip h1 em {
+    color: var(--gold-light);
+    font-style: normal;
+  }
+
+  .hero-strip p {
+    font-size: 15px;
+    color: var(--text-muted);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+
+  .hero-strip .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .hero-stat {
+    text-align: center;
+  }
+
+  .hero-stat .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--gold-light);
+    display: block;
+  }
+
+  .hero-stat .lbl {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* MAIN GRID */
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .grid-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .grid-title {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .grid-title strong { color: var(--text-dark); }
+
+  #no-results {
+    display: none;
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-muted);
+  }
+
+  #no-results svg { margin-bottom: 1rem; opacity: 0.4; }
+  #no-results p { font-size: 16px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    overflow: hidden;
+    animation: fadeIn 0.35s ease both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--gold);
+  }
+
+  .card-top {
+    padding: 1.25rem 1.25rem 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 20px;
+  }
+
+  .card-meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-cat {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+
+  .card-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-dark);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-loc {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+
+  .card-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 1.25rem;
+  }
+
+  .card-body {
+    padding: 1rem 1.25rem;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-mid);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-footer {
+    padding: 0.75rem 1.25rem;
+    background: var(--cream);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-phone {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-mid);
+  }
+
+  .card-phone svg {
+    width: 13px;
+    height: 13px;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .card-more {
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 500;
+    letter-spacing: 0.03em;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(13,27,42,0.65);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeBg 0.2s ease;
+  }
+
+  @keyframes fadeBg {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--white);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 540px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 80px rgba(13,27,42,0.35);
+    animation: slideUp 0.28s cubic-bezier(0.34,1.1,0.64,1);
+    border: 1px solid var(--border);
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(24px) scale(0.97); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  .modal-header {
+    background: var(--navy);
+    padding: 1.5rem 1.5rem 1.25rem;
+    border-radius: 16px 16px 0 0;
+    position: relative;
+  }
+
+  .modal-header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 0.75rem;
+  }
+
+  .modal-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: var(--navy-mid);
+    border: 1px solid var(--navy-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--navy-light);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .modal-close:hover { background: var(--navy-mid); color: var(--white); }
+  .modal-close svg { width: 16px; height: 16px; }
+
+  .modal-cat {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+
+  .modal-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.15;
+    margin-bottom: 4px;
+  }
+
+  .modal-slogan {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+  }
+
+  .modal-section {
+    margin-bottom: 1.25rem;
+  }
+
+  .modal-section-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .modal-section p {
+    font-size: 14px;
+    color: var(--text-mid);
+    line-height: 1.65;
+  }
+
+  .modal-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .modal-info-item {
+    background: var(--cream);
+    border-radius: 8px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+  }
+
+  .modal-info-item .lbl {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .modal-info-item .val {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-dark);
+  }
+
+  .modal-services {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .service-tag {
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-mid);
+    background: var(--cream);
+  }
+
+  .modal-cta {
+    padding: 1rem 1.5rem 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn-primary {
+    flex: 1;
+    padding: 12px;
+    background: var(--navy);
+    color: var(--gold-light);
+    border: 1px solid var(--navy-light);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-primary:hover { background: var(--navy-mid); border-color: var(--gold); }
+
+  .btn-secondary {
+    flex: 1;
+    padding: 12px;
+    background: transparent;
+    color: var(--text-dark);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-secondary:hover { border-color: var(--text-mid); background: var(--cream); }
+
+  /* FOOTER */
+  footer {
+    background: var(--navy);
+    color: var(--text-muted);
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 13px;
+    margin-top: 3rem;
+    border-top: 3px solid var(--gold);
+  }
+
+  footer strong { color: var(--gold-light); font-weight: 500; }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .header-inner { padding: 0 1rem; gap: 1rem; }
+    .hero-stats { gap: 1.5rem; }
+    main { padding: 1rem; }
+    .modal-info-grid { grid-template-columns: 1fr; }
+    .modal-cta { flex-direction: column; }
+    .header-count { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-main">Plaza San Marcelo</span>
+      <span class="logo-sub">Galería Médica</span>
+    </div>
+    <div class="search-wrap">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="9" cy="9" r="6"/><path d="m15 15 3 3"/>
+      </svg>
+      <input type="text" id="search" placeholder="Buscar tienda, especialidad…" autocomplete="off">
+    </div>
+    <div class="header-count">
+      <span id="count-num">0</span> tiendas
+    </div>
+  </div>
+</header>
+
+<div class="filters-bar">
+  <div class="filters-inner">
+    <span class="filters-label">Filtrar:</span>
+    <button class="filter-btn active" data-cat="Todos">Todos</button>
+    <button class="filter-btn" data-cat="Consultorios">Consultorios</button>
+    <button class="filter-btn" data-cat="Laboratorio">Laboratorio</button>
+    <button class="filter-btn" data-cat="Farmacia">Farmacia</button>
+    <button class="filter-btn" data-cat="Óptica">Óptica</button>
+    <button class="filter-btn" data-cat="Odontología">Odontología</button>
+    <button class="filter-btn" data-cat="Imagen Médica">Imagen Médica</button>
+    <button class="filter-btn" data-cat="Psicología">Psicología</button>
+    <button class="filter-btn" data-cat="Nutrición">Nutrición</button>
+    <button class="filter-btn" data-cat="Fisioterapia">Fisioterapia</button>
+  </div>
+</div>
+
+<div class="hero-strip">
+  <h1>Directorio de <em>Tiendas y Servicios</em></h1>
+  <p>Encuentra consultorios, laboratorios, farmacias y más en un solo lugar</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="num" id="total-stores">—</span><span class="lbl">Tiendas</span></div>
+    <div class="hero-stat"><span class="num">4</span><span class="lbl">Pisos</span></div>
+    <div class="hero-stat"><span class="num">9</span><span class="lbl">Especialidades</span></div>
+  </div>
+</div>
+
+<main>
+  <div class="grid-header">
+    <p class="grid-title">Mostrando <strong id="showing-count">0</strong> resultados</p>
+  </div>
+  <div id="no-results">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35M11 8v3m0 3h.01"/>
+    </svg>
+    <p>No se encontraron tiendas con ese criterio.</p>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer>
+  <strong>Plaza San Marcelo</strong> — Galería Médica &nbsp;·&nbsp; Av. San Marcelo 120, Lima &nbsp;·&nbsp; (01) 123-4567
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-header-top">
+        <div class="modal-icon" id="m-icon"></div>
+        <button class="modal-close" id="modal-close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-cat" id="m-cat"></div>
+      <div class="modal-name" id="m-name"></div>
+      <div class="modal-slogan" id="m-slogan"></div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <div class="modal-section-label">Descripción</div>
+        <p id="m-desc"></p>
+      </div>
+      <div class="modal-info-grid">
+        <div class="modal-info-item">
+          <div class="lbl">Tienda / Consultorio</div>
+          <div class="val" id="m-tienda"></div>
+        </div>
+        <div class="modal-info-item">
+          <div class="lbl">Piso</div>
+          <div class="val" id="m-piso"></div>
+        </div>
+        <div class="modal-info-item">
+          <div class="lbl">Teléfono</div>
+          <div class="val" id="m-tel"></div>
+        </div>
+        <div class="modal-info-item">
+          <div class="lbl">Horario</div>
+          <div class="val" id="m-horario"></div>
+        </div>
+      </div>
+      <div class="modal-section" style="margin-top:1.25rem">
+        <div class="modal-section-label">Servicios</div>
+        <div class="modal-services" id="m-services"></div>
+      </div>
+    </div>
+    <div class="modal-cta">
+      <button class="btn-primary" id="btn-call">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.59 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6.06 6.06l1.63-1.63a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+        Llamar
+      </button>
+      <button class="btn-secondary" onclick="document.getElementById('modal-overlay').classList.remove('open')">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const stores = [
+  {
+    id: 1, icon: "🫀", category: "Consultorios",
+    name: "Cardiología San Marcelo",
+    slogan: "Cuidando tu corazón desde 2005",
+    desc: "Consultorio especializado en diagnóstico y tratamiento de enfermedades cardiovasculares. Contamos con ecocardiografía, prueba de esfuerzo y holter.",
+    tienda: "Consultorio 101", piso: "1.° Piso",
+    phone: "(01) 423-1100", horario: "Lun–Vie 8am–6pm",
+    services: ["Ecocardiografía", "Holter 24h", "Prueba de esfuerzo", "Electrocardiograma"]
+  },
+  {
+    id: 2, icon: "🔬", category: "Laboratorio",
+    name: "Lab Clínico Salud Plus",
+    slogan: "Resultados precisos y rápidos",
+    desc: "Laboratorio de análisis clínicos con tecnología de punta. Ofrecemos resultados en línea y toma de muestra a domicilio.",
+    tienda: "Local 102", piso: "1.° Piso",
+    phone: "(01) 423-1200", horario: "Lun–Sáb 6am–8pm",
+    services: ["Hematología", "Bioquímica", "Microbiología", "Serología", "Pruebas COVID"]
+  },
+  {
+    id: 3, icon: "💊", category: "Farmacia",
+    name: "Farmacia San Marcelo",
+    slogan: "Tu salud, nuestro compromiso",
+    desc: "Farmacia completa con medicamentos genéricos y de marca, insumos médicos, vitaminas y suplementos. Delivery disponible.",
+    tienda: "Local 103", piso: "1.° Piso",
+    phone: "(01) 423-1300", horario: "Lun–Dom 7am–10pm",
+    services: ["Medicamentos", "Insumos médicos", "Vitaminas", "Delivery"]
+  },
+  {
+    id: 4, icon: "👁️", category: "Óptica",
+    name: "Óptica Visión Clara",
+    slogan: "Ve el mundo con claridad",
+    desc: "Óptica con optometrista en consultorio. Examen visual gratuito con cualquier compra de lentes. Armazones nacionales e importados.",
+    tienda: "Local 201", piso: "2.° Piso",
+    phone: "(01) 423-2100", horario: "Lun–Sáb 9am–7pm",
+    services: ["Examen visual", "Lentes de contacto", "Lentes oftálmicos", "Gafas de sol"]
+  },
+  {
+    id: 5, icon: "🦷", category: "Odontología",
+    name: "Clínica Dental SmilePro",
+    slogan: "Sonrisas que transforman vidas",
+    desc: "Centro odontológico integral con especialistas en ortodoncia, implantes, blanqueamiento y endodoncia. Atención para toda la familia.",
+    tienda: "Consultorio 202", piso: "2.° Piso",
+    phone: "(01) 423-2200", horario: "Lun–Vie 9am–7pm",
+    services: ["Ortodoncia", "Implantes", "Blanqueamiento", "Endodoncia", "Limpieza"]
+  },
+  {
+    id: 6, icon: "📷", category: "Imagen Médica",
+    name: "RadioScan Diagnóstico",
+    slogan: "Imágenes de alta resolución",
+    desc: "Centro de diagnóstico por imágenes con equipos de última generación. Ecografías, radiografías y tomografías con lectura inmediata.",
+    tienda: "Local 203", piso: "2.° Piso",
+    phone: "(01) 423-2300", horario: "Lun–Sáb 7am–9pm",
+    services: ["Ecografía", "Radiografía", "Tomografía", "Densitometría"]
+  },
+  {
+    id: 7, icon: "🧠", category: "Psicología",
+    name: "Centro Psicológico Mente Sana",
+    slogan: "Bienestar emocional a tu alcance",
+    desc: "Consultorios psicológicos para adultos, niños y adolescentes. Terapia cognitivo-conductual, de pareja y orientación vocacional.",
+    tienda: "Consultorio 301", piso: "3.° Piso",
+    phone: "(01) 423-3100", horario: "Lun–Sáb 9am–8pm",
+    services: ["Terapia individual", "Terapia de pareja", "Psicología infantil", "Orientación vocacional"]
+  },
+  {
+    id: 8, icon: "🥗", category: "Nutrición",
+    name: "NutriBalance Consultoría",
+    slogan: "Alimentación inteligente para vivir mejor",
+    desc: "Nutricionistas especializadas en pérdida de peso, deportiva y clínica. Plan personalizado con seguimiento mensual incluido.",
+    tienda: "Consultorio 302", piso: "3.° Piso",
+    phone: "(01) 423-3200", horario: "Lun–Vie 10am–6pm",
+    services: ["Nutrición clínica", "Nutrición deportiva", "Plan de adelgazamiento", "Bioimpedancia"]
+  },
+  {
+    id: 9, icon: "🦴", category: "Fisioterapia",
+    name: "FisioMed Rehabilitación",
+    slogan: "Recupera tu movimiento",
+    desc: "Centro de fisioterapia y rehabilitación física. Tratamiento de lesiones deportivas, post-operatorio y dolor crónico con tecnología avanzada.",
+    tienda: "Local 303", piso: "3.° Piso",
+    phone: "(01) 423-3300", horario: "Lun–Sáb 8am–7pm",
+    services: ["Electroterapia", "Ultrasonido terapéutico", "Kinesiotaping", "Masoterapia"]
+  },
+  {
+    id: 10, icon: "🩺", category: "Consultorios",
+    name: "Medicina General Dra. Vega",
+    slogan: "Atención médica personalizada",
+    desc: "Consultorio de medicina general y preventiva. Atención a adultos y adultos mayores. Certificados médicos y chequeos anuales.",
+    tienda: "Consultorio 104", piso: "1.° Piso",
+    phone: "(01) 423-1400", horario: "Lun–Vie 8am–5pm",
+    services: ["Medicina general", "Certificados médicos", "Control preventivo", "Vacunación"]
+  },
+  {
+    id: 11, icon: "🫁", category: "Consultorios",
+    name: "Neumología Respirar Bien",
+    slogan: "Especialistas en salud respiratoria",
+    desc: "Consultorio especializado en enfermedades respiratorias: asma, EPOC, apnea del sueño y alergias pulmonares. Espirometría disponible.",
+    tienda: "Consultorio 205", piso: "2.° Piso",
+    phone: "(01) 423-2400", horario: "Lun–Vie 9am–6pm",
+    services: ["Espirometría", "Oximetría", "Nebulización", "Manejo de asma"]
+  },
+  {
+    id: 12, icon: "💉", category: "Laboratorio",
+    name: "Banco de Sangre Vital",
+    slogan: "Donación y análisis especializados",
+    desc: "Unidad de banco de sangre y pruebas inmunológicas. Donación voluntaria y pruebas de compatibilidad para transfusiones.",
+    tienda: "Local 105", piso: "1.° Piso",
+    phone: "(01) 423-1500", horario: "Lun–Sáb 7am–5pm",
+    services: ["Donación de sangre", "Pruebas de compatibilidad", "Serología inmunológica", "Grupos sanguíneos"]
+  }
+];
+
+let activeCategory = "Todos";
+let searchQuery = "";
+
+function renderCards(list) {
+  const grid = document.getElementById("grid");
+  const noResults = document.getElementById("no-results");
+  const showingCount = document.getElementById("showing-count");
+
+  grid.innerHTML = "";
+  showingCount.textContent = list.length;
+
+  if (list.length === 0) {
+    noResults.style.display = "block";
+    return;
+  }
+  noResults.style.display = "none";
+
+  list.forEach((s, i) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.style.animationDelay = (i * 40) + "ms";
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="card-icon">${s.icon}</div>
+        <div class="card-meta">
+          <div class="card-cat">${s.category}</div>
+          <div class="card-name">${s.name}</div>
+          <div class="card-loc">${s.tienda} · ${s.piso}</div>
+        </div>
+      </div>
+      <div class="card-divider"></div>
+      <div class="card-body">
+        <p class="card-desc">${s.desc}</p>
+      </div>
+      <div class="card-footer">
+        <div class="card-phone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.59 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6.06 6.06l1.63-1.63a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+          ${s.phone}
+        </div>
+        <span class="card-more">Ver ficha →</span>
+      </div>`;
+    card.addEventListener("click", () => openModal(s));
+    grid.appendChild(card);
+  });
+}
+
+function filter() {
+  let list = stores;
+  if (activeCategory !== "Todos") {
+    list = list.filter(s => s.category === activeCategory);
+  }
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    list = list.filter(s =>
+      s.name.toLowerCase().includes(q) ||
+      s.desc.toLowerCase().includes(q) ||
+      s.category.toLowerCase().includes(q) ||
+      s.services.some(sv => sv.toLowerCase().includes(q))
+    );
+  }
+  renderCards(list);
+}
+
+function openModal(s) {
+  document.getElementById("m-icon").textContent = s.icon;
+  document.getElementById("m-cat").textContent = s.category;
+  document.getElementById("m-name").textContent = s.name;
+  document.getElementById("m-slogan").textContent = s.slogan;
+  document.getElementById("m-desc").textContent = s.desc;
+  document.getElementById("m-tienda").textContent = s.tienda;
+  document.getElementById("m-piso").textContent = s.piso;
+  document.getElementById("m-tel").textContent = s.phone;
+  document.getElementById("m-horario").textContent = s.horario;
+
+  const srvEl = document.getElementById("m-services");
+  srvEl.innerHTML = s.services.map(sv => `<span class="service-tag">${sv}</span>`).join("");
+
+  document.getElementById("btn-call").onclick = () => { window.location.href = "tel:" + s.phone.replace(/[^0-9]/g, ""); };
+
+  document.getElementById("modal-overlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+document.getElementById("modal-close").addEventListener("click", closeModal);
+document.getElementById("modal-overlay").addEventListener("click", e => {
+  if (e.target === document.getElementById("modal-overlay")) closeModal();
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+function closeModal() {
+  document.getElementById("modal-overlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeCategory = btn.dataset.cat;
+    filter();
+  });
+});
+
+document.getElementById("search").addEventListener("input", e => {
+  searchQuery = e.target.value.trim();
+  filter();
+});
+
+document.getElementById("total-stores").textContent = stores.length;
+document.getElementById("count-num").textContent = stores.length;
+filter();
+</script>
+</body>
+</html>
