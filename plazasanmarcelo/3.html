@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Directorio de tiendas - Plaza San Marcelo, Galería Comercial Médica">
+    <title>Plaza San Marcelo • Directorio de Tiendas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&amp;family=Space+Grotesk:wght@500&amp;display=swap');
+        
+        :root {
+            --tw-color-primary: #00b4b3;
+        }
+        
+        * {
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+        
+        .tail-container * {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .logo-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 25px 25px 0 -10px rgb(0 180 179 / 0.1);
+        }
+        
+        .modal-content {
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes modalPop {
+            0% {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        .search-input {
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            box-shadow: 0 0 0 4px rgba(0, 180, 179, 0.2);
+        }
+        
+        .chip {
+            transition: all 0.2s ease;
+        }
+    </style>
+</head>
+<body class="tail-container bg-slate-50">
+    <!-- HEADER -->
+    <header class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+        <div class="max-w-screen-2xl mx-auto">
+            <div class="px-8 py-5 flex items-center justify-between">
+                
+                <!-- Logo + Nombre -->
+                <div class="flex items-center gap-x-4">
+                    <div class="w-11 h-11 bg-[#00b4b3] rounded-3xl flex items-center justify-center text-white text-3xl shadow-inner flex-shrink-0">
+                        🏥
+                    </div>
+                    <div>
+                        <h1 class="logo-font text-3xl font-medium tracking-[-1px] text-slate-900">Plaza San Marcelo</h1>
+                        <p class="text-xs font-medium text-[#00b4b3] tracking-[1px] -mt-1">GALERÍA COMERCIAL MÉDICA</p>
+                    </div>
+                </div>
+
+                <!-- Info rápida -->
+                <div class="hidden md:flex items-center gap-x-8 text-sm">
+                    <div class="flex items-center gap-x-2">
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                        <span class="font-medium text-slate-600">Abierto hoy hasta las 22:00</span>
+                    </div>
+                    <a href="#" onclick="fakeCall()" class="flex items-center gap-x-1.5 text-slate-700 hover:text-[#00b4b3]">
+                        <span class="text-xl">📍</span>
+                        <span class="font-medium">Av. Argentina 4560, Callao</span>
+                    </a>
+                    <div class="flex items-center gap-x-3 bg-slate-100 rounded-3xl px-4 py-1 text-xs font-medium">
+                        <span>📱</span>
+                        <span>(01) 234-5678</span>
+                    </div>
+                </div>
+
+                <!-- Botón SPA (solo visual) -->
+                <div onclick="window.location.reload()" class="flex items-center gap-x-2 text-sm font-medium text-slate-500 hover:text-slate-700 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.058 11H1M12 3v2m0 16v2m9-9H15m-6 0a8 8 0 01-7.714-6.314" />
+                    </svg>
+                    <span class="hidden sm:inline">SPA Mode</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barra de navegación secundaria -->
+        <div class="bg-slate-900 text-white px-8 py-3 text-sm flex items-center gap-x-6 overflow-x-auto">
+            <a href="#" class="flex items-center gap-x-2 hover:text-[#00b4b3] whitespace-nowrap">
+                <span>🏠</span>
+                <span class="font-medium">Inicio</span>
+            </a>
+            <div class="w-px h-4 bg-white/30"></div>
+            <a href="#" onclick="showAll()" class="font-medium flex items-center gap-x-1 whitespace-nowrap">
+                📋 Directorio completo
+            </a>
+            <a href="#" class="font-medium flex items-center gap-x-1 whitespace-nowrap">
+                🗺️ Mapa de la galería
+            </a>
+            <a href="#" class="font-medium flex items-center gap-x-1 whitespace-nowrap">
+                🚨 Horarios de atención
+            </a>
+            <a href="#" class="font-medium flex items-center gap-x-1 whitespace-nowrap">
+                📅 Agendar cita
+            </a>
+            <div class="flex-1"></div>
+            <div class="text-xs bg-white/10 px-3 py-1 rounded-3xl flex items-center gap-x-1">
+                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                28 tiendas abiertas ahora
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-screen-2xl mx-auto px-6 lg:px-8 py-8">
+        
+        <!-- HERO TÍTULO -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10">
+            <div>
+                <h2 class="text-4xl md:text-5xl font-semibold text-slate-900 tracking-[-1px]">Directorio de Tiendas</h2>
+                <p class="text-slate-600 mt-2 text-lg">Encuentra la atención médica que necesitas en un solo lugar</p>
+            </div>
+            
+            <!-- Contador de tiendas -->
+            <div id="counter" class="mt-4 md:mt-0 flex items-center gap-x-4 bg-white rounded-3xl shadow-sm px-6 py-3">
+                <div class="text-4xl font-semibold text-[#00b4b3]" id="total-stores">28</div>
+                <div>
+                    <p class="text-xs font-medium uppercase tracking-widest">tiendas médicas</p>
+                    <p class="text-sm text-slate-500">en Plaza San Marcelo</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- BUSCADOR + FILTROS -->
+        <div class="flex flex-col lg:flex-row gap-6 mb-8">
+            
+            <!-- Buscador -->
+            <div class="flex-1">
+                <div class="relative">
+                    <input 
+                        id="search-input"
+                        type="text" 
+                        placeholder="Buscar por nombre, especialidad o servicio..."
+                        class="search-input w-full bg-white border border-slate-300 focus:border-[#00b4b3] rounded-3xl px-6 py-5 pl-14 text-lg shadow-sm focus:outline-none"
+                        onkeyup="if(event.keyCode===13) filterAndRender()">
+                    <div class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400">
+                        🔎
+                    </div>
+                    <button onclick="clearSearch()" 
+                            class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xl">
+                        ✕
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filtros por categoría -->
+            <div class="flex-shrink-0">
+                <p class="text-xs font-medium text-slate-500 mb-3 tracking-widest px-1">FILTRAR POR CATEGORÍA</p>
+                <div id="category-filters" class="flex flex-wrap gap-2">
+                    <!-- Generado por JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTADOS -->
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-x-3">
+                <span id="results-text" class="font-medium text-slate-700">Mostrando todas las tiendas</span>
+                <button onclick="resetFilters()" 
+                        class="text-xs flex items-center gap-x-1 text-[#00b4b3] hover:underline">
+                    <span>⟳</span>
+                    <span>Limpiar filtros</span>
+                </button>
+            </div>
+            <div class="text-sm text-slate-500 flex items-center">
+                Ordenado por: 
+                <select id="sort-select" onchange="filterAndRender()" class="bg-transparent font-medium focus:outline-none ml-2">
+                    <option value="name">Nombre A-Z</option>
+                    <option value="category">Categoría</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- GRID DE TIENDAS -->
+        <div id="stores-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+            <!-- Las tarjetas se generan con JavaScript -->
+        </div>
+
+        <!-- Mensaje vacío -->
+        <div id="empty-state" class="hidden flex-col items-center justify-center py-16 text-center">
+            <div class="text-7xl mb-6">🔎</div>
+            <h3 class="text-2xl font-medium text-slate-800">No encontramos resultados</h3>
+            <p class="text-slate-500 max-w-xs mt-3">Intenta con otras palabras o quita algunos filtros</p>
+            <button onclick="resetFilters()" 
+                    class="mt-8 px-8 py-3 bg-[#00b4b3] text-white rounded-3xl font-medium flex items-center gap-x-2 hover:shadow-lg">
+                Ver todas las tiendas
+                <span class="text-xl">→</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL DETALLE DE TIENDA -->
+    <div onclick="if(event.target.id === 'modal-backdrop') hideModal()" 
+         id="modal-backdrop"
+         class="hidden fixed inset-0 bg-black/70 z-[9999] flex items-center justify-center p-4">
+        
+        <div onclick="event.stopImmediatePropagation()" 
+             class="modal-content bg-white max-w-2xl w-full rounded-3xl shadow-2xl overflow-hidden">
+            
+            <div class="px-8 pt-8 pb-6">
+                <!-- Cabecera modal -->
+                <div class="flex justify-between items-start">
+                    <div id="modal-category-badge" class="px-5 py-1 text-sm font-semibold rounded-3xl"></div>
+                    <button onclick="hideModal()" class="text-4xl leading-none text-slate-300 hover:text-slate-500">×</button>
+                </div>
+                
+                <h2 id="modal-name" class="text-3xl font-semibold text-slate-900 mt-4"></h2>
+                <p id="modal-description" class="text-slate-600 mt-3 leading-relaxed"></p>
+                
+                <!-- Información de contacto -->
+                <div class="mt-8 grid grid-cols-2 gap-6">
+                    <div>
+                        <div class="text-xs font-medium text-slate-500 mb-1">TELÉFONO</div>
+                        <a id="modal-phone" href="#" class="flex items-center gap-x-3 text-2xl font-medium text-slate-700 hover:text-[#00b4b3]"></a>
+                    </div>
+                    <div>
+                        <div class="text-xs font-medium text-slate-500 mb-1">LOCAL</div>
+                        <div id="modal-address" class="text-2xl font-medium text-slate-700"></div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-x-8 mt-6 text-sm">
+                    <div>
+                        <span class="text-slate-500">⏰ Horario:</span>
+                        <span id="modal-hours" class="font-medium ml-2"></span>
+                    </div>
+                    <div class="flex-1 h-px bg-slate-200"></div>
+                    <div class="flex items-center text-emerald-500 font-medium">
+                        <span class="mr-2">🟢</span>
+                        Abierto ahora
+                    </div>
+                </div>
+                
+                <!-- Más información -->
+                <div class="mt-8">
+                    <h4 class="text-sm font-medium text-slate-500 mb-4">SERVICIOS DESTACADOS</h4>
+                    <div id="modal-services" class="grid grid-cols-2 gap-3 text-sm">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+                
+                <div class="mt-10 pt-8 border-t flex items-center justify-between">
+                    <button onclick="fakeContact()" 
+                            class="flex items-center justify-center gap-x-3 bg-[#00b4b3] text-white px-8 py-4 rounded-3xl font-medium text-base hover:bg-teal-700">
+                        <span>💬 Contactar por WhatsApp</span>
+                    </button>
+                    
+                    <button onclick="fakeMap()" 
+                            class="flex items-center gap-x-2 text-slate-700 hover:text-slate-900">
+                        <span class="text-2xl">📍</span>
+                        <span class="font-medium">Ver ubicación en galería</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER MINIMAL -->
+    <footer class="bg-slate-900 text-white py-12 mt-16">
+        <div class="max-w-screen-2xl mx-auto px-8 text-center">
+            <div class="flex justify-center items-center gap-x-2 text-[#00b4b3] text-2xl mb-6">
+                🏥 Plaza San Marcelo
+            </div>
+            <p class="text-slate-400 text-sm">Galería Comercial Médica • Callao, Perú • 2026</p>
+            <p class="text-xs text-slate-500 mt-8">Desarrollado como SPA con Vanilla JS • Un solo archivo index.html</p>
+        </div>
+    </footer>
+
+    <script>
+        /**
+         * Datos de ejemplo de tiendas (total 12 tiendas para demo realista)
+         */
+        const storesData = [
+            {
+                id: 1,
+                name: "Farmacia San Marcelo",
+                category: "Farmacia",
+                description: "Medicamentos recetados, genéricos, suplementos y productos de cuidado personal. Entrega a domicilio disponible.",
+                phone: "(01) 234-5678",
+                address: "Local 101 - Planta Baja",
+                hours: "8:00 am - 10:00 pm",
+                services: ["Entrega 24h", "Farmacia de guardia", "Vacunas", "Test rápidos"]
+            },
+            {
+                id: 2,
+                name: "Laboratorio Clínico Vital",
+                category: "Laboratorio",
+                description: "Análisis clínicos, exámenes de sangre, pruebas hormonales y PCR. Resultados en menos de 24 horas.",
+                phone: "(01) 456-7890",
+                address: "Local 205 - 2do piso",
+                hours: "7:00 am - 6:00 pm",
+                services: ["Resultados digitales", "Atención express", "Paquetes ejecutivos"]
+            },
+            {
+                id: 3,
+                name: "Clínica del Corazón",
+                category: "Clínica",
+                description: "Cardiología, chequeos preventivos, electrocardiogramas y ecocardiogramas. Especialistas de primer nivel.",
+                phone: "(01) 765-4321",
+                address: "Local 310 - 3er piso",
+                hours: "9:00 am - 7:00 pm",
+                services: ["Consulta cardiología", "Holter 24h", "Prueba de esfuerzo"]
+            },
+            {
+                id: 4,
+                name: "Óptica Visión Clara",
+                category: "Óptica",
+                description: "Exámenes de la vista, lentes de contacto, gafas de sol y monturas premium. Laboratorio propio.",
+                phone: "(01) 987-6543",
+                address: "Local 115 - Planta Baja",
+                hours: "10:00 am - 8:00 pm",
+                services: ["Examen visual gratis", "Lentes progresivos", "Protección UV"]
+            },
+            {
+                id: 5,
+                name: "Dental Smile Center",
+                category: "Odontología",
+                description: "Odontología general, ortodoncia invisible, implantes y blanqueamiento dental. Tecnología 3D.",
+                phone: "(01) 321-9876",
+                address: "Local 401 - 4to piso",
+                hours: "8:30 am - 6:30 pm",
+                services: ["Ortodoncia Invisalign", "Implantes", "Blanqueamiento láser"]
+            },
+            {
+                id: 6,
+                name: "Centro de Nutrición Equilibrio",
+                category: "Nutrición",
+                description: "Consultas nutricionales, planes alimenticios personalizados y venta de suplementos de calidad.",
+                phone: "(01) 555-1122",
+                address: "Local 220 - 2do piso",
+                hours: "9:00 am - 5:00 pm",
+                services: ["Evaluación corporal", "Planes para deportistas", "Nutrición clínica"]
+            },
+            {
+                id: 7,
+                name: "Podología Paso Firme",
+                category: "Podología",
+                description: "Tratamientos para uñas encarnadas, callos, pie diabético y ortesis plantares.",
+                phone: "(01) 998-7766",
+                address: "Local 130 - Planta Baja",
+                hours: "10:00 am - 7:00 pm",
+                services: ["Cirugía menor", "Plantillas personalizadas", "Tratamiento pie diabético"]
+            },
+            {
+                id: 8,
+                name: "Farmacia 24 Horas Express",
+                category: "Farmacia",
+                description: "Farmacia de guardia las 24 horas. Entregas rápidas en menos de 30 minutos.",
+                phone: "(01) 112-3344",
+                address: "Local 150 - Planta Baja",
+                hours: "24 horas",
+                services: ["Entrega express", "Antibióticos", "Medicamentos controlados"]
+            },
+            {
+                id: 9,
+                name: "Ginecología y Obstetricia Dra. López",
+                category: "Clínica",
+                description: "Atención ginecológica integral, ecografías 4D y seguimiento de embarazo.",
+                phone: "(01) 667-8899",
+                address: "Local 305 - 3er piso",
+                hours: "8:00 am - 8:00 pm",
+                services: ["Ecografías 4D", "Control prenatal", "Colposcopia"]
+            },
+            {
+                id: 10,
+                name: "Oftalmología Avanzada",
+                category: "Óptica",
+                description: "Cirugía láser de ojos, cataratas y retina. Exámenes especializados.",
+                phone: "(01) 223-4455",
+                address: "Local 410 - 4to piso",
+                hours: "9:00 am - 6:00 pm",
+                services: ["Cirugía LASIK", "Tratamiento de glaucoma", "Retina"]
+            },
+            {
+                id: 11,
+                name: "Psicología y Bienestar Mental",
+                category: "Clínica",
+                description: "Terapia psicológica, coaching y talleres de mindfulness para toda la familia.",
+                phone: "(01) 334-5566",
+                address: "Local 280 - 2do piso",
+                hours: "10:00 am - 8:00 pm",
+                services: ["Terapia individual", "Terapia de pareja", "Mindfulness"]
+            },
+            {
+                id: 12,
+                name: "Fisioterapia y Rehabilitación",
+                category: "Rehabilitación",
+                description: "Recuperación post-quirúrgica, lesiones deportivas y terapia manual.",
+                phone: "(01) 778-9900",
+                address: "Local 160 - 1er piso",
+                hours: "7:30 am - 7:00 pm",
+                services: ["Rehabilitación deportiva", "Terapia manual", "Electroterapia"]
+            }
+        ]
+
+        // Variables globales del estado
+        let selectedCategories = []
+        let searchTerm = ''
+        let currentSort = 'name'
+
+        /**
+         * Inicializa Tailwind y renderiza todo
+         */
+        function initializeTailwindAndApp() {
+            // Configuración Tailwind vía CDN
+            return {
+                config(userConfig = {}) {
+                    return {
+                        content: [],
+                        theme: {
+                            extend: {
+                                colors: {
+                                    primary: '#00b4b3'
+                                }
+                            }
+                        },
+                        plugins: [],
+                        ...userConfig,
+                    }
+                },
+                theme: {
+                    extend: {},
+                },
+            }
+        }
+
+        /**
+         * Extrae categorías únicas
+         */
+        function getUniqueCategories() {
+            const categories = new Set()
+            storesData.forEach(store => categories.add(store.category))
+            return Array.from(categories).sort()
+        }
+
+        /**
+         * Renderiza los botones de categorías
+         */
+        function renderCategoryFilters() {
+            const container = document.getElementById('category-filters')
+            container.innerHTML = `
+                <button onclick="toggleCategory('all')" 
+                        id="chip-all"
+                        class="chip px-6 py-3 text-sm font-medium rounded-3xl border border-transparent bg-[#00b4b3] text-white flex items-center gap-x-2">
+                    🌐 Todas las categorías
+                </button>`
+            
+            const uniqueCats = getUniqueCategories()
+            
+            uniqueCats.forEach(cat => {
+                const isSelected = selectedCategories.includes(cat)
+                const btn = document.createElement('button')
+                btn.className = `chip px-5 py-3 text-sm font-medium rounded-3xl flex items-center gap-x-2 border ${isSelected ? 'bg-[#00b4b3] text-white border-[#00b4b3]' : 'bg-white border-slate-300 hover:border-slate-400'}`
+                btn.innerHTML = `
+                    ${cat === 'Farmacia' ? '💊' : ''}
+                    ${cat === 'Laboratorio' ? '🧪' : ''}
+                    ${cat === 'Clínica' ? '🩺' : ''}
+                    ${cat === 'Óptica' ? '👓' : ''}
+                    ${cat === 'Odontología' ? '🦷' : ''}
+                    ${cat === 'Nutrición' ? '🥗' : ''}
+                    ${cat === 'Podología' ? '🦶' : ''}
+                    ${cat === 'Rehabilitación' ? '🏋️' : ''}
+                    <span>${cat}</span>
+                `
+                btn.onclick = () => toggleCategory(cat)
+                container.appendChild(btn)
+            })
+        }
+
+        /**
+         * Alterna selección de categoría
+         */
+        function toggleCategory(category) {
+            if (category === 'all') {
+                selectedCategories = []
+            } else {
+                if (selectedCategories.includes(category)) {
+                    selectedCategories = selectedCategories.filter(c => c !== category)
+                } else {
+                    selectedCategories.push(category)
+                }
+            }
+            renderCategoryFilters()
+            filterAndRender()
+        }
+
+        /**
+         * Filtra y ordena las tiendas según estado actual
+         */
+        function filterStores() {
+            let filtered = storesData.filter(store => {
+                const matchesSearch = !searchTerm || 
+                    store.name.toLowerCase().includes(searchTerm) ||
+                    store.description.toLowerCase().includes(searchTerm) ||
+                    store.category.toLowerCase().includes(searchTerm)
+                
+                const matchesCategory = selectedCategories.length === 0 || 
+                    selectedCategories.includes(store.category)
+                
+                return matchesSearch && matchesCategory
+            })
+            
+            // Ordenar
+            if (currentSort === 'name') {
+                filtered.sort((a, b) => a.name.localeCompare(b.name))
+            } else if (currentSort === 'category') {
+                filtered.sort((a, b) => a.category.localeCompare(b.category))
+            }
+            
+            return filtered
+        }
+
+        /**
+         * Renderiza las tarjetas de tiendas
+         */
+        function renderStores(filteredStores) {
+            const grid = document.getElementById('stores-grid')
+            grid.innerHTML = ''
+            
+            if (filteredStores.length === 0) {
+                document.getElementById('empty-state').classList.remove('hidden')
+                document.getElementById('results-text').textContent = '0 resultados'
+                return
+            }
+            
+            document.getElementById('empty-state').classList.add('hidden')
+            
+            filteredStores.forEach(store => {
+                const cardHTML = `
+                <div onclick="showModal(${store.id})" class="card bg-white rounded-3xl shadow-md hover:shadow-xl p-6 cursor-pointer border border-transparent hover:border-[#00b4b3]/10 group">
+                    <div class="flex justify-between items-start">
+                        <span class="inline-flex items-center px-4 py-1 text-xs font-semibold rounded-3xl bg-[#00b4b3]/10 text-[#00b4b3]">
+                            ${store.category}
+                        </span>
+                        <span class="text-4xl opacity-20 group-hover:opacity-30">${getEmojiForCategory(store.category)}</span>
+                    </div>
+                    
+                    <h3 class="font-semibold text-xl mt-6 group-hover:text-[#00b4b3]">${store.name}</h3>
+                    <p class="text-slate-600 line-clamp-3 mt-3 text-[15px] leading-tight">${store.description}</p>
+                    
+                    <div class="mt-8 flex items-center justify-between">
+                        <div class="flex items-center text-slate-700">
+                            <span class="text-xl mr-2">📞</span>
+                            <span class="font-medium">${store.phone}</span>
+                        </div>
+                        <span class="text-xs text-emerald-500 font-medium flex items-center">
+                            <span class="mr-1">🟢</span> ABIERTO
+                        </span>
+                    </div>
+                    
+                    <div class="text-[13px] text-slate-500 mt-4">${store.address}</div>
+                </div>`
+                
+                grid.innerHTML += cardHTML
+            })
+            
+            // Actualizar texto de resultados
+            const total = filteredStores.length
+            document.getElementById('results-text').innerHTML = `
+                Mostrando <span class="font-semibold text-[#00b4b3]">${total}</span> 
+                ${total === 1 ? 'tienda' : 'tiendas'}
+                ${selectedCategories.length > 0 ? `en ${selectedCategories.length} categoría${selectedCategories.length > 1 ? 's' : ''}` : ''}
+            `
+            document.getElementById('total-stores').textContent = storesData.length
+        }
+
+        /**
+         * Emoji según categoría (decorativo)
+         */
+        function getEmojiForCategory(category) {
+            const map = {
+                'Farmacia': '💊',
+                'Laboratorio': '🧪',
+                'Clínica': '🩺',
+                'Óptica': '👓',
+                'Odontología': '🦷',
+                'Nutrición': '🥗',
+                'Podología': '🦶',
+                'Rehabilitación': '🏋️'
+            }
+            return map[category] || '🩹'
+        }
+
+        /**
+         * Filtra y renderiza (función central)
+         */
+        function filterAndRender() {
+            searchTerm = document.getElementById('search-input').value.toLowerCase().trim()
+            currentSort = document.getElementById('sort-select').value
+            const filtered = filterStores()
+            renderStores(filtered)
+        }
+
+        /**
+         * Muestra modal con datos completos
+         */
+        function showModal(id) {
+            const store = storesData.find(s => s.id === id)
+            if (!store) return
+            
+            // Rellenar modal
+            document.getElementById('modal-name').textContent = store.name
+            document.getElementById('modal-description').textContent = store.description
+            document.getElementById('modal-phone').innerHTML = `
+                📞 <span class="font-medium">${store.phone}</span>
+            `
+            document.getElementById('modal-phone').href = `tel:${store.phone}`
+            document.getElementById('modal-address').textContent = store.address
+            document.getElementById('modal-hours').textContent = store.hours
+            
+            // Badge de categoría
+            const badge = document.getElementById('modal-category-badge')
+            badge.textContent = store.category
+            badge.className = `px-5 py-1 text-sm font-semibold rounded-3xl ${store.category === 'Farmacia' ? 'bg-blue-100 text-blue-700' : 
+                                store.category === 'Laboratorio' ? 'bg-purple-100 text-purple-700' : 
+                                'bg-[#00b4b3]/10 text-[#00b4b3]'}`
+            
+            // Servicios
+            const servicesContainer = document.getElementById('modal-services')
+            servicesContainer.innerHTML = ''
+            store.services.forEach(service => {
+                const div = document.createElement('div')
+                div.className = 'flex items-center bg-slate-50 rounded-2xl px-4 py-3 text-slate-700'
+                div.innerHTML = `✅ ${service}`
+                servicesContainer.appendChild(div)
+            })
+            
+            // Mostrar modal
+            const backdrop = document.getElementById('modal-backdrop')
+            backdrop.style.display = 'flex'
+        }
+
+        /**
+         * Oculta modal
+         */
+        function hideModal() {
+            const backdrop = document.getElementById('modal-backdrop')
+            backdrop.style.display = 'none'
+        }
+
+        /**
+         * Limpia búsqueda
+         */
+        function clearSearch() {
+            document.getElementById('search-input').value = ''
+            searchTerm = ''
+            filterAndRender()
+        }
+
+        /**
+         * Resetea todos los filtros
+         */
+        function resetFilters() {
+            selectedCategories = []
+            document.getElementById('search-input').value = ''
+            searchTerm = ''
+            renderCategoryFilters()
+            filterAndRender()
+        }
+
+        /**
+         * Muestra todas las tiendas (botón rápido)
+         */
+        function showAll() {
+            resetFilters()
+        }
+
+        /**
+         * Simula llamada / WhatsApp
+         */
+        function fakeCall() {
+            alert('✅ Llamando al centro de atención al cliente de Plaza San Marcelo...\n\n(En una web real esto abriría WhatsApp o teléfono)')
+        }
+
+        /**
+         * Simula contacto
+         */
+        function fakeContact() {
+            hideModal()
+            setTimeout(() => {
+                alert('✅ ¡Mensaje enviado por WhatsApp!\n\nLa tienda te responderá en menos de 2 minutos.')
+            }, 400)
+        }
+
+        /**
+         * Simula vista de mapa
+         */
+        function fakeMap() {
+            hideModal()
+            setTimeout(() => {
+                alert('🗺️ Abriendo plano interactivo de la galería...\n\nLocal encontrado en el mapa interno de Plaza San Marcelo.')
+            }, 300)
+        }
+
+        /**
+         * Inicia la aplicación completa
+         */
+        function startApp() {
+            initializeTailwindAndApp()
+            renderCategoryFilters()
+            filterAndRender()
+            
+            // Tecla Escape para cerrar modal
+            document.addEventListener('keydown', function(e) {
+                if (e.key === "Escape") {
+                    const backdrop = document.getElementById('modal-backdrop')
+                    if (backdrop.style.display === 'flex') hideModal()
+                }
+            })
+            
+            console.log('%c✅ Plaza San Marcelo Directorio SPA cargado con Vanilla JS', 'background:#00b4b3;color:white;padding:2px 6px;border-radius:4px')
+        }
+        
+        // ¡Lanzar la app!
+        window.onload = startApp
+    </script>
+</body>
+</html>
