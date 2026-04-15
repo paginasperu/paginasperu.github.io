@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plaza San Marcelo | Directorio Médico</title>
+    
+    <!-- Tipografía elegante y limpia -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Iconos minimalistas -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind CSS (CDN para mantener todo en un archivo) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#f0fdfa', 100: '#ccfbf1', 500: '#14b8a6', 600: '#0d9488', 900: '#134e4a' }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Ajustes finos de perfección */
+        body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .modal-enter { opacity: 0; transform: scale(0.95); }
+        .modal-enter-active { opacity: 1; transform: scale(1); transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-leave { opacity: 1; transform: scale(1); }
+        .modal-leave-active { opacity: 0; transform: scale(0.95); transition: all 0.15s ease-in; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Header Elegante -->
+    <header class="bg-white border-b border-gray-100 sticky top-0 z-30">
+        <div class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-brand-50 text-brand-600 rounded-lg flex items-center justify-center">
+                    <i class="ph ph-cross text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-semibold tracking-tight text-gray-900">Plaza San Marcelo</h1>
+                    <p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Galería Médica</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Área de Controles (Buscador y Filtros) -->
+    <section class="max-w-6xl mx-auto px-6 py-8 w-full">
+        <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+            
+            <!-- Buscador -->
+            <div class="relative w-full md:w-96">
+                <i class="ph ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Buscar tienda, especialidad..." 
+                    class="w-full bg-white border border-gray-200 rounded-full py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-shadow shadow-sm"
+                >
+            </div>
+
+            <!-- Filtro de Categorías -->
+            <div class="w-full md:w-auto overflow-x-auto hide-scrollbar">
+                <div class="flex gap-2" id="categoryFilters">
+                    <!-- Se inyectan vía JS -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Grid de Directorio -->
+    <main class="flex-1 max-w-6xl mx-auto px-6 pb-12 w-full">
+        <div id="emptyState" class="hidden text-center py-20">
+            <i class="ph ph-magnifying-glass text-4xl text-gray-300 mb-3"></i>
+            <h3 class="text-lg font-medium text-gray-900">Sin resultados</h3>
+            <p class="text-gray-500 mt-1">No encontramos tiendas que coincidan con tu búsqueda.</p>
+        </div>
+        <div id="directoryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Las fichas se inyectan vía JS -->
+        </div>
+    </main>
+
+    <!-- Modal (Oculto por defecto) -->
+    <div id="modalOverlay" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200">
+        <div id="modalContent" class="bg-white rounded-2xl w-full max-w-md shadow-2xl modal-enter transition-all">
+            <!-- El contenido del modal se inyecta vía JS -->
+        </div>
+    </div>
+
+    <!-- Lógica de la Aplicación -->
+    <script>
+        // --- ESTADO Y DATOS ---
+        
+        // Datos de ejemplo precisos y limpios
+        const stores = [
+            { id: 1, name: "Farmacia Vida Vital", category: "Farmacia", local: "101", phone: "01 456-7890", desc: "Medicamentos de patente, genéricos y productos de cuidado personal con atención farmacéutica." },
+            { id: 2, name: "Óptica Visión Clara", category: "Óptica", local: "102", phone: "01 234-5678", desc: "Monturas de diseñador, examen visual computarizado y adaptación de lentes de contacto." },
+            { id: 3, name: "Sonrisas San Marcelo", category: "Odontología", local: "201", phone: "987 654 321", desc: "Ortodoncia, implantes y estética dental integral con tecnología de vanguardia." },
+            { id: 4, name: "Laboratorios Biolab", category: "Laboratorio", local: "205", phone: "01 333-4444", desc: "Análisis clínicos precisos, pruebas de sangre y resultados en línea en 24 horas." },
+            { id: 5, name: "Consultorio Pediátrico Feliz", category: "Pediatría", local: "301", phone: "999 888 777", desc: "Atención médica infantil, control de niño sano y vacunación en un ambiente cálido." },
+            { id: 6, name: "Centro Cardiológico", category: "Cardiología", local: "302", phone: "01 555-6666", desc: "Electrocardiogramas, ecocardiogramas y prevención de enfermedades cardiovasculares." },
+            { id: 7, name: "DermaSalud", category: "Dermatología", local: "305", phone: "912 345 678", desc: "Tratamientos clínicos y estéticos para la piel, cabello y uñas." },
+            { id: 8, name: "FarmaExpress", category: "Farmacia", local: "104", phone: "01 777-8888", desc: "Botiquín de emergencias, inyectables y suplementos vitamínicos." }
+        ];
+
+        let state = {
+            search: '',
+            category: 'Todas'
+        };
+
+        // --- REFERENCIAS AL DOM ---
+        const dom = {
+            searchInput: document.getElementById('searchInput'),
+            categoryFilters: document.getElementById('categoryFilters'),
+            directoryGrid: document.getElementById('directoryGrid'),
+            emptyState: document.getElementById('emptyState'),
+            modalOverlay: document.getElementById('modalOverlay'),
+            modalContent: document.getElementById('modalContent')
+        };
+
+        // --- LÓGICA DE RENDERIZADO ---
+
+        function init() {
+            renderCategories();
+            renderGrid();
+            setupEventListeners();
+        }
+
+        function getFilteredStores() {
+            return stores.filter(store => {
+                const matchCategory = state.category === 'Todas' || store.category === state.category;
+                const matchSearch = store.name.toLowerCase().includes(state.search.toLowerCase()) || 
+                                    store.category.toLowerCase().includes(state.search.toLowerCase());
+                return matchCategory && matchSearch;
+            });
+        }
+
+        function renderCategories() {
+            // Extraer categorías únicas
+            const categories = ['Todas', ...new Set(stores.map(s => s.category))];
+            
+            dom.categoryFilters.innerHTML = categories.map(cat => {
+                const isActive = cat === state.category;
+                const baseClass = "px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap cursor-pointer";
+                const activeClass = isActive 
+                    ? "bg-brand-600 text-white shadow-sm" 
+                    : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50";
+                
+                return `<button class="${baseClass} ${activeClass}" data-category="${cat}">${cat}</button>`;
+            }).join('');
+        }
+
+        function renderGrid() {
+            const filtered = getFilteredStores();
+            
+            if (filtered.length === 0) {
+                dom.directoryGrid.innerHTML = '';
+                dom.emptyState.classList.remove('hidden');
+                return;
+            }
+
+            dom.emptyState.classList.add('hidden');
+            dom.directoryGrid.innerHTML = filtered.map(store => `
+                <article 
+                    onclick="openModal(${store.id})"
+                    class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-brand-100 transition-all duration-300 cursor-pointer group flex flex-col h-full">
+                    
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="inline-block px-3 py-1 bg-brand-50 text-brand-600 text-xs font-semibold rounded-full">
+                            ${store.category}
+                        </span>
+                        <span class="text-xs text-gray-400 font-medium bg-gray-50 px-2 py-1 rounded">Local ${store.local}</span>
+                    </div>
+                    
+                    <h2 class="text-lg font-semibold text-gray-900 mb-2 group-hover:text-brand-600 transition-colors">${store.name}</h2>
+                    <p class="text-sm text-gray-500 line-clamp-2 mb-6 flex-1">${store.desc}</p>
+                    
+                    <div class="flex items-center text-sm text-gray-600 border-t border-gray-50 pt-4">
+                        <i class="ph ph-phone text-brand-500 mr-2"></i>
+                        ${store.phone}
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        // --- LÓGICA DEL MODAL ---
+
+        function openModal(id) {
+            const store = stores.find(s => s.id === id);
+            if (!store) return;
+
+            dom.modalContent.innerHTML = `
+                <div class="p-8">
+                    <div class="flex justify-between items-start mb-6">
+                        <span class="inline-block px-3 py-1 bg-brand-50 text-brand-600 text-xs font-semibold rounded-full">
+                            ${store.category}
+                        </span>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-900 transition-colors p-1">
+                            <i class="ph ph-x text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">${store.name}</h2>
+                    <p class="text-gray-600 mb-8 leading-relaxed">${store.desc}</p>
+                    
+                    <div class="space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <div class="flex items-center text-sm">
+                            <i class="ph ph-map-pin text-brand-500 text-lg mr-3 w-5 text-center"></i>
+                            <div>
+                                <span class="text-gray-400 text-xs block">Ubicación</span>
+                                <span class="font-medium text-gray-900">Local ${store.local}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <i class="ph ph-phone text-brand-500 text-lg mr-3 w-5 text-center"></i>
+                            <div>
+                                <span class="text-gray-400 text-xs block">Teléfono de contacto</span>
+                                <span class="font-medium text-gray-900">${store.phone}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Mostrar
+            dom.modalOverlay.classList.remove('opacity-0', 'pointer-events-none');
+            dom.modalContent.classList.remove('modal-enter');
+            dom.modalContent.classList.add('modal-enter-active');
+            
+            // Bloquear scroll del body
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            dom.modalContent.classList.remove('modal-enter-active');
+            dom.modalContent.classList.add('modal-leave-active');
+            
+            setTimeout(() => {
+                dom.modalOverlay.classList.add('opacity-0', 'pointer-events-none');
+                dom.modalContent.classList.remove('modal-leave-active');
+                dom.modalContent.classList.add('modal-enter');
+                document.body.style.overflow = '';
+            }, 150);
+        }
+
+        // --- EVENTOS ---
+
+        function setupEventListeners() {
+            // Búsqueda
+            dom.searchInput.addEventListener('input', (e) => {
+                state.search = e.target.value;
+                renderGrid();
+            });
+
+            // Categorías (Delegación de eventos)
+            dom.categoryFilters.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    state.category = e.target.dataset.category;
+                    renderCategories(); // Re-renderizar para actualizar clases activas
+                    renderGrid();
+                }
+            });
+
+            // Cerrar modal al clickear afuera
+            dom.modalOverlay.addEventListener('click', (e) => {
+                if (e.target === dom.modalOverlay) {
+                    closeModal();
+                }
+            });
+
+            // Cerrar modal con escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !dom.modalOverlay.classList.contains('pointer-events-none')) {
+                    closeModal();
+                }
+            });
+        }
+
+        // Iniciar app
+        init();
+
+    </script>
+</body>
+</html>
