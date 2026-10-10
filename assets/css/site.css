@@ -661,6 +661,74 @@ a:focus-visible {
   animation: spin 700ms linear infinite;
 }
 
+.site-footer {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  margin-top: 42px;
+  padding: 28px 0 8px;
+  border-top: 1px solid var(--border);
+  scroll-margin-top: 24px;
+}
+
+.site-footer__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+  gap: 36px;
+}
+
+.site-footer h2 {
+  margin: 0 0 14px;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+}
+
+.site-footer ul {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer a {
+  color: #363636;
+  text-decoration-color: #b8b8b8;
+  text-underline-offset: 3px;
+}
+
+.site-footer a:hover {
+  color: #111;
+  text-decoration-color: currentColor;
+}
+
+.site-footer__location address,
+.site-footer__location p,
+.site-footer__directions {
+  margin: 0;
+  color: #5e5e5e;
+  font-size: 13px;
+  font-style: normal;
+  line-height: 1.7;
+}
+
+.site-footer__location > p {
+  margin-top: 9px;
+}
+
+.site-footer ul.site-footer__directions {
+  margin-top: 12px;
+}
+
+.site-footer .site-footer__hours {
+  margin-top: 14px;
+}
+
+.site-footer__hours strong {
+  color: #303030;
+}
+
 .profile-modal {
   width: 100%;
   max-width: none;
@@ -1054,6 +1122,18 @@ a:focus-visible {
   }
 }
 
+@media (max-width: 639px) {
+  .site-footer {
+    margin-top: 32px;
+    padding-top: 22px;
+  }
+
+  .site-footer__grid {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+}
+
 @media (min-width: 640px) and (max-width: 979px) {
   .directory-nav {
     align-items: center;
@@ -1149,4 +1229,3 @@ a:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
-

@@ -271,6 +271,20 @@ function parseCsv(text) {
       destacado: toBoolean(record.es_destacado),
       posicion: record.posicion.trim() === "" ? null : Number(record.posicion),
       csvOrder,
+      searchText: normalizeText([
+        record.nombres,
+        record.apellidos,
+        record.categoria,
+        record.descripcion_corta,
+        record.descripcion_larga,
+        record.productos_servicios,
+        record.experiencia,
+        record.nivel_precio,
+        record.departamento,
+        record.provincia,
+        record.distrito,
+        record.whatsapp_publico,
+      ].join(" ")),
     };
   });
 }
@@ -352,26 +366,13 @@ function fuzzyMatches(profile, rawQuery) {
   const query = normalizeText(rawQuery);
   if (!query) return true;
 
-  const searchable = normalizeText(
-    [
-      profile.nombres,
-      profile.apellidos,
-      profile.descripcion_corta,
-      profile.descripcion_larga,
-      profile.productos_servicios,
-    ].join(" "),
-  );
-  const words = searchable.split(" ");
-
-  return query.split(" ").every(
-    (token) =>
-      searchable.includes(token) ||
-      words.some(
-        (word) =>
-          word.startsWith(token) ||
-          token.startsWith(word) ||
-          (token.length >= 4 && editDistance(token, word) <= 1),
-      ),
+  const words = profile.searchText.split(" ");
+  return query.split(" ").every((token) =>
+    words.some((word) =>
+      word === token ||
+      (token.length >= 2 && word.startsWith(token)) ||
+      (token.length >= 6 && word.length >= 6 && editDistance(token, word) <= 1),
+    ),
   );
 }
 
@@ -563,10 +564,10 @@ function createProfileCard(profile, index) {
   );
 
   const profileImage = document.createElement("img");
-  setImageSource(profileImage, profile.imagen_portada, `${profile.nombres} ${profile.apellidos}`, "cover");
   profileImage.decoding = "async";
-  profileImage.loading = index < PROFILES_PER_PAGE ? "eager" : "lazy";
+  profileImage.loading = index < 2 ? "eager" : "lazy";
   profileImage.fetchPriority = index === 0 ? "high" : "auto";
+  setImageSource(profileImage, profile.imagen_portada, `${profile.nombres} ${profile.apellidos}`, "cover");
 
   const info = document.createElement("span");
   info.className = "profile-card__info";
@@ -977,4 +978,3 @@ if (siteMenu && siteMenuToggle) {
 }
 
 initializeDirectory();
-
