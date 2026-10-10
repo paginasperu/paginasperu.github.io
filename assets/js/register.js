@@ -1,4 +1,4 @@
-import SITE_CONFIG from "./config.js?v=20261010-3";
+import SITE_CONFIG from "./config.js?v=20261010-4";
 
 const form = document.querySelector("#registro");
 const message = document.querySelector("#mensaje");
@@ -6,7 +6,7 @@ const submitButton = document.querySelector("#enviar");
 const departmentSelect = document.querySelector("#departamento");
 const provinceSelect = document.querySelector("#provincia");
 const districtSelect = document.querySelector("#distrito");
-const locationUrl = new URL("../../data/distritos.csv", import.meta.url);
+const locationUrl = new URL("../../data/districts.csv", import.meta.url);
 const locationRows = [];
 
 function parseCsv(text) {
@@ -71,7 +71,7 @@ function trimTextFields() {
 
 async function loadLocations() {
   const response = await fetch(locationUrl);
-  if (!response.ok) throw new Error("No se pudo cargar data/distritos.csv.");
+  if (!response.ok) throw new Error("No se pudo cargar data/districts.csv.");
   const rows = parseCsv(await response.text()).filter((row) => row.departamento && row.provincia && row.distrito);
   if (!rows.length) throw new Error("El catálogo de ubicaciones está vacío o tiene encabezados distintos.");
   locationRows.push(...rows);
@@ -333,6 +333,6 @@ form.addEventListener("submit", async (event) => {
 configureBirthDateLimits();
 loadLocations().catch((error) => {
   departmentSelect.replaceChildren(new Option("No se pudo cargar", ""));
-  showMessage(`${error.message} Comprueba que el archivo esté disponible en data/distritos.csv.`, "error");
+  showMessage(`${error.message} Comprueba que el archivo esté disponible en data/districts.csv.`, "error");
 });
 

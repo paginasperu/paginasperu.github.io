@@ -1,4 +1,4 @@
-import SITE_CONFIG from "./config.js?v=20261010-3";
+import SITE_CONFIG from "./config.js?v=20261010-4";
 
 const PROFILES_PER_PAGE = 6;
 const LOAD_DELAY = 350;
@@ -173,15 +173,7 @@ function resolveImageUrl(source, imageType = "cover") {
     return PROFILE_PLACEHOLDER;
   }
 
-  if (SITE_CONFIG.imageMode === "cloudinary" && SITE_CONFIG.cloudinary.cloudName) {
-    const publicId = source.replace(/\.(jpe?g|webp|png)$/i, "");
-    const transform = imageType === "avatar"
-      ? "c_fill,g_face,w_150,h_150,f_auto,q_auto"
-      : "c_fill,w_540,h_720,f_auto,q_auto";
-    return `https://res.cloudinary.com/${SITE_CONFIG.cloudinary.cloudName}/image/upload/${transform}/${publicId}`;
-  }
-
-  return new URL(`${SITE_CONFIG.localImagesDirectory}/${source}`, import.meta.url).href;
+  return PROFILE_PLACEHOLDER;
 }
 
 function setImageSource(element, source, alt = "", imageType = "cover") {
