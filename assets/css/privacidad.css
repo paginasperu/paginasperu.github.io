@@ -1,0 +1,35 @@
+.privacy-content {
+  max-width: 920px;
+}
+
+.privacy-notice {
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border: 1px solid #e7c46c;
+  border-radius: 12px;
+  background: #fff8e6;
+  color: #5c4817;
+  line-height: 1.55;
+}
+
+.privacy-document section + section {
+  margin-top: 28px;
+}
+
+.privacy-document h2 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+}
+
+.privacy-document p {
+  margin: 0 0 12px;
+  color: #515766;
+  line-height: 1.7;
+}
+
+.privacy-document a {
+  color: #3444c5;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
