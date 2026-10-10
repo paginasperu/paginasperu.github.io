@@ -93,13 +93,12 @@ button {
 
 .site-menu__toggle {
   display: grid;
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   place-items: center;
   color: #222;
-  border: 1px solid #e2e2e5;
-  border-radius: 50%;
-  background: #fff;
+  border: 0;
+  background: transparent;
   cursor: pointer;
   list-style: none;
 }
@@ -113,14 +112,13 @@ button {
 }
 
 .site-menu__toggle svg {
-  width: 20px;
-  height: 20px;
+  width: 27px;
+  height: 27px;
 }
 
 .site-menu__toggle:hover,
 .site-menu[open] .site-menu__toggle {
   color: #111;
-  background: #f3f3f5;
 }
 
 .site-menu__toggle:focus-visible,

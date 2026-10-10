@@ -945,5 +945,36 @@ const loadObserver = new IntersectionObserver(
 );
 
 loadObserver.observe(elements.loader);
+
+const siteMenu = document.querySelector(".site-menu");
+const siteMenuToggle = siteMenu?.querySelector(".site-menu__toggle");
+
+if (siteMenu && siteMenuToggle) {
+  const closeSiteMenu = () => {
+    siteMenu.open = false;
+  };
+
+  siteMenu.addEventListener("toggle", () => {
+    siteMenuToggle.setAttribute(
+      "aria-label",
+      siteMenu.open ? "Cerrar menú" : "Abrir menú",
+    );
+  });
+
+  document.addEventListener("click", (event) => {
+    if (siteMenu.open && !siteMenu.contains(event.target)) closeSiteMenu();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || !siteMenu.open) return;
+    closeSiteMenu();
+    siteMenuToggle.focus();
+  });
+
+  siteMenu.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", closeSiteMenu);
+  });
+}
+
 initializeDirectory();
 
