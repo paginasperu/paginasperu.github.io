@@ -24,7 +24,7 @@
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23111'/%3E%3Ctext x='32' y='43' fill='white' font-family='Arial,sans-serif' font-size='32' font-weight='700' text-anchor='middle'%3EO%3C/text%3E%3C/svg%3E"
     />
-    <link rel="stylesheet" href="./assets/css/site.css?v=20261010-3" />
+    <link rel="stylesheet" href="./assets/css/site.css?v=20261010-4" />
     <script src="./assets/js/site.js?v=20261010-3" type="module"></script>
   </head>
   <body>
@@ -52,12 +52,18 @@
               type="search"
             />
             </label>
-            <a
-              class="subscribe-link"
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-            >Suscríbete</a>
+            <details class="site-menu">
+              <summary class="site-menu__toggle" aria-label="Abrir menú">
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-linecap="round" stroke-width="1.8" />
+                </svg>
+              </summary>
+              <nav class="site-menu__panel" aria-label="Menú principal">
+                <a class="subscribe-link" href="#" target="_blank" rel="noopener noreferrer">Suscríbete</a>
+                <a href="./registro/">Registro</a>
+                <a href="./privacidad/">Privacidad</a>
+              </nav>
+            </details>
           </div>
 
           <div class="directory-nav">

@@ -84,19 +84,77 @@ button {
   text-transform: uppercase;
 }
 
-.subscribe-link {
+.site-menu {
   grid-area: subscribe;
-  width: fit-content;
-  color: #5f5f63;
-  font-size: 12px;
-  font-weight: 650;
-  text-decoration-color: #c5c5c8;
-  text-underline-offset: 4px;
+  position: relative;
+  justify-self: end;
+  z-index: 20;
 }
 
-.subscribe-link:hover {
+.site-menu__toggle {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  color: #222;
+  border: 1px solid #e2e2e5;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  list-style: none;
+}
+
+.site-menu__toggle::-webkit-details-marker {
+  display: none;
+}
+
+.site-menu__toggle::marker {
+  content: "";
+}
+
+.site-menu__toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.site-menu__toggle:hover,
+.site-menu[open] .site-menu__toggle {
   color: #111;
-  text-decoration-color: #111;
+  background: #f3f3f5;
+}
+
+.site-menu__toggle:focus-visible,
+.site-menu__panel a:focus-visible {
+  outline: 3px solid rgb(45 91 255 / 35%);
+  outline-offset: 3px;
+}
+
+.site-menu__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  display: grid;
+  min-width: 176px;
+  padding: 6px;
+  border: 1px solid #e6e6e8;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 12%);
+}
+
+.site-menu__panel a {
+  display: block;
+  padding: 11px 12px;
+  border-radius: 9px;
+  color: #303034;
+  font-size: 14px;
+  font-weight: 550;
+  text-decoration: none;
+}
+
+.site-menu__panel a:hover {
+  color: #111;
+  background: #f3f3f5;
 }
 
 .search {
@@ -974,10 +1032,6 @@ a:focus-visible {
     grid-template-areas: "title search subscribe";
     grid-template-columns: max-content minmax(240px, 660px) minmax(90px, 1fr);
     gap: 18px;
-  }
-
-  .subscribe-link {
-    justify-self: end;
   }
 
   .filter-panel {
