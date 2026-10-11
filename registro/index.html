@@ -6,8 +6,8 @@
     <meta name="description" content="Registra tu perfil profesional en el Directorio Oficial de Publicidad." />
     <title>Registro | Directorio Oficial de Publicidad</title>
     <link rel="stylesheet" href="../assets/css/site.css?v=20261010-9" />
-    <link rel="stylesheet" href="../assets/css/register.css?v=20261010-1" />
-    <script type="module" src="../assets/js/register.js?v=20261010-1"></script>
+    <link rel="stylesheet" href="../assets/css/register.css?v=20261010-3" />
+    <script type="module" src="../assets/js/register.js?v=20261010-5"></script>
   </head>
   <body>
     <main class="page register-page">
@@ -47,9 +47,10 @@
               <label class="register-field" for="whatsapp_publico"><span>WhatsApp público</span><input id="whatsapp_publico" name="whatsapp_publico" type="tel" inputmode="tel" autocomplete="tel" placeholder="950 141 414" maxlength="20" pattern="[0-9+() -]*" title="Usa solo números, espacios, +, paréntesis o guiones." /><small>Será visible en tu perfil para que te contacten.</small></label>
               <label class="register-field" for="whatsapp_interno"><span>WhatsApp de contacto <b aria-hidden="true">*</b></span><input id="whatsapp_interno" name="whatsapp_interno" type="tel" inputmode="tel" autocomplete="tel" placeholder="950 141 414" maxlength="20" pattern="[0-9+() -]*" title="Usa solo números, espacios, +, paréntesis o guiones." required /><small>Lo usaremos para contactarte; no se mostrará en el directorio.</small></label>
               <label class="register-field" for="correo"><span>Correo electrónico <b aria-hidden="true">*</b></span><input id="correo" name="correo" type="email" autocomplete="email" minlength="3" maxlength="50" required /><small>Lo usaremos para contactarte; no se mostrará en el directorio.</small></label>
-              <label class="register-field" for="behance_usuario"><span>Usuario de Behance</span><input id="behance_usuario" name="behance_usuario" minlength="3" maxlength="50" placeholder="tuusuario" /><small>Escribe tu usuario, sin incluir el enlace completo.</small></label>
               <label class="register-field" for="instagram_usuario"><span>Usuario de Instagram</span><input id="instagram_usuario" name="instagram_usuario" minlength="3" maxlength="50" placeholder="tuusuario" /><small>Escribe tu usuario, sin incluir el enlace completo.</small></label>
               <label class="register-field" for="linkedin_usuario"><span>Usuario de LinkedIn</span><input id="linkedin_usuario" name="linkedin_usuario" minlength="3" maxlength="50" placeholder="tuusuario" /><small>Escribe tu usuario, sin incluir el enlace completo.</small></label>
+              <label class="register-field" for="behance_usuario"><span>Usuario de Behance</span><input id="behance_usuario" name="behance_usuario" minlength="3" maxlength="50" placeholder="tuusuario" /><small>Escribe tu usuario, sin incluir el enlace completo.</small></label>
+              <label class="register-field register-field--wide" for="canva_url"><span>Portafolio de Canva</span><input id="canva_url" name="canva_url" type="url" maxlength="500" placeholder="https://www.canva.com/design/..." /><small>Opcional. Pega el enlace público de tu portafolio en Canva.</small></label>
             </div>
           </section>
 
@@ -68,8 +69,8 @@
           <section class="register-section" aria-labelledby="section-images">
             <div class="register-section__heading"><span>05</span><div><h2 id="section-images">Imágenes</h2><p>Prepara tus archivos con las medidas indicadas.</p></div></div>
             <div class="register-grid">
-              <label class="register-field register-upload" for="foto_perfil"><span>Foto de perfil <b aria-hidden="true">*</b></span><input id="foto_perfil" name="foto_perfil" type="file" accept="image/jpeg,.jpg,.jpeg" required /><small>Sube un JPG de 150 × 150 px (máximo 250 KB).</small><output data-file-for="foto_perfil"></output></label>
-              <label class="register-field register-upload" for="imagen_portada"><span>Imagen de portada <b aria-hidden="true">*</b></span><input id="imagen_portada" name="imagen_portada" type="file" accept="image/jpeg,.jpg,.jpeg" required /><small>Sube un JPG de 540 × 720 px (máximo 500 KB).</small><output data-file-for="imagen_portada"></output></label>
+              <label class="register-field register-upload" for="foto_perfil"><span>Foto de perfil <b aria-hidden="true">*</b></span><input id="foto_perfil" name="foto_perfil" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" required /><small>Acepta JPG, PNG o WebP de hasta 1 MB. La ajustaremos a JPG de 150 × 150 px.</small><output data-file-for="foto_perfil"></output></label>
+              <label class="register-field register-upload" for="imagen_portada"><span>Imagen de portada <b aria-hidden="true">*</b></span><input id="imagen_portada" name="imagen_portada" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" required /><small>Acepta JPG, PNG o WebP de hasta 1 MB. La ajustaremos a JPG de 540 × 720 px.</small><output data-file-for="imagen_portada"></output></label>
             </div>
           </section>
 

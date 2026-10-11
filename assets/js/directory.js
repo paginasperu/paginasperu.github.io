@@ -2,15 +2,19 @@ import SITE_CONFIG from "./config.js?v=20261010-4";
 
 const PROFILES_PER_PAGE = 6;
 const LOAD_DELAY = 350;
+const PROFILE_REFRESH_INTERVAL = 5 * 60 * 1000;
 const FAVORITES_STORAGE_KEY = "directorio-creativo:favorites:v1";
 const PROFILE_PLACEHOLDER = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200"><rect width="900" height="1200" fill="#eeeae4"/><circle cx="450" cy="380" r="145" fill="#c8beb2"/><path fill="#b2a69a" d="M185 1200c18-282 112-446 265-446s247 164 265 446Z"/></svg>');
 const SOCIAL_HOSTS = {
   behance: new Set(["behance.net", "www.behance.net"]),
   instagram: new Set(["instagram.com", "www.instagram.com"]),
   linkedin: new Set(["linkedin.com", "www.linkedin.com"]),
+  canva: new Set(["canva.com", "www.canva.com"]),
 };
 
 let profiles = [];
+let profilesCsvSnapshot = "";
+let refreshingProfiles = false;
 
 const elements = {
   title: document.querySelector("#directory-title"),
@@ -61,6 +65,7 @@ const elements = {
   modalBehance: document.querySelector("#modal-behance"),
   modalInstagram: document.querySelector("#modal-instagram"),
   modalLinkedin: document.querySelector("#modal-linkedin"),
+  modalCanva: document.querySelector("#modal-canva"),
   modalDescriptionSection: document.querySelector("#modal-description-section"),
   modalLong: document.querySelector("#modal-long-description"),
   modalServicesSection: document.querySelector("#modal-services-section"),
@@ -218,18 +223,19 @@ function parseCsv(text) {
     row.push(value);
     rows.push(row);
   }
-  if (rows.length < 2) throw new Error("El CSV no contiene perfiles.");
+  if (rows.length === 0) throw new Error("El CSV está vacío.");
 
   const headers = rows.shift().map((header) => header.trim());
   const required = [
     "id", "nombres", "apellidos", "departamento", "provincia", "distrito",
-    "whatsapp_publico", "behance_url", "instagram_url", "linkedin_url",
+    "whatsapp_publico", "behance_usuario", "instagram_usuario", "linkedin_usuario", "canva_url",
     "categoria", "descripcion_corta", "descripcion_larga", "productos_servicios",
-    "experiencia", "nivel_precio", "foto_perfil", "imagen_portada",
+    "nivel_experiencia", "nivel_precio", "foto_perfil", "imagen_portada",
     "es_verificado", "es_destacado", "posicion",
   ];
   const missing = required.filter((header) => !headers.includes(header));
   if (missing.length) throw new Error(`Faltan columnas: ${missing.join(", ")}.`);
+  if (rows.length === 0) return [];
 
   const seenIds = new Set();
   const toBoolean = (value) => /^(true|1|si|sí|yes)$/i.test(value.trim());
@@ -248,14 +254,15 @@ function parseCsv(text) {
       provincia: record.provincia.trim(),
       distrito: record.distrito.trim(),
       whatsapp: record.whatsapp_publico.trim(),
-      usuario_behance: record.behance_url.trim(),
-      usuario_instagram: record.instagram_url.trim(),
-      usuario_linkedin: record.linkedin_url.trim(),
+      usuario_behance: record.behance_usuario.trim(),
+      usuario_instagram: record.instagram_usuario.trim(),
+      usuario_linkedin: record.linkedin_usuario.trim(),
+      canva_url: record.canva_url.trim(),
       categoria: record.categoria.trim(),
       descripcion_corta: record.descripcion_corta.trim(),
       descripcion_larga: record.descripcion_larga.trim(),
       productos_servicios: record.productos_servicios.trim(),
-      experiencia: record.experiencia.trim(),
+      experiencia: record.nivel_experiencia.trim(),
       nivel_precio: record.nivel_precio.trim(),
       foto_perfil: record.foto_perfil.trim(),
       imagen_portada: record.imagen_portada.trim(),
@@ -270,7 +277,7 @@ function parseCsv(text) {
         record.descripcion_corta,
         record.descripcion_larga,
         record.productos_servicios,
-        record.experiencia,
+        record.nivel_experiencia,
         record.nivel_precio,
         record.departamento,
         record.provincia,
@@ -297,10 +304,8 @@ async function initializeDirectory() {
   )}`;
 
   try {
-    const csvUrl = new URL(SITE_CONFIG.profilesCsv, import.meta.url);
-    const response = await fetch(csvUrl, { cache: "no-store" });
-    if (!response.ok) throw new Error(`No se pudo leer el CSV (HTTP ${response.status}).`);
-    profiles = parseCsv(await response.text());
+    profilesCsvSnapshot = await fetchProfilesCsv();
+    profiles = parseCsv(profilesCsvSnapshot);
   } catch (error) {
     elements.resultsCount.textContent = "No se pudo cargar el directorio";
     elements.empty.textContent = "Abre esta web desde GitHub Pages o mediante un servidor local para cargar el CSV.";
@@ -320,6 +325,62 @@ async function initializeDirectory() {
   const initialProfile = initialSlug && profiles.find((profile) => profileSlug(profile) === initialSlug);
   if (initialProfile) {
     openProfile(initialProfile.id, { historyMode: "none", captureFocus: false });
+  }
+
+  window.setInterval(refreshProfiles, PROFILE_REFRESH_INTERVAL);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) refreshProfiles();
+  });
+}
+
+async function fetchProfilesCsv() {
+  const csvUrl = new URL(SITE_CONFIG.profilesCsv, import.meta.url);
+  csvUrl.searchParams.set("v", String(Date.now()));
+  const response = await fetch(csvUrl, { cache: "no-store" });
+  if (!response.ok) throw new Error(`No se pudo leer el CSV (HTTP ${response.status}).`);
+  return response.text();
+}
+
+async function refreshProfiles() {
+  if (document.hidden || refreshingProfiles) return;
+  refreshingProfiles = true;
+
+  try {
+    const nextSnapshot = await fetchProfilesCsv();
+    if (nextSnapshot === profilesCsvSnapshot) return;
+
+    const nextProfiles = parseCsv(nextSnapshot);
+    const previousRenderedCount = renderedCount;
+    profilesCsvSnapshot = nextSnapshot;
+    profiles = nextProfiles;
+
+    const currentIds = new Set(profiles.map((profile) => profile.id));
+    favoriteIds = new Set([...favoriteIds].filter((id) => currentIds.has(id)));
+    saveFavorites();
+    updateFavoritesSummary();
+
+    fillSelect(elements.department, profiles.map((profile) => profile.departamento), "Todos");
+    updateLocationOptions("department");
+    updateLocationOptions("province");
+    if (elements.sort.value === "random") shuffleProfiles();
+
+    const openProfileId = elements.modal.open ? activeProfileId : null;
+    applyFilters();
+
+    const targetCount = Math.min(previousRenderedCount, filteredProfiles.length);
+    while (renderedCount < targetCount) renderNextBatch({ immediate: true });
+
+    if (openProfileId !== null) {
+      if (currentIds.has(openProfileId)) {
+        openProfile(openProfileId, { historyMode: "none", captureFocus: false });
+      } else {
+        closeProfile();
+      }
+    }
+  } catch (error) {
+    console.error("No se pudo actualizar el directorio:", error);
+  } finally {
+    refreshingProfiles = false;
   }
 }
 
@@ -534,9 +595,11 @@ function applyFilters() {
     filteredProfiles.length === 1 ? "perfil" : "perfiles"
   }`;
   elements.empty.hidden = filteredProfiles.length > 0;
-  elements.empty.textContent = favoriteOnly
-    ? "Aún no tienes perfiles favoritos con esos criterios."
-    : "No encontramos perfiles con esos criterios.";
+  elements.empty.textContent = profiles.length === 0
+    ? "Aún no hay perfiles publicados."
+    : favoriteOnly
+      ? "Aún no tienes perfiles favoritos con esos criterios."
+      : "No encontramos perfiles con esos criterios.";
   updateFilterCount();
   updateActiveFilters();
   renderNextBatch({ immediate: true });
@@ -640,6 +703,7 @@ function profileLink(network, username) {
     try {
       const suppliedUrl = new URL(handle);
       if (suppliedUrl.protocol !== "https:" || !SOCIAL_HOSTS[network].has(suppliedUrl.hostname)) return "#";
+      if (network === "canva") return suppliedUrl.href;
       const pathParts = suppliedUrl.pathname.split("/").filter(Boolean);
       if (network === "linkedin") {
         handle = pathParts[0]?.toLowerCase() === "in" ? pathParts[1] || "" : "";
@@ -713,13 +777,14 @@ function openProfile(
     [elements.modalBehance, "behance", profile.usuario_behance],
     [elements.modalInstagram, "instagram", profile.usuario_instagram],
     [elements.modalLinkedin, "linkedin", profile.usuario_linkedin],
+    [elements.modalCanva, "canva", profile.canva_url],
   ];
   socialProfiles.forEach(([element, network, username]) => {
     const url = username ? profileLink(network, username) : "#";
     element.hidden = !username || url === "#";
     if (!element.hidden) element.href = url;
   });
-  elements.modalSocialSection.hidden = !socialProfiles.some(([, , username]) => username);
+  elements.modalSocialSection.hidden = socialProfiles.every(([element]) => element.hidden);
 
   elements.modalDescriptionSection.hidden = !profile.descripcion_larga;
   elements.modalLong.textContent = profile.descripcion_larga || "";

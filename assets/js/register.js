@@ -8,6 +8,10 @@ const provinceSelect = document.querySelector("#provincia");
 const districtSelect = document.querySelector("#distrito");
 const locationUrl = new URL("../../data/districts.csv", import.meta.url);
 const locationRows = [];
+const MAX_SOURCE_IMAGE_BYTES = 1024 * 1024;
+const MAX_PROCESSING_WIDTH = 1200;
+const MAX_PROCESSING_HEIGHT = 1500;
+const JPEG_QUALITY = 0.86;
 
 function parseCsv(text) {
   const rows = [];
@@ -169,7 +173,7 @@ function cleanFormValues() {
   const payload = {};
   const fields = [
     "nombres", "apellidos", "genero", "fecha_nacimiento", "departamento", "provincia", "distrito",
-    "whatsapp_publico", "whatsapp_interno", "correo", "behance_usuario", "instagram_usuario", "linkedin_usuario",
+    "whatsapp_publico", "whatsapp_interno", "correo", "behance_usuario", "instagram_usuario", "linkedin_usuario", "canva_url",
     "categoria", "descripcion_corta", "descripcion_larga", "productos_servicios",
     "nivel_experiencia", "nivel_precio",
   ];
@@ -188,24 +192,62 @@ function cleanFormValues() {
   return payload;
 }
 
-async function validateImage(input, expectedDimensions, maxBytes) {
+async function processImage(input, expectedDimensions, outputFilename) {
   const file = input.files[0];
   const fieldName = imageFieldName(input);
   if (!file) throw new Error(`Selecciona ${fieldName === "Foto de perfil" ? "una foto de perfil" : "una imagen de portada"}.`);
-  const isJpeg = file.type === "image/jpeg" || /\.jpe?g$/i.test(file.name);
-  if (!isJpeg) throw new Error(`${fieldName}: el archivo debe ser JPG.`);
-  if (file.size > maxBytes) throw new Error(`${fieldName}: el tamaño máximo es ${Math.round(maxBytes / 1024)} KB.`);
-  const dimensions = await new Promise((resolve, reject) => {
-    const image = new Image();
-    const objectUrl = URL.createObjectURL(file);
-    image.onload = () => { resolve([image.naturalWidth, image.naturalHeight]); URL.revokeObjectURL(objectUrl); };
-    image.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error("No se pudo leer uno de los archivos de imagen.")); };
-    image.src = objectUrl;
-  });
-  if (dimensions[0] !== expectedDimensions[0] || dimensions[1] !== expectedDimensions[1]) {
-    throw new Error(`${fieldName}: debe medir ${expectedDimensions[0]} × ${expectedDimensions[1]} px.`);
+  if (file.size > MAX_SOURCE_IMAGE_BYTES) throw new Error(`${fieldName}: el archivo original no puede superar 1 MB.`);
+
+  const signature = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+  const isJpeg = signature[0] === 0xff && signature[1] === 0xd8 && signature[2] === 0xff;
+  const isPng = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a].every((byte, index) => signature[index] === byte);
+  const isWebp = String.fromCharCode(...signature.slice(0, 4)) === "RIFF"
+    && String.fromCharCode(...signature.slice(8, 12)) === "WEBP";
+  const detectedType = isJpeg ? "image/jpeg" : isPng ? "image/png" : isWebp ? "image/webp" : "";
+  if (!detectedType) {
+    throw new Error(`${fieldName}: elige una imagen JPG, PNG o WebP válida.`);
   }
-  return file;
+
+  const image = await new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const decoded = new Image();
+    decoded.onload = () => { URL.revokeObjectURL(objectUrl); resolve(decoded); };
+    decoded.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error(`${fieldName}: no se pudo leer la imagen.`)); };
+    decoded.src = objectUrl;
+  });
+  if (!image.naturalWidth || !image.naturalHeight) throw new Error(`${fieldName}: la imagen no tiene dimensiones válidas.`);
+
+  const processingScale = Math.min(1, MAX_PROCESSING_WIDTH / image.naturalWidth, MAX_PROCESSING_HEIGHT / image.naturalHeight);
+  const processingCanvas = document.createElement("canvas");
+  processingCanvas.width = Math.max(1, Math.round(image.naturalWidth * processingScale));
+  processingCanvas.height = Math.max(1, Math.round(image.naturalHeight * processingScale));
+  const processingContext = processingCanvas.getContext("2d");
+  if (!processingContext) throw new Error("Este navegador no pudo preparar la imagen.");
+  processingContext.drawImage(image, 0, 0, processingCanvas.width, processingCanvas.height);
+
+  const targetRatio = expectedDimensions[0] / expectedDimensions[1];
+  const sourceRatio = processingCanvas.width / processingCanvas.height;
+  let cropWidth = processingCanvas.width;
+  let cropHeight = processingCanvas.height;
+  if (sourceRatio > targetRatio) cropWidth = processingCanvas.height * targetRatio;
+  else cropHeight = processingCanvas.width / targetRatio;
+  const cropX = (processingCanvas.width - cropWidth) / 2;
+  const cropY = (processingCanvas.height - cropHeight) / 2;
+
+  const outputCanvas = document.createElement("canvas");
+  outputCanvas.width = expectedDimensions[0];
+  outputCanvas.height = expectedDimensions[1];
+  const outputContext = outputCanvas.getContext("2d");
+  if (!outputContext) throw new Error("Este navegador no pudo convertir la imagen.");
+  outputContext.drawImage(processingCanvas, cropX, cropY, cropWidth, cropHeight, 0, 0, outputCanvas.width, outputCanvas.height);
+  processingCanvas.width = 0;
+  processingCanvas.height = 0;
+
+  const jpegBlob = await new Promise((resolve) => outputCanvas.toBlob(resolve, "image/jpeg", JPEG_QUALITY));
+  outputCanvas.width = 0;
+  outputCanvas.height = 0;
+  if (!jpegBlob || jpegBlob.type !== "image/jpeg") throw new Error(`${fieldName}: no se pudo convertir a JPG.`);
+  return new File([jpegBlob], outputFilename, { type: "image/jpeg", lastModified: Date.now() });
 }
 
 async function uploadToCloudinary(file) {
@@ -288,11 +330,6 @@ form.addEventListener("submit", async (event) => {
   }
 
   try {
-    const [profilePhoto, coverImage] = await Promise.all([
-      validateImage(form.foto_perfil, [150, 150], 250 * 1024),
-      validateImage(form.imagen_portada, [540, 720], 500 * 1024),
-    ]);
-
     if (!SITE_CONFIG.cloudinary.cloudName || !SITE_CONFIG.cloudinary.unsignedUploadPreset) {
       showMessage("Falta configurar la subida de imágenes a Cloudinary.", "error");
       return;
@@ -303,7 +340,15 @@ form.addEventListener("submit", async (event) => {
     }
 
     submitButton.disabled = true;
-    submitButton.textContent = "Enviando…";
+    submitButton.textContent = "Preparando imágenes…";
+    const [profilePhoto, coverImage] = await Promise.all([
+      processImage(form.foto_perfil, [150, 150], "foto-perfil.jpg"),
+      processImage(form.imagen_portada, [540, 720], "imagen-portada.jpg"),
+    ]);
+    document.querySelector('[data-file-for="foto_perfil"]').textContent = "Imagen lista: JPG · 150 × 150 px";
+    document.querySelector('[data-file-for="imagen_portada"]').textContent = "Imagen lista: JPG · 540 × 720 px";
+
+    submitButton.textContent = "Subiendo imágenes…";
     const [photoUrl, coverUrl] = await Promise.all([
       uploadToCloudinary(profilePhoto),
       uploadToCloudinary(coverImage),
@@ -311,6 +356,7 @@ form.addEventListener("submit", async (event) => {
     const payload = cleanFormValues();
     payload.foto_perfil = photoUrl;
     payload.imagen_portada = coverUrl;
+    submitButton.textContent = "Enviando…";
     const result = await sendToAppsScript(payload);
     showMessage(result.message || "Recibimos tu perfil para revisión.");
     form.reset();

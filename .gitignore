@@ -1,0 +1,9 @@
+# Local Apps Script project mapping and OAuth credentials
+**/.clasprc.json
+**/client_secret*.json
+
+# Local environment and dependencies
+.env
+.env.*
+!.env.example
+node_modules/
