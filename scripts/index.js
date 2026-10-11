@@ -1,3 +1,5 @@
+import { resolveProfileContact } from "./profile-contact.js";
+
 const SITE_CONFIG = {
   title: "Directorio Oficial de Publicidad",
   brandLabel: "Directorio Oficial",
@@ -68,6 +70,7 @@ const elements = {
   modalContactSection: document.querySelector("#modal-contact-section"),
   modalWhatsapp: document.querySelector("#modal-whatsapp"),
   modalPhone: document.querySelector("#modal-phone"),
+  modalContactNote: document.querySelector("#modal-contact-note"),
   modalSocialSection: document.querySelector("#modal-social-section"),
   modalBehance: document.querySelector("#modal-behance"),
   modalInstagram: document.querySelector("#modal-instagram"),
@@ -807,14 +810,14 @@ function openProfile(
   elements.modalLocation.textContent =
     `${profile.distrito}, ${profile.provincia} · ${profile.departamento}`;
 
-  elements.modalContactSection.hidden = profile.demo || !profile.whatsapp;
-  if (profile.whatsapp) {
-    const phone = profile.whatsapp.replace(/\D/g, "").slice(-9);
+  const contact = resolveProfileContact(profile, SITE_CONFIG.subscriptionWhatsapp);
+  elements.modalContactSection.hidden = profile.demo || !contact;
+  if (contact) {
+    const phone = contact.number.replace(/^(?:51)?/, "").slice(-9);
     elements.modalPhone.textContent = phone.replace(/(\d{3})(?=\d)/g, "$1 ");
-    elements.modalWhatsapp.href =
-      `https://wa.me/${profile.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(
-        `Hola ${profile.nombres}, vi tu perfil y quisiera más información.`,
-      )}`;
+    elements.modalWhatsapp.href = `https://wa.me/${contact.number}?text=${encodeURIComponent(contact.message)}`;
+    elements.modalContactNote.textContent = contact.note;
+    elements.modalContactNote.hidden = !contact.note;
   }
 
   const socialProfiles = [

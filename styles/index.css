@@ -1245,8 +1245,9 @@ summary {
 .card-verified { color: #1b5bc2; }
 .profile-favorite { width: 44px; height: 44px; background: #222b; }
 .profile-card__featured { background: #fff2c5; color: #574000; }
-.empty-state { min-height: auto; padding: 70px 20px 16px; color: #595959; }
-.reset-results { display: block; min-height: 44px; margin: 0 auto 60px; padding: 10px 18px; border: 1px solid #ccc; border-radius: 999px; background: #fff; }
+.empty-state { display: grid; min-height: 120px; place-items: center; margin: 0; padding: 24px; color: #595959; text-align: center; }
+.reset-results { display: block; min-height: 44px; margin: 20px auto 60px; padding: 10px 18px; border: 1px solid #ccc; border-radius: 999px; background: #fff; }
+.contact-note { display: block; margin-top: 8px; color: #595959; font-size: 12px; line-height: 1.5; }
 .profile-details { padding: 28px; }
 .profile-name-line h2 { font-size: 23px; white-space: normal; overflow-wrap: anywhere; }
 .profile-heading__copy > p, .profile-description, .profile-location { font-size: 15px; }
