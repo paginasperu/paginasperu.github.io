@@ -1200,3 +1200,14 @@ select,
 summary {
   -webkit-tap-highlight-color: rgb(17 17 17 / 10%);
 }
+.profile-demo {
+  display: inline-block;
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: #fff;
+  color: #292929;
+  font-size: 11px;
+  font-weight: 650;
+}

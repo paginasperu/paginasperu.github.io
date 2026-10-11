@@ -19,6 +19,7 @@ const SOCIAL_HOSTS = {
 };
 
 let profiles = [];
+let demoIds = new Set();
 let profilesCsvSnapshot = "";
 let refreshingProfiles = false;
 
@@ -174,8 +175,8 @@ function resolveImageUrl(source, imageType = "cover") {
       const imageUrl = new URL(source);
       if (imageUrl.hostname === "res.cloudinary.com") {
         const transform = imageType === "avatar"
-          ? "c_fill,g_face,w_300,h_300,f_auto,q_auto"
-          : "c_fill,w_720,h_960,f_auto,q_auto";
+          ? "c_fill,g_face,w_150,h_150,f_auto,q_auto"
+          : "c_fill,w_540,h_720,f_auto,q_auto";
         return imageUrl.href.replace("/image/upload/", `/image/upload/${transform}/`);
       }
     } catch {
@@ -254,6 +255,7 @@ function parseCsv(text) {
     seenIds.add(id);
     return {
       id,
+      demo: demoIds.has(id),
       nombres: record.nombres.trim(),
       apellidos: record.apellidos.trim(),
       departamento: record.departamento.trim(),
@@ -310,6 +312,10 @@ async function initializeDirectory() {
   )}`;
 
   try {
+    const demoResponse = await fetch(new URL("../data/perfiles-demo.json", import.meta.url));
+    if (!demoResponse.ok) throw new Error("No se pudo comprobar qué perfiles son de demostración.");
+    const demoData = await demoResponse.json();
+    demoIds = new Set(demoData.ids);
     profilesCsvSnapshot = await fetchProfilesCsv();
     profiles = parseCsv(profilesCsvSnapshot);
   } catch (error) {
@@ -625,6 +631,8 @@ function createProfileCard(profile, index) {
   );
 
   const profileImage = document.createElement("img");
+  profileImage.width = 540;
+  profileImage.height = 720;
   profileImage.decoding = "async";
   profileImage.loading = index < 2 ? "eager" : "lazy";
   profileImage.fetchPriority = index === 0 ? "high" : "auto";
@@ -640,6 +648,12 @@ function createProfileCard(profile, index) {
   meta.textContent =
     `${profile.categoria} · ${profile.distrito}, ${profile.departamento}`;
   info.append(name, meta);
+  if (profile.demo) {
+    const demo = document.createElement("span");
+    demo.className = "profile-demo";
+    demo.textContent = "Demostración";
+    info.append(demo);
+  }
 
   openButton.append(profileImage, info);
   card.append(openButton);
@@ -754,6 +768,11 @@ function openProfile(
   };
   elements.modalCategory.textContent = categoryLabels[profile.categoria];
   elements.modalBadges.replaceChildren();
+  if (profile.demo) {
+    const badge = document.createElement("span");
+    badge.textContent = "Demostración · datos de ejemplo, sin contacto";
+    elements.modalBadges.append(badge);
+  }
   updateModalFavorite(profile.id);
 
   if (profile.destacado) {
@@ -769,7 +788,7 @@ function openProfile(
   elements.modalLocation.textContent =
     `${profile.distrito}, ${profile.provincia} · ${profile.departamento}`;
 
-  elements.modalContactSection.hidden = !profile.whatsapp;
+  elements.modalContactSection.hidden = profile.demo || !profile.whatsapp;
   if (profile.whatsapp) {
     const phone = profile.whatsapp.replace(/\D/g, "").slice(-9);
     elements.modalPhone.textContent = phone.replace(/(\d{3})(?=\d)/g, "$1 ");
@@ -787,7 +806,7 @@ function openProfile(
   ];
   socialProfiles.forEach(([element, network, username]) => {
     const url = username ? profileLink(network, username) : "#";
-    element.hidden = !username || url === "#";
+    element.hidden = profile.demo || !username || url === "#";
     if (!element.hidden) element.href = url;
   });
   elements.modalSocialSection.hidden = socialProfiles.every(([element]) => element.hidden);

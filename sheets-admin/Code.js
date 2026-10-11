@@ -93,11 +93,17 @@ function saveReview(update) {
 }
 
 function getPublicCsvData() {
-  const sheet = getSheetWithHeaders_(PUBLIC_SHEET_NAME, PUBLIC_HEADERS);
+  const sheet = getSheetWithHeaders_(REVIEW_SHEET_NAME, REVIEW_HEADERS);
   const lastRow = sheet.getLastRow();
-  if (lastRow < 1) return [PUBLIC_HEADERS];
-  const values = sheet.getRange(1, 1, lastRow, PUBLIC_HEADERS.length).getDisplayValues();
-  return [PUBLIC_HEADERS].concat(values.slice(1).filter(function (row) { return row[0] !== ""; }));
+  if (lastRow < 2) return [PUBLIC_HEADERS];
+  const values = sheet.getRange(2, 1, lastRow - 1, REVIEW_HEADERS.length).getDisplayValues();
+  const seen = new Set();
+  const active = values.filter(function (row) { return row[REVIEW_HEADERS.indexOf("estado")] === "Activo"; });
+  return [PUBLIC_HEADERS].concat(active.map(function (row) {
+    if (!/^[1-9]\d*$/.test(row[0]) || seen.has(row[0])) throw new Error("Hay un ID inválido o duplicado; se canceló la exportación.");
+    seen.add(row[0]);
+    return PUBLIC_HEADERS.map(function (header) { return row[REVIEW_HEADERS.indexOf(header)]; });
+  }));
 }
 
 function getSheetWithHeaders_(name, headers) {

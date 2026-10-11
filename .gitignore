@@ -4,3 +4,5 @@
 node_modules/
 .clasprc.json
 **/.clasprc.json
+backups/
+audit-artifacts/

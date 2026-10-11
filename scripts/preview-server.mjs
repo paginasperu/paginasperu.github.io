@@ -13,6 +13,8 @@ const contentTypes = {
   ".json": "application/json; charset=utf-8",
   ".mjs": "text/javascript; charset=utf-8",
   ".svg": "image/svg+xml",
+  ".xml": "application/xml; charset=utf-8",
+  ".txt": "text/plain; charset=utf-8",
 };
 
 function resolveRequestPath(requestUrl) {
@@ -23,8 +25,9 @@ function resolveRequestPath(requestUrl) {
     return null;
   }
 
-  const relativePath = normalize(pathname.replace(/^[/\\]+/, ""));
   if (pathname === "/") return join(projectRoot, "index.html");
+  const relativePath = normalize(pathname.replace(/^[/\\]+/, ""));
+  if (relativePath.split(/[/\\]/).some(part => part.startsWith('.')) || /^(node_modules|backups|apps-script|sheets-admin|audit-artifacts)([/\\]|$)/i.test(relativePath)) return null;
   const filePath = resolve(projectRoot, relativePath);
   if (filePath !== projectRoot && !filePath.startsWith(`${projectRoot}${sep}`)) return null;
 
@@ -45,7 +48,7 @@ function resolveRequestPath(requestUrl) {
 const server = createServer((request, response) => {
   const filePath = resolveRequestPath(request.url || "/");
   if (!filePath) {
-    response.writeHead(400).end("Solicitud no válida");
+    response.writeHead(404).end("No se encontró la página");
     return;
   }
 
@@ -55,10 +58,15 @@ const server = createServer((request, response) => {
   }
 
   response.setHeader("Content-Type", contentTypes[extname(filePath)] || "application/octet-stream");
+  if (filePath === join(projectRoot, "404.html")) response.statusCode = 404;
   response.setHeader("Cache-Control", "no-store");
   createReadStream(filePath).pipe(response);
 });
 
+server.on("error", error => {
+  console.error(error.code === "EADDRINUSE" ? `El puerto ${port} está ocupado. Elige otro con $env:PORT = 8123.` : error.message);
+  process.exitCode = 1;
+});
 server.listen(port, "127.0.0.1", () => {
   console.log(`Vista previa local: http://127.0.0.1:${port}`);
   console.log("Detén el servidor con Ctrl+C.");

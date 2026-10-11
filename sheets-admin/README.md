@@ -9,7 +9,7 @@ Proyecto de Apps Script vinculado a la hoja `directorio`. Añade el menú `Gesti
 3. Cambiar estado, verificación, destacado, posición o notas y guardar.
 4. Cuando se quiera actualizar la web, descargar el CSV público y reemplazar `data/perfiles.csv` en el repositorio; aprobar en Sheets no publica automáticamente la web.
 
-El CSV se crea solo desde `publico`, que funciona como lista permitida de campos públicos. El panel no implementa publicación automática en GitHub ni almacena credenciales de GitHub.
+El CSV se crea desde `perfiles`, filtrando estrictamente el estado `Activo` y una lista permitida de 22 campos públicos. Comprueba IDs únicos antes de exportar; no depende de que la fórmula de `publico` esté actualizada. El panel no implementa publicación automática en GitHub ni almacena credenciales de GitHub.
 
 Si Google presenta el aviso de aplicación no verificada, la persona propietaria de la hoja debe decidir si confía en este script antes de continuar. La autorización necesaria está limitada a la hoja actual y a mostrar la barra lateral.
 

@@ -64,4 +64,6 @@ El directorio lee `data/perfiles.csv`; el formulario lee `data/distritos.csv`. C
 
 ## Comprobación antes de publicar
 
+Ejecuta `npm test` y consulta [la revisión crítica y recuperación](REVISION-CRITICA.md). `npm run check:live` comprueba disponibilidad; `npm run backup:public` respalda el CSV y sus imágenes públicas. Al modificar `data/distritos.csv`, ejecuta `npm run sync:locations` antes de desplegar el backend.
+
 Revisa en local el directorio, el formulario, contacto y privacidad; confirma las rutas limpias, filtros, búsqueda, modal y vista móvil. Después inspecciona `git diff`, confirma que el CSV público no contiene datos internos, y publica solo cuando los cambios estén aprobados. La publicación ocurre al subir los cambios a la fuente configurada en Settings → Pages.

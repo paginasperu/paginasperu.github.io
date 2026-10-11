@@ -7,7 +7,9 @@
     <title>Registro | Directorio Oficial de Publicidad</title>
     <link rel="stylesheet" href="./styles/index.css?v=20261011-6" />
     <link rel="stylesheet" href="./styles/registro.css?v=20261011-3" />
-    <script type="module" src="./scripts/registro.js?v=20261011-4"></script>
+    <script type="module" src="./scripts/registro.js?v=20261011-5"></script>
+    <link rel="canonical" href="https://oficial.pe/registro" />
+    <meta property="og:url" content="https://oficial.pe/registro" />
   </head>
   <body>
     <main class="page register-page">
@@ -75,6 +77,7 @@
             <label class="register-consent"><input id="acepta_privacidad" name="acepta_privacidad" type="checkbox" required /><span>He leído y acepto la <a href="./privacidad" target="_blank" rel="noopener noreferrer">política de privacidad</a> y autorizo el tratamiento de mis datos personales</span></label>
           </section>
 
+          <label class="registration-trap" aria-hidden="true">Deja este campo vacío<input name="website" tabindex="-1" autocomplete="off" /></label>
           <div id="mensaje" class="register-status" role="status" aria-live="polite" hidden></div>
           <div class="register-actions"><button id="enviar" class="register-submit" type="submit">Enviar para revisión</button></div>
         </form>

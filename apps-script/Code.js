@@ -30,7 +30,7 @@ const OPTIONS = {
 const UNIQUE_FIELDS = ["whatsapp_publico", "whatsapp_interno", "correo", "behance_usuario", "instagram_usuario", "linkedin_usuario"];
 
 function doGet() {
-  return jsonOutput_({ ok: true, service: "registro", message: "Servicio de registro disponible." });
+  return jsonOutput_({ ok: true, service: "registro", version: "20261011-security", message: "Servicio de registro disponible." });
 }
 
 function doPost(event) {
@@ -39,13 +39,28 @@ function doPost(event) {
     : "";
   try {
     const payload = parsePayload_(event);
+    validateSubmission_(payload);
     const record = validateAndNormalize_(payload);
     const lock = LockService.getScriptLock();
     lock.waitLock(15000);
     try {
       const sheet = getProfilesSheet_();
       validateHeaders_(sheet);
+      const properties = PropertiesService.getScriptProperties();
+      const now = Date.now();
+      const requests = JSON.parse(properties.getProperty("DIRECTORY_REQUESTS") || "{}");
+      Object.keys(requests).forEach(function (key) { if (now - requests[key].at > 86400000) delete requests[key]; });
+      const fingerprint = digest_(JSON.stringify(Object.assign({}, record, { foto_perfil: null, imagen_portada: null })));
+      const previous = requests[payload.submissionId];
+      if (previous) {
+        if (previous.fingerprint !== fingerprint) throw inputError_("El envío cambió. Revisa los datos y vuelve a enviarlos.");
+        const idExists = sheet.getLastRow() > 1 && sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues().some(function (row) { return Number(row[0]) === previous.id; });
+        if (idExists) return responseOutput_({ ok: true, message: "Recibimos tu perfil para revisión.", id: previous.id }, requestId, event);
+        delete requests[payload.submissionId];
+      }
+      checkRateLimit_(record.correo);
       assertUnique_(sheet, record);
+      if (payload.action === "validate") return responseOutput_({ ok: true, validated: true }, requestId, event);
       record.id = nextId_(sheet);
       record.calificacion_interna = "";
       record.es_verificado = false;
@@ -54,14 +69,17 @@ function doPost(event) {
       record.estado = "Pendiente";
       record.notas = "";
       record.fecha_registro = new Date();
+      requests[payload.submissionId] = { at: now, id: record.id, fingerprint: fingerprint };
+      if (Object.keys(requests).length > 40) delete requests[Object.keys(requests).sort(function (a, b) { return requests[a].at - requests[b].at; })[0]];
+      properties.setProperty("DIRECTORY_REQUESTS", JSON.stringify(requests));
       appendRecord_(sheet, record);
     } finally {
       lock.releaseLock();
     }
-    return responseOutput_({ ok: true, message: "Recibimos tu perfil para revisión.", id: record.id }, requestId);
+    return responseOutput_({ ok: true, message: "Recibimos tu perfil para revisión.", id: record.id }, requestId, event);
   } catch (error) {
     console.error(error && error.stack ? error.stack : error);
-    return responseOutput_({ ok: false, message: error.message || "No se pudo guardar el registro." }, requestId);
+    return responseOutput_({ ok: false, retryable: !error.isInput, message: error.isInput ? error.message : "No pudimos confirmar el registro. Conserva tus datos y vuelve a intentarlo." }, requestId, event);
   }
 }
 
@@ -69,14 +87,15 @@ function parsePayload_(event) {
   const submittedPayload = event && event.parameter && typeof event.parameter.payload === "string"
     ? event.parameter.payload
     : event && event.postData && event.postData.contents;
-  if (!submittedPayload) throw new Error("No llegaron datos del formulario.");
+  if (!submittedPayload) throw inputError_("No llegaron datos del formulario.");
+  if (submittedPayload.length > 16000) throw inputError_("El formulario supera el tamaño permitido.");
   let data;
   try {
     data = JSON.parse(submittedPayload);
   } catch (error) {
-    throw new Error("El formato enviado no es válido.");
+    throw inputError_("El formato enviado no es válido.");
   }
-  if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("El formulario enviado no es válido.");
+  if (!data || typeof data !== "object" || Array.isArray(data)) throw inputError_("El formulario enviado no es válido.");
   return data;
 }
 
@@ -104,9 +123,9 @@ function validateAndNormalize_(payload) {
     "whatsapp_interno", "correo", "categoria", "descripcion_corta", "productos_servicios", "nivel_experiencia",
     "nivel_precio"];
   required.forEach(function (field) {
-    if (record[field] === null || record[field] === "") throw new Error("Completa el campo obligatorio: " + field + ".");
+    if (record[field] === null || record[field] === "") throw inputError_("Completa el campo obligatorio: " + field + ".");
   });
-  if (!record.acepta_privacidad) throw new Error("Debes aceptar la política de privacidad para enviar el registro.");
+  if (!record.acepta_privacidad) throw inputError_("Debes aceptar la política de privacidad para enviar el registro.");
 
   validateName_("nombres", record.nombres);
   validateName_("apellidos", record.apellidos);
@@ -115,9 +134,12 @@ function validateAndNormalize_(payload) {
   validateLocation_("departamento", record.departamento, 3, 13, /^[\p{L}\p{M} ]+$/u);
   validateLocation_("provincia", record.provincia, 3, 25, /^[\p{L}\p{M} ]+$/u);
   validateLocation_("distrito", record.distrito, 3, 36, /^[\p{L}\p{M} _()\-]+$/u);
+  if (!VALID_LOCATIONS.has([record.departamento, record.provincia, record.distrito].join("|"))) {
+    throw inputError_("Selecciona una combinación válida de departamento, provincia y distrito.");
+  }
   validatePhone_("whatsapp_publico", record.whatsapp_publico, false);
   validatePhone_("whatsapp_interno", record.whatsapp_interno, true);
-  if (record.correo !== null && (record.correo.length < 3 || record.correo.length > 50 || !/^[^\s@]{1,}@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(record.correo))) throw new Error("Ingresa un correo de 3 a 50 caracteres.");
+  if (record.correo !== null && (record.correo.length < 3 || record.correo.length > 50 || !/^[^\s@]{1,}@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(record.correo))) throw inputError_("Ingresa un correo de 3 a 50 caracteres.");
   validateChoice_("categoria", record.categoria);
   validateUsername_("behance_usuario", record.behance_usuario);
   validateUsername_("instagram_usuario", record.instagram_usuario);
@@ -135,7 +157,7 @@ function validateAndNormalize_(payload) {
 
 function cleanText_(value) {
   if (value === null || value === undefined) return null;
-  if (typeof value !== "string" && typeof value !== "number") throw new Error("El formato de un campo no es válido.");
+  if (typeof value !== "string" && typeof value !== "number") throw inputError_("El formato de un campo no es válido.");
   const text = String(value).normalize("NFC").replace(/^[\s\uFEFF]+|[\s\uFEFF]+$/gu, "");
   return text === "" ? null : text;
 }
@@ -153,50 +175,50 @@ function normalizePhone_(value) {
 
 function validateName_(field, value) {
   if (value.length < 2 || value.length > 150 || !/^[\p{L}\p{M} '-]+$/u.test(value)) {
-    throw new Error(field + ": usa solo letras, espacios, guiones y apóstrofos (2 a 150 caracteres).");
+    throw inputError_(field + ": usa solo letras, espacios, guiones y apóstrofos (2 a 150 caracteres).");
   }
 }
 
 function validateLocation_(field, value, min, max, pattern) {
   if (value !== value.toLocaleUpperCase("es-PE") || value.length < min || value.length > max || !pattern.test(value)) {
-    throw new Error(field + ": revisa el formato y la longitud permitidos.");
+    throw inputError_(field + ": revisa el formato y la longitud permitidos.");
   }
 }
 
 function validatePhone_(field, value, required) {
   if (value === null && !required) return;
-  if (value === null || !/^519\d{8}$/.test(value)) throw new Error(field + ": usa un número peruano de 11 dígitos que empiece por 519.");
+  if (value === null || !/^519\d{8}$/.test(value)) throw inputError_(field + ": usa un número peruano de 11 dígitos que empiece por 519.");
 }
 
 function validateUsername_(field, value) {
   if (value === null) return;
   if (value.length < 3 || value.length > 50 || !/^[a-z0-9._-]+$/.test(value)) {
-    throw new Error(field + ": usa 3 a 50 letras, números, puntos, guiones o guiones bajos.");
+    throw inputError_(field + ": usa 3 a 50 letras, números, puntos, guiones o guiones bajos.");
   }
 }
 
 function validateTextLength_(field, value, min, max, required) {
   if (value === null && !required) return;
   if (value === null || value.length < min || value.length > max) {
-    throw new Error(field + ": debe tener entre " + min + " y " + max + " caracteres.");
+    throw inputError_(field + ": debe tener entre " + min + " y " + max + " caracteres.");
   }
 }
 
 function validateChoice_(field, value) {
-  if (!OPTIONS[field] || OPTIONS[field].indexOf(value) === -1) throw new Error("Selecciona una opción válida para " + field + ".");
+  if (!OPTIONS[field] || OPTIONS[field].indexOf(value) === -1) throw inputError_("Selecciona una opción válida para " + field + ".");
 }
 
 function validateBirthDate_(value) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) throw new Error("La fecha de nacimiento no es válida.");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) throw inputError_("La fecha de nacimiento no es válida.");
   const parts = value.split("-").map(Number);
   const birthDate = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
   const normalized = birthDate.getUTCFullYear() + "-" + String(birthDate.getUTCMonth() + 1).padStart(2, "0") + "-" + String(birthDate.getUTCDate()).padStart(2, "0");
-  if (Number.isNaN(birthDate.getTime()) || normalized !== value) throw new Error("La fecha de nacimiento no es válida.");
+  if (Number.isNaN(birthDate.getTime()) || normalized !== value) throw inputError_("La fecha de nacimiento no es válida.");
   const todayText = Utilities.formatDate(new Date(), TIME_ZONE, "yyyy-MM-dd");
   const todayParts = todayText.split("-").map(Number);
   const beforeBirthday = todayParts[1] < parts[1] || (todayParts[1] === parts[1] && todayParts[2] < parts[2]);
   const age = todayParts[0] - parts[0] - (beforeBirthday ? 1 : 0);
-  if (age < 18 || age > 50) throw new Error("La edad debe estar entre 18 y 50 años.");
+  if (age < 18 || age > 50) throw inputError_("La edad debe estar entre 18 y 50 años.");
 }
 
 function validateImageUrl_(field, value) {
@@ -206,7 +228,7 @@ function validateImageUrl_(field, value) {
   if (typeof value !== "string" || value.length > 1000
       || value.indexOf(CLOUDINARY_IMAGE_PREFIX) !== 0 || value.length === CLOUDINARY_IMAGE_PREFIX.length
       || /[\s?#\\]/.test(value)) {
-    throw new Error(field + ": debe ser una URL HTTPS de Cloudinary.");
+    throw inputError_(field + ": debe ser una URL HTTPS de Cloudinary.");
   }
 }
 
@@ -216,20 +238,20 @@ function validateCanvaUrl_(value) {
   // parecidos como canva.com.ejemplo.test o credenciales antes del dominio.
   if (typeof value !== "string" || value.length > 500
       || !/^https:\/\/(?:www\.)?canva\.com\/[^\s]*$/i.test(value)) {
-    throw new Error("El enlace debe ser HTTPS y pertenecer a canva.com.");
+    throw inputError_("El enlace debe ser HTTPS y pertenecer a canva.com.");
   }
 }
 
 function getProfilesSheet_() {
   const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAME);
-  if (!sheet) throw new Error("No se encontró la pestaña de perfiles.");
+  if (!sheet) throw inputError_("No se encontró la pestaña de perfiles.");
   return sheet;
 }
 
 function validateHeaders_(sheet) {
   const actual = sheet.getRange(1, 1, 1, HEADERS.length).getDisplayValues()[0];
   if (HEADERS.some(function (header, index) { return actual[index] !== header; })) {
-    throw new Error("Los encabezados de la pestaña perfiles no coinciden con el esquema aprobado.");
+    throw inputError_("Los encabezados de la pestaña perfiles no coinciden con el esquema aprobado.");
   }
 }
 
@@ -245,7 +267,7 @@ function assertUnique_(sheet, record) {
       const stored = String(row[column] || "").trim().toLocaleLowerCase("es-PE");
       return stored !== "" && stored === incoming.toLocaleLowerCase("es-PE");
     });
-    if (duplicate) throw new Error("Ya existe un perfil con el dato indicado en " + field + ".");
+    if (duplicate) throw inputError_("Ya existe un perfil con el dato indicado en " + field + ".");
   });
 }
 
@@ -262,7 +284,7 @@ function nextId_(sheet) {
     (ids.length ? Math.max.apply(null, ids) : 0) + 1,
   );
   if (!Number.isSafeInteger(nextId) || nextId >= Number.MAX_SAFE_INTEGER) {
-    throw new Error("No se pudo reservar un identificador válido para el perfil.");
+    throw inputError_("No se pudo reservar un identificador válido para el perfil.");
   }
   PropertiesService.getScriptProperties().setProperty(NEXT_ID_PROPERTY, String(nextId + 1));
   return nextId;
@@ -274,16 +296,52 @@ function appendRecord_(sheet, record) {
     if (typeof value === "string" && /^[=+@-]/.test(value)) return "'" + value;
     return value === null ? "" : value;
   });
-  sheet.appendRow(values);
+  const existing = sheet.getLastRow() > 1 ? sheet.getRange(2, 1, sheet.getLastRow() - 1, HEADERS.length).getValues() : [];
+  const available = existing.findIndex(function (row) {
+    return row.every(function (value, index) {
+      return value === "" || value === null || ((HEADERS[index] === "es_verificado" || HEADERS[index] === "es_destacado") && value === false);
+    });
+  });
+  if (available >= 0) sheet.getRange(available + 2, 1, 1, HEADERS.length).setValues([values]);
+  else sheet.appendRow(values);
 }
 
 function jsonOutput_(data) {
   return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
 }
 
-function responseOutput_(data, requestId) {
+function responseOutput_(data, requestId, event) {
   if (!requestId) return jsonOutput_(data);
+  const origin = event && event.parameter && event.parameter.clientOrigin;
+  const target = /^(https:\/\/(?:www\.)?oficial\.pe|http:\/\/(?:localhost|127\.0\.0\.1):\d{2,5})$/.test(origin || "") ? origin : "https://oficial.pe";
   const message = JSON.stringify({ type: "registro-response", requestId: requestId, response: data }).replace(/</g, "\\u003c");
-  const html = "<!doctype html><html lang=\"es\"><head><meta charset=\"utf-8\"></head><body><script>window.top.postMessage(" + message + ", \"*\");</script></body></html>";
+  const html = "<!doctype html><html lang=\"es\"><head><meta charset=\"utf-8\"></head><body><script>window.top.postMessage(" + message + ", " + JSON.stringify(target) + ");</script></body></html>";
   return HtmlService.createHtmlOutput(html).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
+
+function validateSubmission_(payload) {
+  const elapsed = Date.now() - Number(payload.startedAt);
+  if (payload.website || !Number.isFinite(elapsed) || elapsed < 3000 || elapsed > 86400000) {
+    throw inputError_("No se pudo validar el envío. Espera unos segundos o recarga la página.");
+  }
+  if (!/^[A-Za-z0-9_-]{16,80}$/.test(payload.submissionId || "")) throw inputError_("El identificador del envío no es válido.");
+  if (payload.action && payload.action !== "validate") throw inputError_("La acción solicitada no es válida.");
+}
+
+function digest_(value) {
+  return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, value).map(function (byte) { return (byte + 256).toString(16).slice(-2); }).join("");
+}
+
+function checkRateLimit_(email) {
+  const cache = CacheService.getScriptCache();
+  const bucket = Math.floor(Date.now() / 600000);
+  const contactKey = "rate:" + bucket + ":" + digest_(email);
+  const globalKey = "rate:" + bucket + ":global";
+  const contactCount = Number(cache.get(contactKey) || 0);
+  const globalCount = Number(cache.get(globalKey) || 0);
+  if (contactCount >= 8 || globalCount >= 100) throw inputError_("Hay demasiados intentos. Vuelve a intentarlo en diez minutos.");
+  cache.put(contactKey, String(contactCount + 1), 1200);
+  cache.put(globalKey, String(globalCount + 1), 1200);
+}
+
+function inputError_(message) { const error = new Error(message); error.isInput = true; return error; }

@@ -20,6 +20,34 @@ const MAX_PROCESSING_WIDTH = 1200;
 const MAX_PROCESSING_HEIGHT = 1500;
 const JPEG_QUALITY = 0.86;
 const cropStates = new Map();
+const uploadedImages = new Map();
+let startedAt = Date.now();
+let pendingSubmission = null;
+
+function newSubmissionId() {
+  const bytes = crypto.getRandomValues(new Uint8Array(24));
+  return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function imageFingerprint(input) {
+  const file = input.files?.[0];
+  const crop = cropStates.get(input.name);
+  return file ? JSON.stringify([file.name, file.size, file.lastModified, crop?.zoom, crop?.x, crop?.y]) : "";
+}
+
+async function discardUnusedImages(usedUrls = []) {
+  for (const [key, asset] of uploadedImages) {
+    if (usedUrls.includes(asset.url)) continue;
+      if (asset.uncertain) continue;
+    if (!asset.deleteToken || Date.now() - asset.uploadedAt > 9 * 60000) continue;
+    try {
+      const body = new FormData();
+      body.append("token", asset.deleteToken);
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${SITE_CONFIG.cloudinary.cloudName}/delete_by_token`, { method: "POST", body, signal: AbortSignal.timeout(10000) });
+      if (response.ok && (await response.json()).result === "ok") uploadedImages.delete(key);
+    } catch { /* Se conserva la URL para poder reutilizarla en el siguiente intento. */ }
+  }
+}
 
 function parseCsv(text) {
   const rows = [];
@@ -361,18 +389,20 @@ async function uploadToCloudinary(file) {
   const body = new FormData();
   body.append("file", file);
   body.append("upload_preset", preset);
-  const response = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(cloudName)}/image/upload`, { method: "POST", body });
+  const response = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(cloudName)}/image/upload`, { method: "POST", body, signal: AbortSignal.timeout(45000) });
   const result = await response.json();
   if (!response.ok) throw new Error(result.error?.message || "Cloudinary no aceptó la imagen.");
   if (typeof result.secure_url !== "string" || !result.secure_url.startsWith(`https://res.cloudinary.com/${cloudName}/image/upload/`)) {
     throw new Error("Cloudinary no devolvió una URL HTTPS válida para la imagen.");
   }
-  return result.secure_url;
+  return { url: result.secure_url, deleteToken: result.delete_token || null, uploadedAt: Date.now() };
 }
 
 async function uploadOptionalImage(input, dimensions, filename) {
   const output = form.querySelector(`[data-file-for="${input.name}"]`);
   if (!input.files || !input.files[0]) return { url: null, failed: false };
+  const key = input.name + imageFingerprint(input);
+  if (uploadedImages.has(key)) return { url: uploadedImages.get(key).url, failed: false };
 
   try {
     if (!SITE_CONFIG.cloudinary.cloudName || !SITE_CONFIG.cloudinary.unsignedUploadPreset) {
@@ -381,9 +411,10 @@ async function uploadOptionalImage(input, dimensions, filename) {
     output.textContent = "Preparando imagen…";
     const processedFile = await processImage(input, dimensions, filename);
     output.textContent = "Subiendo imagen…";
-    const url = await uploadToCloudinary(processedFile);
+    const asset = await uploadToCloudinary(processedFile);
+    uploadedImages.set(key, asset);
     output.textContent = `Imagen lista: JPG · ${dimensions[0]} × ${dimensions[1]} px`;
-    return { url, failed: false };
+    return { url: asset.url, failed: false };
   } catch {
     output.textContent = "No se pudo cargar; el perfil continuará sin esta imagen.";
     return { url: null, failed: true };
@@ -392,9 +423,7 @@ async function uploadOptionalImage(input, dimensions, filename) {
 
 function sendToAppsScript(payload) {
   const endpoint = SITE_CONFIG.appsScriptEndpoint;
-  const requestId = globalThis.crypto?.randomUUID
-    ? globalThis.crypto.randomUUID()
-    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const requestId = newSubmissionId();
 
   return new Promise((resolve, reject) => {
     const iframe = document.createElement("iframe");
@@ -404,7 +433,7 @@ function sendToAppsScript(payload) {
 
     const submission = document.createElement("form");
     submission.method = "POST";
-    submission.action = `${endpoint}?requestId=${encodeURIComponent(requestId)}`;
+    submission.action = `${endpoint}?requestId=${encodeURIComponent(requestId)}&clientOrigin=${encodeURIComponent(location.origin)}`;
     submission.target = iframe.name;
     submission.hidden = true;
 
@@ -423,17 +452,24 @@ function sendToAppsScript(payload) {
     };
 
     const handleResponse = (event) => {
+      let hostname;
+      try { const origin = new URL(event.origin); if (origin.protocol !== "https:") return; hostname = origin.hostname; } catch { return; }
+      if (hostname !== "script.googleusercontent.com" && !hostname.endsWith("-script.googleusercontent.com")) return;
       const message = event.data;
       if (!message || message.type !== "registro-response" || message.requestId !== requestId) return;
       cleanup();
       if (message.response?.ok) resolve(message.response);
-      else reject(new Error(message.response?.message || "No se pudo guardar el registro."));
+      else {
+        const error = new Error(message.response?.message || "No se pudo guardar el registro.");
+        error.definitive = message.response?.retryable === false;
+        reject(error);
+      }
     };
 
     window.addEventListener("message", handleResponse);
     timeoutId = window.setTimeout(() => {
       cleanup();
-      reject(new Error("Apps Script no respondió. Actualiza su implementación y vuelve a intentarlo."));
+      reject(new Error("No pudimos confirmar el envío. Conservamos tus datos: pulsa Enviar para revisión para reintentarlo."));
     }, 30000);
 
     document.body.append(iframe, submission);
@@ -462,6 +498,11 @@ form.addEventListener("submit", async (event) => {
 
     submitButton.disabled = true;
     const payload = cleanFormValues();
+    const fingerprint = JSON.stringify([payload, imageFingerprint(form.foto_perfil), imageFingerprint(form.imagen_portada)]);
+    if (!pendingSubmission || pendingSubmission.fingerprint !== fingerprint) pendingSubmission = { fingerprint, id: newSubmissionId() };
+    Object.assign(payload, { submissionId: pendingSubmission.id, startedAt, website: form.elements.website.value });
+    submitButton.textContent = "Validando datos…";
+    await sendToAppsScript({ ...payload, action: "validate" });
     const hasSelectedImages = Boolean(form.foto_perfil.files?.[0] || form.imagen_portada.files?.[0]);
     submitButton.textContent = hasSelectedImages ? "Preparando imágenes…" : "Enviando…";
     const [profilePhoto, coverImage] = await Promise.all([
@@ -485,12 +526,23 @@ form.addEventListener("submit", async (event) => {
       showMessage(confirmation);
     }
     form.reset();
+    await discardUnusedImages([payload.foto_perfil, payload.imagen_portada]);
+    uploadedImages.clear();
+    pendingSubmission = null;
+    startedAt = Date.now();
     for (const input of form.querySelectorAll("input[type='file']")) clearCropState(input);
     setOptions(provinceSelect, [], "Selecciona primero un departamento");
     setOptions(districtSelect, [], "Selecciona primero una provincia");
     provinceSelect.disabled = true;
     districtSelect.disabled = true;
   } catch (error) {
+    if (pendingSubmission) {
+      if (error.definitive && !pendingSubmission.uncertain) await discardUnusedImages();
+      else if (!error.definitive) {
+        pendingSubmission.uncertain = true;
+        for (const asset of uploadedImages.values()) asset.uncertain = true;
+      }
+    }
     showMessage(error.message || "No se pudo completar el envío.", "error");
   } finally {
     submitButton.disabled = false;

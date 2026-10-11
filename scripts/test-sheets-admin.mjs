@@ -80,9 +80,13 @@ assert.deepEqual(writes.map((write) => write.column).sort((a, b) => a - b), [25,
 assert.equal(records[0][headers.indexOf('whatsapp_interno')], '51900000017', 'el guardado no debe tocar los datos de registro');
 
 const csvData = context.getPublicCsvData();
-assert.equal(csvData.length, 2);
+assert.equal(csvData.length, 3);
 assert.deepEqual(Array.from(csvData[0]), publicHeaders);
 assert.equal(publicHeaders.includes('correo'), false, 'la descarga se limita a la lista pública');
+records[0][headers.indexOf('estado')] = 'Inactivo';
+assert.equal(context.getPublicCsvData().length, 2, 'un perfil inactivo debe desaparecer del CSV');
+records[0][headers.indexOf('estado')] = 'Pendiente';
+assert.equal(context.getPublicCsvData().length, 2, 'un perfil pendiente debe quedar fuera del CSV');
 
 const duplicateRows = [headers, ...records, [...records[0]]];
 context.SpreadsheetApp.getActiveSpreadsheet = () => ({ getSheetByName: (name) => name === 'perfiles' ? fakeSheet(name, duplicateRows) : sheets[name] });
