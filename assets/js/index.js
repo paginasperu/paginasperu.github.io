@@ -1,4 +1,4 @@
-import SITE_CONFIG from "./config.js?v=20261010-4";
+import SITE_CONFIG from "./config.js?v=20261011-1";
 
 const PROFILES_PER_PAGE = 6;
 const LOAD_DELAY = 350;
