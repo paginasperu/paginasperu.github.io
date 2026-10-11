@@ -645,17 +645,21 @@ function createProfileCard(profile, index) {
   profileImage.decoding = "async";
   profileImage.loading = index < 2 ? "eager" : "lazy";
   profileImage.fetchPriority = index === 0 ? "high" : "auto";
+  profileImage.addEventListener("load", () => {
+    const card = profileImage.closest(".profile-card");
+    if (card) card.classList.add("is-image-loaded");
+  }, { once: true });
   setImageSource(profileImage, profile.imagen_portada, `${profile.nombres} ${profile.apellidos}`, "cover");
 
   const info = document.createElement("span");
   info.className = "profile-card__info";
+  info.hidden = profile.categoria === "Diseñadores gráficos";
   const name = document.createElement("span");
   name.className = "profile-card__name";
   name.textContent = `${profile.nombres} ${profile.apellidos}`;
   const meta = document.createElement("span");
   meta.className = "profile-card__meta";
-  meta.textContent =
-    profile.categoria;
+  meta.textContent = profile.categoria;
   const location = document.createElement("span");
   location.className = "profile-card__location";
   location.textContent = `${profile.distrito}, ${profile.departamento}`;
@@ -670,15 +674,17 @@ function createProfileCard(profile, index) {
     name.append(verified);
   }
   info.append(name, meta, location, details);
-  if (profile.demo) {
-    const demo = document.createElement("span");
-    demo.className = "profile-demo";
-    demo.textContent = "Demostración";
-    info.append(demo);
-  }
 
   openButton.append(profileImage, info);
   card.append(openButton);
+
+  if (profile.demo) {
+    const demo = document.createElement("span");
+    demo.className = "profile-demo";
+    demo.textContent = "Demo";
+    demo.setAttribute("aria-label", "Perfil de demostración");
+    card.append(demo);
+  }
   if (profile.destacado) {
     const featured = document.createElement("span");
     featured.className = "profile-card__featured";

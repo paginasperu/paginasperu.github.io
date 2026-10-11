@@ -114,6 +114,7 @@ button {
 .site-menu__toggle svg {
   width: 27px;
   height: 27px;
+  transform: translateX(14px);
 }
 
 .site-menu__toggle:hover,
@@ -542,6 +543,10 @@ a:focus-visible {
   text-align: left;
   background: linear-gradient(to top, rgb(0 0 0 / 78%), rgb(0 0 0 / 0%));
   transition: padding-bottom 180ms ease;
+}
+
+.profile-card__info[hidden] {
+  display: none;
 }
 
 .profile-card__name {
@@ -1202,46 +1207,55 @@ select,
 summary {
   -webkit-tap-highlight-color: rgb(17 17 17 / 10%);
 }
-.profile-demo {
-  display: inline-block;
-  align-self: flex-start;
-  margin-top: 6px;
-  padding: 3px 7px;
-  border-radius: 6px;
-  background: #fff;
-  color: #292929;
-  font-size: 11px;
+.profile-demo[aria-label="Perfil de demostración"] {
+  position: absolute;
+  z-index: 3;
+  right: 10px;
+  bottom: 10px;
+  display: inline-flex;
+  width: max-content;
+  align-items: center;
+  margin: 0;
+  padding: 4px 8px;
+  color: rgb(255 255 255 / 92%);
+  font-size: 9px;
   font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgb(20 20 20 / 42%);
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+  backdrop-filter: blur(6px);
 }
 
-.search:focus-within { box-shadow: 0 0 0 3px #bdd0f3; }
-
-/* Tarjetas y ficha con más aire, manteniendo la cabecera actual del directorio. */
-.directory-topbar { gap: 10px; }
-.search { height: 50px; border: 1px solid #d7d7d7; background: #fafafa; }
-.search:focus-within { border-color: #2359d1; box-shadow: 0 0 0 3px #c7d8f5; }
-.search__input::placeholder { color: #626262; }
-.search-clear { width: 44px; height: 44px; flex: 0 0 auto; border: 0; background: transparent; font-size: 24px; }
+/* Conserva la cabecera compacta y la cuadrícula fotográfica del diseño anterior. */
+.search { height: 46px; background: #f3f3f5; }
+.search:focus-within { box-shadow: 0 0 0 2px #2359d1; }
+.search__input::placeholder { color: #8d9198; }
+.search-clear { width: 40px; height: 40px; flex: 0 0 auto; border: 0; background: transparent; font-size: 20px; }
 .search__input::-webkit-search-cancel-button { display: none; }
-.category, .control-button, .sort-control select, .check { min-height: 44px; }
+.category, .control-button, .sort-control select, .check { min-height: 38px; }
 .field span, .section-eyebrow { color: #595959; }
 .clear-button { min-height: 44px; }
-.active-filter { min-height: 40px; color: #333; background: #f1f3f5; }
-.active-filters { justify-content: flex-start; }
-.results-meta { margin-top: 24px; }
-.gallery { gap: 22px; overflow: visible; align-items: stretch; grid-auto-rows: 1fr; }
-.profile-card { display: flex; aspect-ratio: auto; border: 1px solid #e2e2e2; border-radius: 16px; background: #fff; }
-.profile-card::after { display: none; }
-.profile-card__open { display: flex; flex: 1; flex-direction: column; height: auto; text-align: left; }
-.profile-card__open > img { width: 100%; height: auto; aspect-ratio: 3 / 4; }
-.profile-card__info { position: static; display: grid; gap: 5px; width: 100%; padding: 17px; color: #161616; background: #fff; }
-.profile-card:hover .profile-card__info { padding-bottom: 17px; }
-.profile-card:hover img { transform: none; }
-.profile-card__name { font-size: 18px; line-height: 1.35; overflow-wrap: anywhere; }
-.profile-card__meta { color: #333; font-size: 13px; white-space: normal; }
-.profile-card__location, .profile-card__summary { color: #595959; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
-.profile-card__summary { margin-top: 6px; padding-top: 10px; border-top: 1px solid #ededed; }
-.profile-demo { justify-self: start; color: #654900; background: #fff4ce; font-size: 11px; }
+.active-filter { min-height: 30px; color: #555; background: #f3f3f4; }
+.active-filters { justify-content: center; }
+.results-meta { margin-top: 18px; }
+.gallery { gap: 2px; overflow: hidden; }
+.profile-card.is-image-loaded { background: transparent; }
+.profile-card.is-image-loaded .profile-card__open > img { opacity: 1; }
+.profile-card__open > img { opacity: 0; transition: opacity 180ms ease, transform 450ms ease; }
+.profile-demo[aria-label="Perfil de demostración"] { justify-self: end; }
+.profile-card__location,
+.profile-card__summary {
+  overflow: hidden;
+  color: rgb(255 255 255 / 82%);
+  font-size: 10px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.profile-card__summary { margin: 0; padding: 0; border: 0; background: transparent; }
 .card-verified { color: #1b5bc2; }
 .profile-favorite { width: 44px; height: 44px; background: #222b; }
 .profile-card__featured { background: #fff2c5; color: #574000; }
