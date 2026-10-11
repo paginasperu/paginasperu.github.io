@@ -66,4 +66,6 @@ El directorio lee `data/perfiles.csv`; el formulario lee `data/distritos.csv`. C
 
 Ejecuta `npm test` y consulta [la revisión crítica y recuperación](REVISION-CRITICA.md). `npm run check:live` comprueba disponibilidad; `npm run backup:public` respalda el CSV y sus imágenes públicas. Al modificar `data/distritos.csv`, ejecuta `npm run sync:locations` antes de desplegar el backend.
 
+`npm ci` aplica una mitigación local de profundidad para la dependencia `braces` de clasp. `npm audit` conserva el aviso oficial; las pruebas verifican el parche y los patrones normales. Revisa `scripts/protect-tooling.mjs` al actualizar clasp o sus dependencias.
+
 Revisa en local el directorio, el formulario, contacto y privacidad; confirma las rutas limpias, filtros, búsqueda, modal y vista móvil. Después inspecciona `git diff`, confirma que el CSV público no contiene datos internos, y publica solo cuando los cambios estén aprobados. La publicación ocurre al subir los cambios a la fuente configurada en Settings → Pages.

@@ -5,11 +5,12 @@
     "node": ">=20"
   },
   "scripts": {
+    "postinstall": "node scripts/protect-tooling.mjs",
     "preview": "node scripts/preview-server.mjs",
     "sync:locations": "node scripts/sync-locations.mjs",
     "check:live": "node scripts/healthcheck.mjs",
     "backup:public": "node scripts/backup-public.mjs",
-    "test": "node scripts/test-registration.mjs && node scripts/test-sheets-admin.mjs && node scripts/check-public.mjs",
+    "test": "node scripts/test-tooling.mjs && node scripts/test-registration.mjs && node scripts/test-sheets-admin.mjs && node scripts/check-public.mjs",
     "test:sheets-admin": "node scripts/test-sheets-admin.mjs",
     "apps-script:login": "clasp --auth .clasprc.json login",
     "apps-script:pull": "node scripts/clasp-pull.mjs",
