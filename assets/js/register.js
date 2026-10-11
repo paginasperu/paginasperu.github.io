@@ -67,6 +67,27 @@ function clearMessage() {
   delete message.dataset.state;
 }
 
+function hasUnsubmittedData() {
+  for (const control of form.elements) {
+    if (!control.name || control.disabled || control.type === "hidden"
+        || ["button", "submit", "reset"].includes(control.type)) continue;
+    if (control.type === "file") {
+      if (control.files?.length) return true;
+    } else if (control.type === "checkbox" || control.type === "radio") {
+      if (control.checked) return true;
+    } else if (control.value.trim()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+window.addEventListener("beforeunload", (event) => {
+  if (!hasUnsubmittedData()) return;
+  event.preventDefault();
+  event.returnValue = "";
+});
+
 function trimTextFields() {
   for (const control of form.querySelectorAll("input:not([type='file']):not([type='checkbox']), textarea")) {
     control.value = control.value.replace(/^[\s\uFEFF]+|[\s\uFEFF]+$/gu, "");

@@ -32,6 +32,13 @@
   line-height: 1.55;
 }
 
+.register-draft-note {
+  margin: 8px 0 0;
+  color: #666;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
 .register-form {
   display: grid;
   gap: 14px;
