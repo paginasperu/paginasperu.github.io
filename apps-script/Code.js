@@ -102,7 +102,7 @@ function validateAndNormalize_(payload) {
 
   const required = ["nombres", "apellidos", "genero", "fecha_nacimiento", "departamento", "provincia", "distrito",
     "whatsapp_interno", "correo", "categoria", "descripcion_corta", "productos_servicios", "nivel_experiencia",
-    "nivel_precio", "foto_perfil", "imagen_portada"];
+    "nivel_precio"];
   required.forEach(function (field) {
     if (record[field] === null || record[field] === "") throw new Error("Completa el campo obligatorio: " + field + ".");
   });
@@ -200,6 +200,7 @@ function validateBirthDate_(value) {
 }
 
 function validateImageUrl_(field, value) {
+  if (value === null) return;
   // Apps Script V8 no incluye la API web global URL. Valida el prefijo HTTPS
   // completo y rechaza separadores que podrían alterar la interpretación.
   if (typeof value !== "string" || value.length > 1000

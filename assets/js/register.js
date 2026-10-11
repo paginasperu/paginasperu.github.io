@@ -265,6 +265,26 @@ async function uploadToCloudinary(file) {
   return result.secure_url;
 }
 
+async function uploadOptionalImage(input, dimensions, filename) {
+  const output = form.querySelector(`[data-file-for="${input.name}"]`);
+  if (!input.files || !input.files[0]) return { url: null, failed: false };
+
+  try {
+    if (!SITE_CONFIG.cloudinary.cloudName || !SITE_CONFIG.cloudinary.unsignedUploadPreset) {
+      throw new Error("La subida de imágenes no está disponible.");
+    }
+    output.textContent = "Preparando imagen…";
+    const processedFile = await processImage(input, dimensions, filename);
+    output.textContent = "Subiendo imagen…";
+    const url = await uploadToCloudinary(processedFile);
+    output.textContent = `Imagen lista: JPG · ${dimensions[0]} × ${dimensions[1]} px`;
+    return { url, failed: false };
+  } catch {
+    output.textContent = "No se pudo cargar; el perfil continuará sin esta imagen.";
+    return { url: null, failed: true };
+  }
+}
+
 function sendToAppsScript(payload) {
   const endpoint = SITE_CONFIG.appsScriptEndpoint;
   const requestId = globalThis.crypto?.randomUUID
@@ -330,35 +350,35 @@ form.addEventListener("submit", async (event) => {
   }
 
   try {
-    if (!SITE_CONFIG.cloudinary.cloudName || !SITE_CONFIG.cloudinary.unsignedUploadPreset) {
-      showMessage("Falta configurar la subida de imágenes a Cloudinary.", "error");
-      return;
-    }
     if (!SITE_CONFIG.appsScriptEndpoint) {
       showMessage("El formulario y Cloudinary están listos. Falta publicar Apps Script y pegar aquí su URL de implementación.", "error");
       return;
     }
 
     submitButton.disabled = true;
-    submitButton.textContent = "Preparando imágenes…";
-    const [profilePhoto, coverImage] = await Promise.all([
-      processImage(form.foto_perfil, [150, 150], "foto-perfil.jpg"),
-      processImage(form.imagen_portada, [540, 720], "imagen-portada.jpg"),
-    ]);
-    document.querySelector('[data-file-for="foto_perfil"]').textContent = "Imagen lista: JPG · 150 × 150 px";
-    document.querySelector('[data-file-for="imagen_portada"]').textContent = "Imagen lista: JPG · 540 × 720 px";
-
-    submitButton.textContent = "Subiendo imágenes…";
-    const [photoUrl, coverUrl] = await Promise.all([
-      uploadToCloudinary(profilePhoto),
-      uploadToCloudinary(coverImage),
-    ]);
     const payload = cleanFormValues();
-    payload.foto_perfil = photoUrl;
-    payload.imagen_portada = coverUrl;
+    const hasSelectedImages = Boolean(form.foto_perfil.files?.[0] || form.imagen_portada.files?.[0]);
+    submitButton.textContent = hasSelectedImages ? "Preparando imágenes…" : "Enviando…";
+    const [profilePhoto, coverImage] = await Promise.all([
+      uploadOptionalImage(form.foto_perfil, [150, 150], "foto-perfil.jpg"),
+      uploadOptionalImage(form.imagen_portada, [540, 720], "imagen-portada.jpg"),
+    ]);
+    payload.foto_perfil = profilePhoto.url;
+    payload.imagen_portada = coverImage.url;
     submitButton.textContent = "Enviando…";
     const result = await sendToAppsScript(payload);
-    showMessage(result.message || "Recibimos tu perfil para revisión.");
+    const failedImages = [
+      profilePhoto.failed ? "la foto de perfil" : "",
+      coverImage.failed ? "la imagen de portada" : "",
+    ].filter(Boolean);
+    const confirmation = result.message || "Recibimos tu perfil para revisión.";
+    if (failedImages.length === 2) {
+      showMessage(`${confirmation} No se pudieron cargar las imágenes; agrégalas antes de publicar el perfil.`, "warning");
+    } else if (failedImages.length === 1) {
+      showMessage(`${confirmation} No se pudo cargar ${failedImages[0]}; agrégala antes de publicar el perfil.`, "warning");
+    } else {
+      showMessage(confirmation);
+    }
     form.reset();
     for (const output of form.querySelectorAll("[data-file-for]")) output.textContent = "";
     setOptions(provinceSelect, [], "Selecciona primero un departamento");

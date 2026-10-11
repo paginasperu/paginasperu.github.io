@@ -72,6 +72,19 @@
   letter-spacing: -0.015em;
 }
 
+.register-optional {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 2px 7px;
+  color: #666;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0;
+  vertical-align: 2px;
+  background: #f2f2f2;
+  border-radius: 999px;
+}
+
 .register-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -205,6 +218,12 @@
   color: #8a1d25;
   background: #fff2f2;
   border-color: #f0c9cc;
+}
+
+.register-status[data-state="warning"] {
+  color: #6b4b00;
+  background: #fff8e6;
+  border-color: #ead9a4;
 }
 
 .register-actions {
