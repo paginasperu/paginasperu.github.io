@@ -6,6 +6,7 @@
   },
   "scripts": {
     "preview": "node scripts/preview-server.mjs",
+    "test:sheets-admin": "node scripts/test-sheets-admin.mjs",
     "apps-script:login": "clasp --auth .clasprc.json login",
     "apps-script:pull": "node scripts/clasp-pull.mjs",
     "apps-script:push": "clasp --auth .clasprc.json push",

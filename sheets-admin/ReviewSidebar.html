@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <style>
+    :root { color-scheme: light; font: 13px Arial, sans-serif; color: #202124; }
+    body { margin: 0; padding: 14px; background: #f8f9fa; }
+    header { position: sticky; top: -14px; z-index: 1; margin: -14px -14px 12px; padding: 14px; background: #fff; border-bottom: 1px solid #dadce0; }
+    h1 { margin: 0 0 10px; font-size: 17px; }
+    .toolbar, .actions { display: flex; gap: 8px; align-items: center; }
+    select, input, textarea, button { font: inherit; }
+    select, input[type="text"], input[type="number"], textarea { box-sizing: border-box; width: 100%; padding: 8px; border: 1px solid #dadce0; border-radius: 4px; background: #fff; }
+    button { padding: 8px 10px; border: 1px solid #dadce0; border-radius: 4px; background: #fff; cursor: pointer; }
+    button.primary { color: #fff; border-color: #1a73e8; background: #1a73e8; }
+    button:disabled { opacity: .55; cursor: wait; }
+    #message { min-height: 18px; margin: 9px 0; color: #5f6368; }
+    #message.error { color: #b3261e; }
+    #message.success { color: #137333; }
+    .card { padding: 12px; border: 1px solid #dadce0; border-radius: 8px; background: white; }
+    .field { padding: 9px 0; border-bottom: 1px solid #f1f3f4; overflow-wrap: anywhere; }
+    .field:last-child { border-bottom: 0; }
+    .label { margin-bottom: 4px; color: #5f6368; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
+    .value { white-space: pre-wrap; line-height: 1.45; }
+    .image { display: block; max-width: 100%; max-height: 230px; margin-top: 5px; object-fit: contain; }
+    .controls { margin-top: 12px; }
+    .control { margin: 12px 0; }
+    .checks { display: flex; flex-wrap: wrap; gap: 18px; }
+    .checks label { display: flex; gap: 6px; align-items: center; }
+    textarea { min-height: 85px; resize: vertical; }
+    .actions { margin: 12px 0; flex-wrap: wrap; }
+    .hint { color: #5f6368; font-size: 11px; line-height: 1.45; }
+    #empty { padding: 24px 8px; text-align: center; color: #5f6368; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Revisión de perfiles</h1>
+    <div class="toolbar">
+      <select id="filter" aria-label="Filtrar perfiles">
+        <option value="Pendiente">Pendientes</option><option value="Activo">Activos</option>
+        <option value="Rechazado">Rechazados</option><option value="Inactivo">Inactivos</option><option value="Todos">Todos</option>
+      </select>
+      <select id="queue" aria-label="Perfiles"></select>
+      <button id="refresh" type="button">Actualizar</button>
+    </div>
+    <div id="message" role="status" aria-live="polite"></div>
+  </header>
+  <main>
+    <div id="empty" hidden>No hay perfiles pendientes. Puedes seleccionar otro estado desde la ficha o descargar la vista pública.</div>
+    <section id="record" hidden>
+      <div id="fields" class="card"></div>
+      <div class="controls card">
+        <div class="control"><div class="label"><label for="status">Estado</label></div>
+          <select id="status"><option>Pendiente</option><option>Activo</option><option>Rechazado</option><option>Inactivo</option></select>
+        </div>
+        <div class="control checks">
+          <label><input id="verified" type="checkbox"> Verificado</label>
+          <label><input id="featured" type="checkbox"> Destacado</label>
+        </div>
+        <div class="control"><div class="label"><label for="position">Posición en la web (opcional)</label></div>
+          <input id="position" type="number" min="1" step="1" inputmode="numeric" placeholder="Ej.: 1">
+        </div>
+        <div class="control"><div class="label"><label for="notes">Notas internas</label></div>
+          <textarea id="notes" maxlength="2000" placeholder="Observaciones para la gestión interna"></textarea>
+        </div>
+        <p class="hint">Marcar como Activo lo incluye en la vista pública. Para que aparezca en la web, después descarga el CSV y actualízalo en el repositorio.</p>
+      </div>
+      <div class="actions">
+        <button id="save" class="primary" type="button">Guardar</button>
+        <button id="saveNext" class="primary" type="button">Guardar y siguiente</button>
+      </div>
+    </section>
+    <div class="actions"><button id="download" type="button">Descargar CSV público</button></div>
+    <p class="hint">El CSV contiene únicamente las columnas de la pestaña publico. Revisa el archivo antes de reemplazar data/perfiles.csv y subirlo al repositorio.</p>
+  </main>
+  <script>
+    const queueEl = document.getElementById('queue');
+    const recordEl = document.getElementById('record');
+    const fieldsEl = document.getElementById('fields');
+    const messageEl = document.getElementById('message');
+    const emptyEl = document.getElementById('empty');
+    const OMIT = new Set(['id', 'calificacion_interna', 'es_verificado', 'es_destacado', 'posicion', 'estado', 'notas']);
+    let queue = [];
+    let current = null;
+    let busy = false;
+
+    function status(text, kind) {
+      messageEl.textContent = text || '';
+      messageEl.className = kind || '';
+    }
+    function setBusy(value) {
+      busy = value;
+      document.querySelectorAll('button, select, input, textarea').forEach(function (el) { el.disabled = value; });
+      document.getElementById('queue').disabled = value || queue.length === 0;
+    }
+    function fail(error) {
+      setBusy(false);
+      status(error && error.message ? error.message : String(error), 'error');
+    }
+    function loadQueue(preferredId) {
+      setBusy(true); status('Cargando solicitudes…');
+      google.script.run.withSuccessHandler(function (items) {
+        queue = items || [];
+        queueEl.replaceChildren();
+        queue.forEach(function (item) {
+          const option = document.createElement('option');
+          option.value = item.id;
+          option.textContent = '#' + item.id + ' · ' + item.name + (item.category ? ' · ' + item.category : '');
+          queueEl.appendChild(option);
+        });
+        const selected = queue.find(function (item) { return item.id === String(preferredId || ''); });
+        emptyEl.hidden = queue.length > 0;
+        recordEl.hidden = queue.length === 0;
+        if (!queue.length) { current = null; status(''); setBusy(false); return; }
+        queueEl.value = selected ? selected.id : queue[0].id;
+        loadRecord(queueEl.value);
+      }).withFailureHandler(fail).getReviewQueue(document.getElementById('filter').value);
+    }
+    function addField(label, value) {
+      const wrapper = document.createElement('div'); wrapper.className = 'field';
+      const title = document.createElement('div'); title.className = 'label'; title.textContent = label;
+      const content = document.createElement('div'); content.className = 'value';
+      const text = value == null || value === '' ? '—' : String(value);
+      if ((label === 'Foto de perfil' || label === 'Imagen de portada') && /^https:\/\/res\.cloudinary\.com\/dahrgg4v5\/image\/upload\//.test(text)) {
+        const link = document.createElement('a'); link.href = text; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = 'Abrir imagen';
+        const image = document.createElement('img'); image.className = 'image'; image.src = text; image.alt = label; image.loading = 'lazy'; image.referrerPolicy = 'no-referrer';
+        content.append(link, image);
+      } else if (label === 'Canva' && /^https:\/\/(?:www\.)?canva\.com\//i.test(text)) {
+        const link = document.createElement('a'); link.href = text; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = 'Abrir proyecto de Canva'; content.appendChild(link);
+      } else { content.textContent = text; }
+      wrapper.append(title, content); fieldsEl.appendChild(wrapper);
+    }
+    function loadRecord(id) {
+      setBusy(true); status('Abriendo ficha…'); fieldsEl.replaceChildren();
+      google.script.run.withSuccessHandler(function (data) {
+        current = data;
+        const labels = {
+          nombres: 'Nombres', apellidos: 'Apellidos', genero: 'Género', fecha_nacimiento: 'Fecha de nacimiento',
+          departamento: 'Departamento', provincia: 'Provincia', distrito: 'Distrito', whatsapp_publico: 'WhatsApp público',
+          whatsapp_interno: 'WhatsApp interno', correo: 'Correo', behance_usuario: 'Behance', instagram_usuario: 'Instagram',
+          linkedin_usuario: 'LinkedIn', categoria: 'Categoría', descripcion_corta: 'Descripción corta',
+          descripcion_larga: 'Descripción', productos_servicios: 'Productos y servicios', nivel_experiencia: 'Experiencia',
+          nivel_precio: 'Nivel de precio', foto_perfil: 'Foto de perfil', imagen_portada: 'Imagen de portada',
+          acepta_privacidad: 'Aceptó la política de privacidad', fecha_registro: 'Fecha de registro', canva_url: 'Canva'
+        };
+        Object.keys(data).forEach(function (key) {
+          if (!OMIT.has(key)) addField(labels[key] || key, key === 'acepta_privacidad' ? (data[key] === 'TRUE' ? 'Sí' : 'No') : data[key]);
+        });
+        document.getElementById('status').value = data.estado || 'Pendiente';
+        document.getElementById('verified').checked = data.es_verificado === 'TRUE';
+        document.getElementById('featured').checked = data.es_destacado === 'TRUE';
+        document.getElementById('position').value = data.posicion || '';
+        document.getElementById('notes').value = data.notas || '';
+        recordEl.hidden = false; emptyEl.hidden = true; status('Ficha #' + data.id, ''); setBusy(false);
+      }).withFailureHandler(fail).getReviewRecord(id);
+    }
+    function save(next) {
+      if (busy || !current) return;
+      const currentIndex = queue.findIndex(function (item) { return item.id === current.id; });
+      const nextId = next && currentIndex >= 0 && currentIndex + 1 < queue.length ? queue[currentIndex + 1].id : '';
+      const update = {
+        id: current.id,
+        estado: document.getElementById('status').value,
+        es_verificado: document.getElementById('verified').checked,
+        es_destacado: document.getElementById('featured').checked,
+        posicion: document.getElementById('position').value,
+        notas: document.getElementById('notes').value
+      };
+      setBusy(true); status('Guardando cambios…');
+      google.script.run.withSuccessHandler(function () {
+        const prior = current.id;
+        status('Cambios guardados.', 'success');
+        loadQueue(next ? nextId : prior);
+      }).withFailureHandler(fail).saveReview(update);
+    }
+    function csvCell(value) { return '"' + String(value == null ? '' : value).replace(/"/g, '""') + '"'; }
+    function downloadCsv() {
+      setBusy(true); status('Preparando CSV público…');
+      google.script.run.withSuccessHandler(function (rows) {
+        const csv = '\uFEFF' + rows.map(function (row) { return row.map(csvCell).join(','); }).join('\r\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob); const link = document.createElement('a');
+        link.href = url; link.download = 'perfiles.csv'; document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
+        status('CSV público descargado. Revisa el archivo antes de actualizar el repositorio.', 'success'); setBusy(false);
+      }).withFailureHandler(fail).getPublicCsvData();
+    }
+    queueEl.addEventListener('change', function () { if (queueEl.value) loadRecord(queueEl.value); });
+    document.getElementById('filter').addEventListener('change', function () { loadQueue(''); });
+    document.getElementById('refresh').addEventListener('click', function () { loadQueue(current && current.id); });
+    document.getElementById('save').addEventListener('click', function () { save(false); });
+    document.getElementById('saveNext').addEventListener('click', function () { save(true); });
+    document.getElementById('download').addEventListener('click', downloadCsv);
+    loadQueue();
+  </script>
+</body>
+</html>

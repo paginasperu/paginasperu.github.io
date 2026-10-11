@@ -1,0 +1,126 @@
+/**
+ * Ficha privada de revisión para la hoja "directorio".
+ * Este proyecto está vinculado a la hoja y no es el endpoint público del formulario.
+ */
+const REVIEW_SHEET_NAME = "perfiles";
+const PUBLIC_SHEET_NAME = "publico";
+const REVIEW_HEADERS = [
+  "id", "nombres", "apellidos", "genero", "fecha_nacimiento", "departamento", "provincia", "distrito",
+  "whatsapp_publico", "whatsapp_interno", "correo", "behance_usuario", "instagram_usuario", "linkedin_usuario",
+  "categoria", "descripcion_corta", "descripcion_larga", "productos_servicios", "nivel_experiencia", "nivel_precio",
+  "foto_perfil", "imagen_portada", "acepta_privacidad", "calificacion_interna", "es_verificado", "es_destacado",
+  "posicion", "estado", "notas", "fecha_registro", "canva_url",
+];
+const PUBLIC_HEADERS = [
+  "id", "nombres", "apellidos", "departamento", "provincia", "distrito", "whatsapp_publico", "behance_usuario",
+  "instagram_usuario", "linkedin_usuario", "categoria", "descripcion_corta", "descripcion_larga", "productos_servicios",
+  "nivel_experiencia", "nivel_precio", "foto_perfil", "imagen_portada", "es_verificado", "es_destacado", "posicion", "canva_url",
+];
+const REVIEW_STATUSES = ["Pendiente", "Activo", "Rechazado", "Inactivo"];
+
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu("Gestión de perfiles")
+    .addItem("Abrir ficha de revisión", "showReviewSidebar")
+    .addToUi();
+}
+
+function showReviewSidebar() {
+  const html = HtmlService.createHtmlOutputFromFile("ReviewSidebar")
+    .setTitle("Revisión de perfiles");
+  SpreadsheetApp.getUi().showSidebar(html);
+}
+
+function getReviewQueue(statusFilter) {
+  const filter = String(statusFilter || "Pendiente");
+  if (filter !== "Todos" && REVIEW_STATUSES.indexOf(filter) === -1) throw new Error("El filtro de estado no es válido.");
+  const sheet = getSheetWithHeaders_(REVIEW_SHEET_NAME, REVIEW_HEADERS);
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return [];
+  const values = sheet.getRange(2, 1, lastRow - 1, REVIEW_HEADERS.length).getDisplayValues();
+  const idCol = REVIEW_HEADERS.indexOf("id");
+  const statusCol = REVIEW_HEADERS.indexOf("estado");
+  const firstCol = REVIEW_HEADERS.indexOf("nombres");
+  const lastCol = REVIEW_HEADERS.indexOf("apellidos");
+  const categoryCol = REVIEW_HEADERS.indexOf("categoria");
+  const dateCol = REVIEW_HEADERS.indexOf("fecha_registro");
+  return values.filter(function (row) { return row[idCol] !== "" && (filter === "Todos" || row[statusCol] === filter); })
+    .map(function (row) {
+      return {
+        id: row[idCol],
+        name: [row[firstCol], row[lastCol]].filter(Boolean).join(" "),
+        category: row[categoryCol],
+        date: row[dateCol],
+      };
+    });
+}
+
+function getReviewRecord(id) {
+  const sheet = getSheetWithHeaders_(REVIEW_SHEET_NAME, REVIEW_HEADERS);
+  const rowNumber = findUniqueRecordRow_(sheet, id);
+  const row = sheet.getRange(rowNumber, 1, 1, REVIEW_HEADERS.length).getDisplayValues()[0];
+  const record = {};
+  REVIEW_HEADERS.forEach(function (header, index) { record[header] = row[index]; });
+  return record;
+}
+
+function saveReview(update) {
+  if (!update || typeof update !== "object") throw new Error("No se recibieron cambios válidos.");
+  const id = String(update.id || "").trim();
+  if (!/^\d+$/.test(id)) throw new Error("El identificador del perfil no es válido.");
+  if (REVIEW_STATUSES.indexOf(update.estado) === -1) throw new Error("Selecciona un estado válido.");
+  const position = String(update.posicion == null ? "" : update.posicion).trim();
+  if (position && (!/^\d+$/.test(position) || Number(position) < 1 || Number(position) > 1000000)) {
+    throw new Error("La posición debe ser un entero positivo.");
+  }
+  const notes = String(update.notas == null ? "" : update.notas);
+  if (notes.length > 2000) throw new Error("Las notas no pueden superar 2000 caracteres.");
+  const lock = LockService.getDocumentLock();
+  lock.waitLock(15000);
+  try {
+    const sheet = getSheetWithHeaders_(REVIEW_SHEET_NAME, REVIEW_HEADERS);
+    const rowNumber = findUniqueRecordRow_(sheet, id);
+    setSafeCell_(sheet.getRange(rowNumber, REVIEW_HEADERS.indexOf("es_verificado") + 1), update.es_verificado === true);
+    setSafeCell_(sheet.getRange(rowNumber, REVIEW_HEADERS.indexOf("es_destacado") + 1), update.es_destacado === true);
+    setSafeCell_(sheet.getRange(rowNumber, REVIEW_HEADERS.indexOf("posicion") + 1), position ? Number(position) : "");
+    setSafeCell_(sheet.getRange(rowNumber, REVIEW_HEADERS.indexOf("estado") + 1), update.estado);
+    setSafeCell_(sheet.getRange(rowNumber, REVIEW_HEADERS.indexOf("notas") + 1), notes);
+    SpreadsheetApp.flush();
+    return { ok: true, id: id, estado: update.estado };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function getPublicCsvData() {
+  const sheet = getSheetWithHeaders_(PUBLIC_SHEET_NAME, PUBLIC_HEADERS);
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 1) return [PUBLIC_HEADERS];
+  const values = sheet.getRange(1, 1, lastRow, PUBLIC_HEADERS.length).getDisplayValues();
+  return [PUBLIC_HEADERS].concat(values.slice(1).filter(function (row) { return row[0] !== ""; }));
+}
+
+function getSheetWithHeaders_(name, headers) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name);
+  if (!sheet) throw new Error("No se encontró la pestaña " + name + ".");
+  const actual = sheet.getRange(1, 1, 1, headers.length).getDisplayValues()[0];
+  if (headers.some(function (header, index) { return actual[index] !== header; })) {
+    throw new Error("Los encabezados de " + name + " cambiaron; se canceló la operación para proteger los datos.");
+  }
+  return sheet;
+}
+
+function findUniqueRecordRow_(sheet, id) {
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) throw new Error("No se encontró el perfil " + id + ".");
+  const matches = sheet.getRange(2, 1, lastRow - 1, 1).getDisplayValues()
+    .map(function (row, index) { return row[0] === id ? index + 2 : 0; })
+    .filter(Boolean);
+  if (matches.length !== 1) throw new Error(matches.length ? "El ID aparece más de una vez; no se guardaron cambios." : "No se encontró el perfil " + id + ".");
+  return matches[0];
+}
+
+function setSafeCell_(cell, value) {
+  if (typeof value === "string" && /^[=+@-]/.test(value)) value = "'" + value;
+  cell.setValue(value);
+}
