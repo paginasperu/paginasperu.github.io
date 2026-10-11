@@ -1277,3 +1277,22 @@ summary {
 @media (min-width: 640px) { .gallery { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (min-width: 1024px) { .gallery { grid-template-columns: repeat(3,minmax(0,1fr)); } }
 @media (max-width: 639px) { .profile-details { padding: 22px 20px; } .filter-panel { grid-template-columns: 1fr; } .filter-panel .field { min-width: 0; } }
+
+/* En móvil aprovecha el ancho del buscador sin reducir el área táctil del menú. */
+@media (max-width: 639px) {
+  .directory-topbar { gap: 0; }
+}
+
+/* En pantallas amplias el buscador queda centrado y con una longitud contenida. */
+@media (min-width: 720px) {
+  .directory-topbar {
+    grid-template-areas: ". search subscribe";
+    grid-template-columns: minmax(0, 1fr) minmax(0, 560px) minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .search {
+    justify-self: center;
+    max-width: 560px;
+  }
+}
