@@ -1,4 +1,6 @@
-# Verificación de esta propuesta
+# Verificación registrada de la demo
+
+Estas comprobaciones corresponden a la iteración inicial de la demo. Para verificar el estado actual del código ejecuta `npm test`; el flujo de GitHub Actions repite esa prueba en cada cambio.
 
 - `npm test`: herramientas, registro, validación del formulario, panel y CSV público correctos (18 perfiles).
 - Navegador: cabecera, tarjetas y ficha revisadas en escritorio y móvil; sin desbordamiento horizontal en móvil.
@@ -8,4 +10,4 @@
 - Consola de las tres vistas: sin errores ni advertencias durante estas pruebas.
 - Panel real sincronizado mediante `clasp push`. Cerrar y volver a abrir la barra lateral de Sheets para cargar la nueva interfaz.
 
-La portada propuesta sigue aislada en `sandbox/`. El formulario y los ajustes de accesibilidad están en el código local. No se hizo commit ni publicación de la web en esta etapa.
+La portada de prueba permanece en `sandbox/` y está marcada `noindex`. La demo del panel usa datos ficticios en memoria. Los archivos funcionales del sitio están en la raíz, `scripts/` y `styles/`.
