@@ -495,8 +495,16 @@ a:focus-visible {
 }
 
 .profile-card.is-featured {
-  outline: 2px solid #d5b45d;
-  outline-offset: -2px;
+  outline: 0;
+}
+
+.profile-card.is-featured::before {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  border: 2px solid #d5b45d;
+  content: "";
+  pointer-events: none;
 }
 
 .profile-card::after {
