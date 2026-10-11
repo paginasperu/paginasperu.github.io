@@ -1,0 +1,17 @@
+{
+  "name": "directorio-oficial-publicidad",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "preview": "node scripts/preview-server.mjs",
+    "apps-script:login": "clasp --auth .clasprc.json login",
+    "apps-script:pull": "node scripts/clasp-pull.mjs",
+    "apps-script:push": "clasp --auth .clasprc.json push",
+    "apps-script:open": "clasp --auth .clasprc.json open-script"
+  },
+  "devDependencies": {
+    "@google/clasp": "3.4.1"
+  }
+}

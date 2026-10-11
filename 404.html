@@ -15,10 +15,22 @@
             "mapa": "https://maps.app.goo.gl/64j7gMR3SiLfdUu46"
         };
 
-        const slug = decodeURIComponent(window.location.pathname.replace(/^\/+|\/+$/g, ""));
+        const slug = window.location.pathname.replace(/^\/+|\/+$/g, "");
+
+        // GitHub Pages also sends clean page routes here because it serves static files only.
+        const pages = {
+            "contacto": "/contacto.html",
+            "privacidad": "/privacidad.html",
+            "registro": "/registro.html"
+        };
+
+        if (pages[slug]) {
+            window.location.replace(pages[slug] + window.location.search + window.location.hash);
+            return;
+        }
         
         // Si el slug existe en nuestra lista, redirigimos de inmediato
-        if (slug && links[slug]) {
+        if (links[slug]) {
             window.location.replace(links[slug]);
             // Guardamos en una variable global que estamos redirigiendo para el CSS
             window.isRedirecting = true;

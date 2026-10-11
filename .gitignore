@@ -2,3 +2,5 @@
 .env.*
 !.env.example
 node_modules/
+.clasprc.json
+**/.clasprc.json
