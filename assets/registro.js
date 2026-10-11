@@ -1,4 +1,11 @@
-import SITE_CONFIG from "./config.js?v=20261011-1";
+const SITE_CONFIG = {
+  appsScriptEndpoint: "https://script.google.com/macros/s/AKfycbyFHXYtrjWYk3QDHj-SoV-lquJI9VQ0dbOSVfA7fJlFIHJGLK8ZXAJ_MlOHkwooYgrFxw/exec",
+  cloudinary: {
+    // Valores públicos del preset unsigned. Nunca incluir aquí API Secret.
+    cloudName: "dahrgg4v5",
+    unsignedUploadPreset: "directorio",
+  },
+};
 
 const form = document.querySelector("#registro");
 const message = document.querySelector("#mensaje");

@@ -1,4 +1,10 @@
-import SITE_CONFIG from "./config.js?v=20261011-1";
+const SITE_CONFIG = {
+  title: "Directorio Oficial de Publicidad",
+  brandLabel: "Directorio Oficial",
+  description: "Encuentra diseñadores gráficos, anfitrionas y volanteras para tus proyectos y eventos en Perú.",
+  subscriptionWhatsapp: "51950141414",
+  profilesCsv: "../data/perfiles.csv",
+};
 
 const PROFILES_PER_PAGE = 6;
 const LOAD_DELAY = 350;
