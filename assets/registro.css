@@ -11,7 +11,7 @@
 .register-topline {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 16px;
   margin-bottom: 22px;
 }
@@ -271,18 +271,8 @@
     padding-inline: 12px;
   }
 
-  .register-topline {
-    align-items: flex-start;
-  }
 
-  .register-topline .directory-kicker {
-    max-width: 210px;
-    line-height: 1.5;
-  }
 
-  .register-topline .subscribe-link {
-    flex: 0 0 auto;
-  }
 
   .register-section {
     padding: 16px;

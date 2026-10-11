@@ -1150,3 +1150,16 @@ a:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+.page-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #555;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.page-back:hover {
+  color: #111;
+}
