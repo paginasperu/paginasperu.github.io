@@ -5,79 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Registra tu perfil profesional en el Directorio Oficial de Publicidad." />
     <title>Registro | Directorio Oficial de Publicidad</title>
-    <link rel="stylesheet" href="./assets/index.css?v=20261010-9" />
-    <link rel="stylesheet" href="./assets/registro.css?v=20261010-4" />
-    <script type="module" src="./assets/registro.js?v=20261011-1"></script>
+    <link rel="stylesheet" href="./assets/index.css?v=20261011-2" />
+    <link rel="stylesheet" href="./assets/registro.css?v=20261011-2" />
+    <script type="module" src="./assets/registro.js?v=20261011-2"></script>
   </head>
   <body>
     <main class="page register-page">
       <div class="page__content register-content">
         <header class="register-header">
-          <div class="register-topline">
-            <p class="directory-kicker">DIRECTORIO OFICIAL DE PUBLICIDAD</p>
-            <a class="subscribe-link" href="./">Volver al directorio</a>
-          </div>
           <h1>Registra tu perfil</h1>
-          <p class="register-intro">Completa tus datos para que revisemos tu perfil profesional.</p>
-          <p class="register-draft-note">Tus datos no se guardan automáticamente. Si sales o recargas antes de enviarlo, tendrás que completarlo de nuevo.</p>
         </header>
 
         <form id="registro" class="register-form" novalidate>
           <section class="register-section" aria-labelledby="section-personal">
-            <div class="register-section__heading"><span>01</span><div><h2 id="section-personal">Datos personales</h2><p>Información básica para identificar tu perfil.</p></div></div>
+            <div class="register-section__heading"><span>01</span><div><h2 id="section-personal">Datos personales</h2></div></div>
             <div class="register-grid">
-              <label class="register-field" for="nombres"><span>Nombres <b aria-hidden="true">*</b></span><input id="nombres" name="nombres" autocomplete="given-name" minlength="2" maxlength="150" required /><small>Indica los nombres que aparecerán en tu perfil.</small></label>
-              <label class="register-field" for="apellidos"><span>Apellidos <b aria-hidden="true">*</b></span><input id="apellidos" name="apellidos" autocomplete="family-name" minlength="2" maxlength="150" required /><small>Indica los apellidos que aparecerán en tu perfil.</small></label>
-              <label class="register-field" for="genero"><span>Género <b aria-hidden="true">*</b></span><select id="genero" name="genero" required><option value="">Selecciona</option><option>Mujer</option><option>Hombre</option></select><small>Dato para estadísticas internas; no se mostrará en tu perfil.</small></label>
-              <label class="register-field" for="fecha_nacimiento"><span>Fecha de nacimiento <b aria-hidden="true">*</b></span><input id="fecha_nacimiento" name="fecha_nacimiento" type="date" required /><small>Se usará para confirmar el rango de edad de 18 a 50 años; no se publicará.</small></label>
+              <label class="register-field" for="nombres"><span>Nombres <b aria-hidden="true">*</b></span><input id="nombres" name="nombres" autocomplete="given-name" minlength="2" maxlength="150" required /></label>
+              <label class="register-field" for="apellidos"><span>Apellidos <b aria-hidden="true">*</b></span><input id="apellidos" name="apellidos" autocomplete="family-name" minlength="2" maxlength="150" required /></label>
+              <label class="register-field" for="genero"><span>Género <b aria-hidden="true">*</b></span><select id="genero" name="genero" required><option value="">Selecciona</option><option>Mujer</option><option>Hombre</option></select></label>
+              <label class="register-field" for="fecha_nacimiento"><span>Fecha de nacimiento <b aria-hidden="true">*</b></span><input id="fecha_nacimiento" name="fecha_nacimiento" type="date" required /></label>
             </div>
           </section>
 
           <section class="register-section" aria-labelledby="section-location">
-            <div class="register-section__heading"><span>02</span><div><h2 id="section-location">Ubicación</h2><p>Selecciona tu ubicación en orden.</p></div></div>
+            <div class="register-section__heading"><span>02</span><div><h2 id="section-location">Ubicación</h2></div></div>
             <div class="register-grid">
-              <label class="register-field" for="departamento"><span>Departamento <b aria-hidden="true">*</b></span><select id="departamento" name="departamento" required><option value="">Cargando departamentos…</option></select><small>Selecciona tu departamento.</small></label>
-              <label class="register-field" for="provincia"><span>Provincia <b aria-hidden="true">*</b></span><select id="provincia" name="provincia" required disabled><option value="">Selecciona primero un departamento</option></select><small>Selecciona tu provincia.</small></label>
-              <label class="register-field" for="distrito"><span>Distrito <b aria-hidden="true">*</b></span><select id="distrito" name="distrito" required disabled><option value="">Selecciona primero una provincia</option></select><small>Selecciona tu distrito.</small></label>
+              <label class="register-field" for="departamento"><span>Departamento <b aria-hidden="true">*</b></span><select id="departamento" name="departamento" required><option value="">Cargando departamentos…</option></select></label>
+              <label class="register-field" for="provincia"><span>Provincia <b aria-hidden="true">*</b></span><select id="provincia" name="provincia" required disabled><option value="">Selecciona primero un departamento</option></select></label>
+              <label class="register-field" for="distrito"><span>Distrito <b aria-hidden="true">*</b></span><select id="distrito" name="distrito" required disabled><option value="">Selecciona primero una provincia</option></select></label>
             </div>
           </section>
 
           <section class="register-section" aria-labelledby="section-contact">
-            <div class="register-section__heading"><span>03</span><div><h2 id="section-contact">Datos de contacto</h2><p>Solo WhatsApp público y redes aparecerán en tu perfil.</p></div></div>
+            <div class="register-section__heading"><span>03</span><div><h2 id="section-contact">Datos de contacto</h2></div></div>
             <div class="register-grid">
-              <label class="register-field" for="whatsapp_publico"><span>WhatsApp público</span><input id="whatsapp_publico" name="whatsapp_publico" type="tel" inputmode="tel" autocomplete="tel" placeholder="950 141 414" maxlength="20" pattern="[0-9+() -]*" title="Usa solo números, espacios, +, paréntesis o guiones." /><small>Será visible en tu perfil para que te contacten.</small></label>
-              <label class="register-field" for="whatsapp_interno"><span>WhatsApp de contacto <b aria-hidden="true">*</b></span><input id="whatsapp_interno" name="whatsapp_interno" type="tel" inputmode="tel" autocomplete="tel" placeholder="950 141 414" maxlength="20" pattern="[0-9+() -]*" title="Usa solo números, espacios, +, paréntesis o guiones." required /><small>Lo usaremos para contactarte; no se mostrará en el directorio.</small></label>
-              <label class="register-field" for="correo"><span>Correo electrónico <b aria-hidden="true">*</b></span><input id="correo" name="correo" type="email" autocomplete="email" minlength="3" maxlength="50" required /><small>Lo usaremos para contactarte; no se mostrará en el directorio.</small></label>
-              <label class="register-field" for="instagram_usuario"><span>Usuario de Instagram</span><input id="instagram_usuario" name="instagram_usuario" minlength="3" maxlength="50" placeholder="tuusuario" /><small>Escribe tu usuario, sin incluir el enlace completo.</small></label>
-              <label class="register-field" for="linkedin_usuario"><span>Usuario de LinkedIn</span><input id="linkedin_usuario" name="linkedin_usuario" minlength="3" maxlength="50" placeholder="tuusuario" /><small>Escribe tu usuario, sin incluir el enlace completo.</small></label>
-              <label class="register-field" for="behance_usuario"><span>Usuario de Behance</span><input id="behance_usuario" name="behance_usuario" minlength="3" maxlength="50" placeholder="tuusuario" /><small>Escribe tu usuario, sin incluir el enlace completo.</small></label>
-              <label class="register-field register-field--wide" for="canva_url"><span>Portafolio de Canva</span><input id="canva_url" name="canva_url" type="url" maxlength="500" placeholder="https://www.canva.com/design/..." /><small>Opcional. Pega el enlace público de tu portafolio en Canva.</small></label>
+              <label class="register-field" for="whatsapp_publico"><span>WhatsApp público</span><input id="whatsapp_publico" name="whatsapp_publico" type="tel" inputmode="tel" autocomplete="tel" placeholder="950 141 414" maxlength="20" pattern="[0-9+() -]*" title="Usa solo números, espacios, +, paréntesis o guiones." /><small>Será visible en tu perfil para que te contacten</small></label>
+              <label class="register-field" for="whatsapp_interno"><span>WhatsApp privado <b aria-hidden="true">*</b></span><input id="whatsapp_interno" name="whatsapp_interno" type="tel" inputmode="tel" autocomplete="tel" placeholder="950 141 414" maxlength="20" pattern="[0-9+() -]*" title="Usa solo números, espacios, +, paréntesis o guiones." required /><small>Se usará para gestiones de nuestra agencia</small></label>
+              <label class="register-field" for="correo"><span>Correo <b aria-hidden="true">*</b></span><input id="correo" name="correo" type="email" autocomplete="email" minlength="3" maxlength="50" required /><small>Lo usaremos para contactarte; no se mostrará en el directorio.</small></label>
+              <label class="register-field" for="instagram_usuario"><span>Usuario de Instagram</span><input id="instagram_usuario" name="instagram_usuario" minlength="3" maxlength="50" /></label>
+              <label class="register-field" for="linkedin_usuario"><span>Usuario de LinkedIn</span><input id="linkedin_usuario" name="linkedin_usuario" minlength="3" maxlength="50" /></label>
+              <label class="register-field" for="behance_usuario"><span>Usuario de Behance</span><input id="behance_usuario" name="behance_usuario" minlength="3" maxlength="50" /></label>
+              <label class="register-field register-field--wide" for="canva_url"><span>Portafolio de Canva</span><input id="canva_url" name="canva_url" type="url" maxlength="500" /></label>
             </div>
           </section>
 
           <section class="register-section" aria-labelledby="section-profile">
-            <div class="register-section__heading"><span>04</span><div><h2 id="section-profile">Detalles del perfil</h2><p>Cuéntales a tus posibles clientes qué ofreces.</p></div></div>
+            <div class="register-section__heading"><span>04</span><div><h2 id="section-profile">Detalles del perfil</h2></div></div>
             <div class="register-grid">
-              <label class="register-field" for="categoria"><span>Categoría <b aria-hidden="true">*</b></span><select id="categoria" name="categoria" required><option value="">Selecciona</option><option>Diseñadores gráficos</option><option>Anfitrionas</option><option>Volanteras</option></select><small>Elige la categoría que aparecerá en tu perfil.</small></label>
-              <label class="register-field register-field--wide" for="descripcion_corta"><span>Descripción breve <b aria-hidden="true">*</b></span><textarea id="descripcion_corta" name="descripcion_corta" rows="3" minlength="10" maxlength="150" required></textarea><small>Resumen breve que aparecerá en tu perfil. <span data-counter-for="descripcion_corta">0/150</span></small></label>
-              <label class="register-field register-field--wide" for="descripcion_larga"><span>Descripción adicional</span><textarea id="descripcion_larga" name="descripcion_larga" rows="5" maxlength="1000"></textarea><small>Información opcional para ampliar tu perfil. <span data-counter-for="descripcion_larga">0/1000</span></small></label>
-              <label class="register-field register-field--wide" for="productos_servicios"><span>Productos y servicios <b aria-hidden="true">*</b></span><textarea id="productos_servicios" name="productos_servicios" rows="4" minlength="1" maxlength="500" required></textarea><small>Describe los productos o servicios que ofreces. <span data-counter-for="productos_servicios">0/500</span></small></label>
-              <label class="register-field" for="nivel_experiencia"><span>Nivel de experiencia <b aria-hidden="true">*</b></span><select id="nivel_experiencia" name="nivel_experiencia" required><option value="">Selecciona</option><option>Principiante</option><option>Intermedio</option><option>Experto</option></select><small>Elige la opción que mejor represente tu experiencia.</small></label>
-              <label class="register-field" for="nivel_precio"><span>Nivel de precios <b aria-hidden="true">*</b></span><select id="nivel_precio" name="nivel_precio" required><option value="">Selecciona</option><option>Económico</option><option>Estándar</option><option>Premium</option></select><small>Elige la opción que mejor represente tus precios.</small></label>
+              <label class="register-field" for="categoria"><span>Categoría <b aria-hidden="true">*</b></span><select id="categoria" name="categoria" required><option value="">Selecciona</option><option>Diseñadores gráficos</option><option>Anfitrionas</option><option>Volanteras</option></select></label>
+              <label class="register-field register-field--wide" for="descripcion_corta"><span>Descripción breve <b aria-hidden="true">*</b></span><textarea id="descripcion_corta" name="descripcion_corta" rows="3" minlength="10" maxlength="150" required></textarea></label>
+              <label class="register-field register-field--wide" for="descripcion_larga"><span>Descripción adicional</span><textarea id="descripcion_larga" name="descripcion_larga" rows="5" maxlength="1000"></textarea></label>
+              <label class="register-field register-field--wide" for="productos_servicios"><span>Productos y servicios <b aria-hidden="true">*</b></span><textarea id="productos_servicios" name="productos_servicios" rows="4" minlength="1" maxlength="500" required></textarea></label>
+              <label class="register-field" for="nivel_experiencia"><span>Nivel de experiencia <b aria-hidden="true">*</b></span><select id="nivel_experiencia" name="nivel_experiencia" required><option value="">Selecciona</option><option>Principiante</option><option>Intermedio</option><option>Experto</option></select></label>
+              <label class="register-field" for="nivel_precio"><span>Nivel de precios <b aria-hidden="true">*</b></span><select id="nivel_precio" name="nivel_precio" required><option value="">Selecciona</option><option>Económico</option><option>Estándar</option><option>Premium</option></select></label>
             </div>
           </section>
 
           <section class="register-section" aria-labelledby="section-images">
             <div class="register-section__heading"><span>05</span><div><h2 id="section-images">Imágenes <span class="register-optional">Opcional</span></h2><p>Si aún no tienes las fotos, puedes enviar el formulario y coordinaremos cómo agregarlas antes de publicar tu perfil.</p></div></div>
             <div class="register-grid">
-              <label class="register-field register-upload" for="foto_perfil"><span>Foto de perfil</span><input id="foto_perfil" name="foto_perfil" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" /><small>Opcional. Acepta JPG, PNG o WebP de hasta 1 MB. La ajustaremos a JPG de 150 × 150 px.</small><output data-file-for="foto_perfil"></output></label>
-              <label class="register-field register-upload" for="imagen_portada"><span>Imagen de portada</span><input id="imagen_portada" name="imagen_portada" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" /><small>Opcional. Acepta JPG, PNG o WebP de hasta 1 MB. La ajustaremos a JPG de 540 × 720 px.</small><output data-file-for="imagen_portada"></output></label>
+              <label class="register-field register-upload" for="foto_perfil"><span>Foto de perfil</span><input id="foto_perfil" name="foto_perfil" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" /><small>Tamaño 150 x 150 pixeles y formato JPG, PNG o WebP de hasta 1 MB.</small><output data-file-for="foto_perfil"></output></label>
+              <label class="register-field register-upload" for="imagen_portada"><span>Imagen de portada</span><input id="imagen_portada" name="imagen_portada" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" /><small>Tamaño 540 x 720 pixeles y formato JPG, PNG o WebP de hasta 1 MB.</small><output data-file-for="imagen_portada"></output></label>
             </div>
           </section>
 
           <section class="register-section" aria-labelledby="section-privacy">
             <div class="register-section__heading"><span>06</span><div><h2 id="section-privacy">Privacidad</h2><p>Necesitamos tu aceptación para recibir el registro.</p></div></div>
-            <label class="register-consent"><input id="acepta_privacidad" name="acepta_privacidad" type="checkbox" required /><span>He leído y acepto la <a href="./privacidad" target="_blank" rel="noopener noreferrer">política de privacidad</a> y autorizo el tratamiento de mis datos para gestionar la solicitud y, si se aprueba, publicar los datos indicados como públicos.</span></label>
+            <label class="register-consent"><input id="acepta_privacidad" name="acepta_privacidad" type="checkbox" required /><span>He leído y acepto la <a href="./privacidad" target="_blank" rel="noopener noreferrer">política de privacidad</a> y autorizo el tratamiento de mis datos personales</span></label>
           </section>
 
           <div id="mensaje" class="register-status" role="status" aria-live="polite" hidden></div>

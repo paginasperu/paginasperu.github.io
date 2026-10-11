@@ -146,13 +146,6 @@ for (const name of ["correo", "behance_usuario", "instagram_usuario", "linkedin_
   });
 }
 
-for (const counter of document.querySelectorAll("[data-counter-for]")) {
-  const input = document.getElementById(counter.dataset.counterFor);
-  const update = () => { counter.textContent = `${input.value.length}/${input.maxLength}`; };
-  input.addEventListener("input", update);
-  update();
-}
-
 for (const input of form.querySelectorAll("input[type='file']")) {
   input.addEventListener("change", () => {
     const output = document.querySelector(`[data-file-for="${input.name}"]`);
@@ -413,9 +406,6 @@ form.addEventListener("submit", async (event) => {
     setOptions(districtSelect, [], "Selecciona primero una provincia");
     provinceSelect.disabled = true;
     districtSelect.disabled = true;
-    for (const counter of document.querySelectorAll("[data-counter-for]")) {
-      document.getElementById(counter.dataset.counterFor).dispatchEvent(new Event("input"));
-    }
   } catch (error) {
     showMessage(error.message || "No se pudo completar el envío.", "error");
   } finally {

@@ -66,9 +66,7 @@ button {
 
 .directory-topbar {
   display: grid;
-  grid-template-areas:
-    "title subscribe"
-    "search search";
+  grid-template-areas: "search subscribe";
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
@@ -661,15 +659,6 @@ a:focus-visible {
   animation: spin 700ms linear infinite;
 }
 
-.site-footer {
-  display: flex;
-  justify-content: center;
-  gap: 22px;
-  margin-top: 42px;
-  padding: 28px 0 8px;
-  border-top: 1px solid var(--border);
-  scroll-margin-top: 24px;
-}
 
 
 .profile-modal {
@@ -1038,8 +1027,8 @@ a:focus-visible {
   }
 
   .directory-topbar {
-    grid-template-areas: "title search subscribe";
-    grid-template-columns: max-content minmax(240px, 660px) minmax(90px, 1fr);
+    grid-template-areas: "search subscribe";
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 18px;
   }
 
@@ -1065,13 +1054,6 @@ a:focus-visible {
   }
 }
 
-@media (max-width: 639px) {
-  .site-footer {
-    margin-top: 32px;
-    padding-top: 22px;
-  }
-
-}
 
 @media (min-width: 640px) and (max-width: 979px) {
   .directory-nav {

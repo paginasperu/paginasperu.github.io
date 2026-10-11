@@ -32,12 +32,6 @@
   line-height: 1.55;
 }
 
-.register-draft-note {
-  margin: 8px 0 0;
-  color: #666;
-  font-size: 11px;
-  line-height: 1.5;
-}
 
 .register-form {
   display: grid;
@@ -165,11 +159,6 @@
   line-height: 1.45;
 }
 
-.register-field small span {
-  float: right;
-  color: #8a8a8a;
-  white-space: nowrap;
-}
 
 .register-field--wide {
   grid-column: 1 / -1;
