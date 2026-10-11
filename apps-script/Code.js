@@ -200,26 +200,21 @@ function validateBirthDate_(value) {
 }
 
 function validateImageUrl_(field, value) {
-  let imageUrl;
-  try {
-    imageUrl = new URL(value);
-  } catch (error) {
-    throw new Error(field + ": debe ser una URL válida de Cloudinary.");
-  }
-  if (value.length > 1000 || imageUrl.protocol !== "https:" || imageUrl.origin !== "https://res.cloudinary.com" || !imageUrl.href.startsWith(CLOUDINARY_IMAGE_PREFIX)) {
+  // Apps Script V8 no incluye la API web global URL. Valida el prefijo HTTPS
+  // completo y rechaza separadores que podrían alterar la interpretación.
+  if (typeof value !== "string" || value.length > 1000
+      || value.indexOf(CLOUDINARY_IMAGE_PREFIX) !== 0 || value.length === CLOUDINARY_IMAGE_PREFIX.length
+      || /[\s?#\\]/.test(value)) {
     throw new Error(field + ": debe ser una URL HTTPS de Cloudinary.");
   }
 }
 
 function validateCanvaUrl_(value) {
   if (value === null) return;
-  let url;
-  try {
-    url = new URL(value);
-  } catch (error) {
-    throw new Error("El enlace de Canva debe ser una URL válida.");
-  }
-  if (value.length > 500 || url.protocol !== "https:" || !["canva.com", "www.canva.com"].includes(url.hostname) || !url.pathname.startsWith("/")) {
+  // Apps Script V8 tampoco implementa URL; ancla el host para evitar dominios
+  // parecidos como canva.com.ejemplo.test o credenciales antes del dominio.
+  if (typeof value !== "string" || value.length > 500
+      || !/^https:\/\/(?:www\.)?canva\.com\/[^\s]*$/i.test(value)) {
     throw new Error("El enlace debe ser HTTPS y pertenecer a canva.com.");
   }
 }
