@@ -251,20 +251,8 @@
   cursor: wait;
 }
 
-.register-footer {
-  padding-top: 22px;
-  text-align: center;
-  font-size: 11px;
-}
 
-.register-footer a {
-  color: var(--muted);
-  text-decoration: none;
-}
 
-.register-footer a:hover {
-  color: var(--accent);
-}
 
 @media (max-width: 600px) {
   .register-page {

@@ -1163,3 +1163,31 @@ a:focus-visible {
 .page-back:hover {
   color: #111;
 }
+
+
+.contact-footer {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  margin-top: 30px;
+  padding-top: 18px;
+  color: #666;
+  font-size: 12px;
+  border-top: 1px solid #e9e9eb;
+}
+
+.contact-footer a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.contact-footer a:hover {
+  color: #111;
+}
+
+@media (max-width: 639px) {
+  .contact-footer {
+    gap: 18px;
+    margin-top: 24px;
+  }
+}
