@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Registra tu perfil profesional en el Directorio Oficial de Publicidad." />
     <title>Registro | Directorio Oficial de Publicidad</title>
-    <link rel="stylesheet" href="./styles/index.css?v=20261011-6" />
-    <link rel="stylesheet" href="./styles/registro.css?v=20261011-3" />
-    <script type="module" src="./scripts/registro.js?v=20261011-5"></script>
+    <link rel="stylesheet" href="./styles/index.css?v=20261011-7" />
+    <link rel="stylesheet" href="./styles/registro.css?v=20261011-4" />
+    <script type="module" src="./scripts/registro.js?v=20261011-6"></script>
     <link rel="canonical" href="https://oficial.pe/registro" />
     <meta property="og:url" content="https://oficial.pe/registro" />
   </head>
@@ -67,8 +67,8 @@
           <section class="register-section" aria-labelledby="section-images">
             <div class="register-section__heading"><span>05</span><div><h2 id="section-images">Imágenes <span class="register-optional">Opcional</span></h2></div></div>
             <div class="register-grid">
-              <label class="register-field register-upload" for="foto_perfil"><span>Foto de perfil</span><input id="foto_perfil" name="foto_perfil" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" /><div class="image-crop" data-crop-for="foto_perfil" hidden><canvas class="image-crop__canvas" data-preview-for="foto_perfil" aria-label="Vista previa del recorte de foto de perfil"></canvas><label class="image-crop__zoom">Zoom <input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="foto_perfil" /></label><small class="image-crop__hint">Arrastra la imagen para elegir el encuadre</small></div><small>Tamaño 150 x 150 pixeles y formato JPG, PNG o WebP de hasta 1 MB.</small><output data-file-for="foto_perfil" aria-live="polite"></output></label>
-              <label class="register-field register-upload" for="imagen_portada"><span>Imagen de portada</span><input id="imagen_portada" name="imagen_portada" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" /><div class="image-crop" data-crop-for="imagen_portada" hidden><canvas class="image-crop__canvas" data-preview-for="imagen_portada" aria-label="Vista previa del recorte de imagen de portada"></canvas><label class="image-crop__zoom">Zoom <input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="imagen_portada" /></label><small class="image-crop__hint">Arrastra la imagen para elegir el encuadre</small></div><small>Tamaño 540 x 720 pixeles y formato JPG, PNG o WebP de hasta 1 MB.</small><output data-file-for="imagen_portada" aria-live="polite"></output></label>
+              <div class="register-field register-upload"><label for="foto_perfil"><span>Foto de perfil</span><input id="foto_perfil" name="foto_perfil" aria-describedby="foto_perfil-help" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" /></label><div class="image-crop" data-crop-for="foto_perfil" hidden><canvas class="image-crop__canvas" data-preview-for="foto_perfil" aria-label="Vista previa del recorte de foto de perfil"></canvas><label class="image-crop__zoom">Zoom <input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="foto_perfil" /></label><small class="image-crop__hint">Arrastra o usa las flechas del teclado para encuadrar</small></div><small id="foto_perfil-help">JPG, PNG o WebP · hasta 1 MB. Recortamos y ajustamos a 150 × 150 px.</small><output data-file-for="foto_perfil" aria-live="polite"></output></div>
+              <div class="register-field register-upload"><label for="imagen_portada"><span>Imagen de portada</span><input id="imagen_portada" name="imagen_portada" aria-describedby="imagen_portada-help" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" /></label><div class="image-crop" data-crop-for="imagen_portada" hidden><canvas class="image-crop__canvas" data-preview-for="imagen_portada" aria-label="Vista previa del recorte de imagen de portada"></canvas><label class="image-crop__zoom">Zoom <input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="imagen_portada" /></label><small class="image-crop__hint">Arrastra o usa las flechas del teclado para encuadrar</small></div><small id="imagen_portada-help">JPG, PNG o WebP · hasta 1 MB. Recortamos y ajustamos a 540 × 720 px.</small><output data-file-for="imagen_portada" aria-live="polite"></output></div>
             </div>
           </section>
 

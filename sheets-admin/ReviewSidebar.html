@@ -31,6 +31,21 @@
     .actions { margin: 12px 0; flex-wrap: wrap; }
     .hint { color: #5f6368; font-size: 11px; line-height: 1.45; }
     #empty { padding: 24px 8px; text-align: center; color: #5f6368; }
+    :focus-visible { outline: 3px solid #2359d1; outline-offset: 2px; }
+    button, select { min-height: 44px; }
+    .toolbar { flex-wrap: wrap; }
+    #filter { flex: 1; width: auto; }
+    #queue { order: 3; flex-basis: 100%; }
+    #queue-count { color: #555; font-size: 12px; margin: 10px 0 0; }
+    #record-heading { font-size: 16px; line-height: 1.4; overflow-wrap: anywhere; }
+    .quick-actions { display: grid; gap: 8px; }
+    .quick-actions button { width: 100%; font-weight: 600; }
+    button.approve { background: #17683b; color: white; border-color: #17683b; }
+    button.reject { color: #a11b1b; border-color: #b3261e; }
+    #unsaved { display: block; color: #805500; font-size: 12px; margin: 8px 0; }
+    #unsaved[hidden] { display: none; }
+    #fields { margin-top: 16px; }
+    .controls { margin-top: 0; }
   </style>
 </head>
 <body>
@@ -45,11 +60,17 @@
       <button id="refresh" type="button">Actualizar</button>
     </div>
     <div id="message" role="status" aria-live="polite"></div>
+    <p id="queue-count" aria-live="polite"></p>
   </header>
   <main>
     <div id="empty" hidden>No hay perfiles pendientes. Puedes seleccionar otro estado desde la ficha o descargar la vista pública.</div>
     <section id="record" hidden>
-      <div id="fields" class="card"></div>
+      <h2 id="record-heading" tabindex="-1"></h2>
+      <div class="quick-actions">
+        <button id="approveNext" class="approve" type="button">Aprobar y siguiente</button>
+        <button id="rejectNext" class="reject" type="button">Rechazar y siguiente</button>
+      </div>
+      <span id="unsaved" role="status" hidden>Cambios sin guardar</span>
       <div class="controls card">
         <div class="control"><div class="label"><label for="status">Estado</label></div>
           <select id="status"><option>Pendiente</option><option>Activo</option><option>Rechazado</option><option>Inactivo</option></select>
@@ -59,7 +80,7 @@
           <label><input id="featured" type="checkbox"> Destacado</label>
         </div>
         <div class="control"><div class="label"><label for="position">Posición en la web (opcional)</label></div>
-          <input id="position" type="number" min="1" step="1" inputmode="numeric" placeholder="Ej.: 1">
+          <input id="position" type="number" min="1" max="1000000" step="1" inputmode="numeric" placeholder="Ej.: 1">
         </div>
         <div class="control"><div class="label"><label for="notes">Notas internas</label></div>
           <textarea id="notes" maxlength="2000" placeholder="Observaciones para la gestión interna"></textarea>
@@ -70,6 +91,7 @@
         <button id="save" class="primary" type="button">Guardar</button>
         <button id="saveNext" class="primary" type="button">Guardar y siguiente</button>
       </div>
+      <div id="fields" class="card"></div>
     </section>
     <div class="actions"><button id="download" type="button">Descargar CSV público</button></div>
     <p class="hint">El CSV incluye solo perfiles Activos y campos públicos. Revisa el archivo antes de actualizar la web.</p>
@@ -84,6 +106,11 @@
     let queue = [];
     let current = null;
     let busy = false;
+    let dirty = false;
+    let selectedFilter = 'Pendiente';
+
+    function markDirty(value) { dirty = value; document.getElementById('unsaved').hidden = !value; }
+    function canLeave() { return !dirty || window.confirm('Hay cambios sin guardar. ¿Quieres descartarlos?'); }
 
     function status(text, kind) {
       messageEl.textContent = text || '';
@@ -98,10 +125,11 @@
       setBusy(false);
       status(error && error.message ? error.message : String(error), 'error');
     }
-    function loadQueue(preferredId) {
+    function loadQueue(preferredId, savedMessage) {
       setBusy(true); status('Cargando solicitudes…');
       google.script.run.withSuccessHandler(function (items) {
         queue = items || [];
+        document.getElementById('queue-count').textContent = queue.length + (queue.length === 1 ? ' perfil en esta cola' : ' perfiles en esta cola');
         queueEl.replaceChildren();
         queue.forEach(function (item) {
           const option = document.createElement('option');
@@ -112,9 +140,9 @@
         const selected = queue.find(function (item) { return item.id === String(preferredId || ''); });
         emptyEl.hidden = queue.length > 0;
         recordEl.hidden = queue.length === 0;
-        if (!queue.length) { current = null; status(''); setBusy(false); return; }
+        if (!queue.length) { current = null; markDirty(false); emptyEl.textContent = 'No hay perfiles en ' + document.getElementById('filter').selectedOptions[0].textContent.toLowerCase() + '.'; status(savedMessage || ''); setBusy(false); return; }
         queueEl.value = selected ? selected.id : queue[0].id;
-        loadRecord(queueEl.value);
+        loadRecord(queueEl.value, savedMessage);
       }).withFailureHandler(fail).getReviewQueue(document.getElementById('filter').value);
     }
     function addField(label, value) {
@@ -131,10 +159,12 @@
       } else { content.textContent = text; }
       wrapper.append(title, content); fieldsEl.appendChild(wrapper);
     }
-    function loadRecord(id) {
+    function loadRecord(id, savedMessage) {
       setBusy(true); status('Abriendo ficha…'); fieldsEl.replaceChildren();
       google.script.run.withSuccessHandler(function (data) {
         current = data;
+        document.getElementById('record-heading').textContent = '#' + data.id + ' · ' + [data.nombres, data.apellidos].filter(Boolean).join(' ');
+        markDirty(false);
         const labels = {
           nombres: 'Nombres', apellidos: 'Apellidos', genero: 'Género', fecha_nacimiento: 'Fecha de nacimiento',
           departamento: 'Departamento', provincia: 'Provincia', distrito: 'Distrito', whatsapp_publico: 'WhatsApp público',
@@ -152,7 +182,8 @@
         document.getElementById('featured').checked = data.es_destacado === 'TRUE';
         document.getElementById('position').value = data.posicion || '';
         document.getElementById('notes').value = data.notas || '';
-        recordEl.hidden = false; emptyEl.hidden = true; status('Ficha #' + data.id, ''); setBusy(false);
+        recordEl.hidden = false; emptyEl.hidden = true; status(savedMessage || ('Ficha #' + data.id), savedMessage ? 'success' : ''); setBusy(false);
+        if (savedMessage) document.getElementById('record-heading').focus();
       }).withFailureHandler(fail).getReviewRecord(id);
     }
     function save(next) {
@@ -167,11 +198,12 @@
         posicion: document.getElementById('position').value,
         notas: document.getElementById('notes').value
       };
+      if (!document.getElementById('position').reportValidity()) return;
       setBusy(true); status('Guardando cambios…');
       google.script.run.withSuccessHandler(function () {
         const prior = current.id;
-        status('Cambios guardados.', 'success');
-        loadQueue(next ? nextId : prior);
+        markDirty(false);
+        loadQueue(next ? nextId : prior, 'Ficha #' + prior + ' guardada como ' + update.estado + '.');
       }).withFailureHandler(fail).saveReview(update);
     }
     function csvCell(value) { return '"' + String(value == null ? '' : value).replace(/"/g, '""') + '"'; }
@@ -185,9 +217,13 @@
         status('CSV público descargado. Revisa el archivo antes de actualizar el repositorio.', 'success'); setBusy(false);
       }).withFailureHandler(fail).getPublicCsvData();
     }
-    queueEl.addEventListener('change', function () { if (queueEl.value) loadRecord(queueEl.value); });
-    document.getElementById('filter').addEventListener('change', function () { loadQueue(''); });
-    document.getElementById('refresh').addEventListener('click', function () { loadQueue(current && current.id); });
+    queueEl.addEventListener('change', function () { if (!canLeave()) { queueEl.value = current.id; return; } if (queueEl.value) loadRecord(queueEl.value); });
+    document.getElementById('filter').addEventListener('change', function () { if (!canLeave()) { this.value = selectedFilter; return; } selectedFilter = this.value; loadQueue(''); });
+    document.getElementById('refresh').addEventListener('click', function () { if (canLeave()) loadQueue(current && current.id); });
+    for (const id of ['status', 'verified', 'featured', 'position', 'notes']) document.getElementById(id).addEventListener('input', function () { markDirty(true); });
+    window.addEventListener('beforeunload', function (event) { if (dirty) { event.preventDefault(); event.returnValue = ''; } });
+    document.getElementById('approveNext').addEventListener('click', function () { if (!busy && current) { document.getElementById('status').value = 'Activo'; markDirty(true); save(true); } });
+    document.getElementById('rejectNext').addEventListener('click', function () { if (!busy && current) { document.getElementById('status').value = 'Rechazado'; markDirty(true); save(true); } });
     document.getElementById('save').addEventListener('click', function () { save(false); });
     document.getElementById('saveNext').addEventListener('click', function () { save(true); });
     document.getElementById('download').addEventListener('click', downloadCsv);

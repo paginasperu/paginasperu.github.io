@@ -342,3 +342,15 @@
   height: 1px;
   overflow: hidden;
 }
+
+.register-field .field-error, .register-consent .field-error { color: #a61b1b; font-size: 12px; line-height: 1.5; }
+.register-field [aria-invalid="true"] { border-color: #b3261e; background: #fffafa; }
+.register-field input:focus-visible, .register-field textarea:focus-visible, .register-field select:focus-visible, .image-crop__canvas:focus-visible { outline: 3px solid #2359d1; outline-offset: 3px; }
+.register-field small, .register-upload output, .image-crop__hint { color: #595959; }
+.register-upload > label { display: grid; gap: 8px; }
+.register-consent { flex-wrap: wrap; }
+.register-consent > span { flex: 1; }
+.register-consent .field-error { flex: 0 0 100%; }
+.register-status:focus { outline: 3px solid #2359d1; outline-offset: 4px; }
+input[type="checkbox"]:focus-visible, input[type="range"]:focus-visible { outline: 3px solid #2359d1; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .register-submit { transition: none; transform: none !important; } }

@@ -1,3 +1,5 @@
+import { attachFieldValidation } from './form-validation.js';
+
 const SITE_CONFIG = {
   appsScriptEndpoint: "https://script.google.com/macros/s/AKfycbyFHXYtrjWYk3QDHj-SoV-lquJI9VQ0dbOSVfA7fJlFIHJGLK8ZXAJ_MlOHkwooYgrFxw/exec",
   cloudinary: {
@@ -8,6 +10,7 @@ const SITE_CONFIG = {
 };
 
 const form = document.querySelector("#registro");
+const fieldValidation = attachFieldValidation(form);
 const message = document.querySelector("#mensaje");
 const submitButton = document.querySelector("#enviar");
 const departmentSelect = document.querySelector("#departamento");
@@ -181,8 +184,20 @@ for (const input of form.querySelectorAll("input[type='file']")) {
   const zoomControl = form.querySelector(`[data-zoom-for="${input.name}"]`);
   const output = form.querySelector(`[data-file-for="${input.name}"]`);
   const targetDimensions = input.name === "foto_perfil" ? [150, 150] : [540, 720];
+  canvas.tabIndex = 0;
+  canvas.addEventListener("keydown", event => {
+    const direction = { ArrowLeft: [-.03, 0], ArrowRight: [.03, 0], ArrowUp: [0, -.03], ArrowDown: [0, .03] }[event.key];
+    const state = cropStates.get(input.name);
+    if (!direction || !state) return;
+    event.preventDefault();
+    state.x = Math.max(0, Math.min(1, state.x + direction[0]));
+    state.y = Math.max(0, Math.min(1, state.y + direction[1]));
+    renderCropPreview(state, canvas);
+  });
 
   input.addEventListener("change", async () => {
+    input.setCustomValidity("");
+    fieldValidation.setError(input, "");
     clearCropState(input);
     const file = input.files?.[0];
     if (!file) return;
@@ -206,6 +221,8 @@ for (const input of form.querySelectorAll("input[type='file']")) {
       renderCropPreview(state, canvas);
     } catch (error) {
       output.textContent = error.message;
+      input.setCustomValidity(error.message);
+      fieldValidation.setError(input, error.message);
     }
   });
 
@@ -239,6 +256,7 @@ for (const input of form.querySelectorAll("input[type='file']")) {
 }
 
 function clearCropState(input) {
+  input.setCustomValidity("");
   const state = cropStates.get(input.name);
   if (state?.objectUrl) URL.revokeObjectURL(state.objectUrl);
   cropStates.delete(input.name);
@@ -288,17 +306,6 @@ function imageFieldName(input) {
   return heading.replace(/\s*\*\s*/g, "").trim();
 }
 
-function ageOnDate(dateText) {
-  const birthDate = new Date(`${dateText}T00:00:00`);
-  if (Number.isNaN(birthDate.getTime())) return null;
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const beforeBirthday = today.getMonth() < birthDate.getMonth()
-    || (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate());
-  if (beforeBirthday) age -= 1;
-  return age;
-}
-
 function configureBirthDateLimits() {
   const input = document.querySelector("#fecha_nacimiento");
   const today = new Date();
@@ -307,17 +314,6 @@ function configureBirthDateLimits() {
   const earliest = new Date(today.getFullYear() - 51, today.getMonth(), today.getDate() + 1);
   input.max = toIso(latest);
   input.min = toIso(earliest);
-}
-
-function validateAge() {
-  const age = ageOnDate(form.fecha_nacimiento.value);
-  if (age === null || age < 18 || age > 50) {
-    form.fecha_nacimiento.setCustomValidity("La edad debe estar entre 18 y 50 años.");
-    form.fecha_nacimiento.reportValidity();
-    form.fecha_nacimiento.setCustomValidity("");
-    return false;
-  }
-  return true;
 }
 
 function cleanFormValues() {
@@ -481,12 +477,13 @@ form.addEventListener("submit", async (event) => {
   event.preventDefault();
   clearMessage();
   trimTextFields();
-  if (!form.reportValidity() || !validateAge()) return;
+  if (!fieldValidation.validate()) return;
 
   const isLocationValid = locationRows.some((row) => row.departamento === departmentSelect.value
     && row.provincia === provinceSelect.value && row.distrito === districtSelect.value);
   if (!isLocationValid) {
-    showMessage("Selecciona departamento, provincia y distrito de las listas disponibles.", "error");
+    fieldValidation.setError(districtSelect, "Selecciona una combinación válida de ubicación.");
+    districtSelect.focus();
     return;
   }
 
@@ -497,6 +494,7 @@ form.addEventListener("submit", async (event) => {
     }
 
     submitButton.disabled = true;
+    form.setAttribute("aria-busy", "true");
     const payload = cleanFormValues();
     const fingerprint = JSON.stringify([payload, imageFingerprint(form.foto_perfil), imageFingerprint(form.imagen_portada)]);
     if (!pendingSubmission || pendingSubmission.fingerprint !== fingerprint) pendingSubmission = { fingerprint, id: newSubmissionId() };
@@ -517,7 +515,7 @@ form.addEventListener("submit", async (event) => {
       profilePhoto.failed ? "la foto de perfil" : "",
       coverImage.failed ? "la imagen de portada" : "",
     ].filter(Boolean);
-    const confirmation = result.message || "Recibimos tu perfil para revisión.";
+    const confirmation = `Solicitud #${result.id} recibida. Tu perfil está pendiente de revisión; aún no es público.`;
     if (failedImages.length === 2) {
       showMessage(`${confirmation} No se pudieron cargar las imágenes; agrégalas antes de publicar el perfil.`, "warning");
     } else if (failedImages.length === 1) {
@@ -526,6 +524,10 @@ form.addEventListener("submit", async (event) => {
       showMessage(confirmation);
     }
     form.reset();
+    fieldValidation.reset();
+    message.tabIndex = -1;
+    message.focus();
+    message.scrollIntoView({ block: "center", behavior: "instant" });
     await discardUnusedImages([payload.foto_perfil, payload.imagen_portada]);
     uploadedImages.clear();
     pendingSubmission = null;
@@ -536,6 +538,9 @@ form.addEventListener("submit", async (event) => {
     provinceSelect.disabled = true;
     districtSelect.disabled = true;
   } catch (error) {
+    for (const control of form.elements) {
+      if (control.name && control.name !== "website" && error.message?.includes(control.name)) fieldValidation.setError(control, error.message);
+    }
     if (pendingSubmission) {
       if (error.definitive && !pendingSubmission.uncertain) await discardUnusedImages();
       else if (!error.definitive) {
@@ -545,6 +550,7 @@ form.addEventListener("submit", async (event) => {
     }
     showMessage(error.message || "No se pudo completar el envío.", "error");
   } finally {
+    form.removeAttribute("aria-busy");
     submitButton.disabled = false;
     submitButton.textContent = "Enviar para revisión";
   }

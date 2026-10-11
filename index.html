@@ -24,18 +24,19 @@
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23000'/%3E%3C/svg%3E"
     />
-    <link rel="stylesheet" href="./styles/index.css?v=20261011-5" />
-    <script src="./scripts/index.js?v=20261011-2" type="module"></script>
+    <link rel="stylesheet" href="./styles/index.css?v=20261011-7" />
+    <script src="./scripts/index.js?v=20261011-3" type="module"></script>
     <link rel="canonical" href="https://oficial.pe/" />
     <meta property="og:url" content="https://oficial.pe/" />
   </head>
   <body>
+    <a class="skip-link" href="#gallery">Saltar a los perfiles</a>
     <main class="page">
       <div class="page__content">
         <header class="directory-header">
           <h1 id="directory-title" class="visually-hidden">DIRECTORIO OFICIAL</h1>
           <div class="directory-topbar">
-            <label class="search">
+            <div class="search">
             <svg aria-hidden="true" class="search__icon" fill="none" viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8" />
               <path
@@ -45,7 +46,7 @@
                 stroke-width="1.8"
               />
             </svg>
-            <span class="visually-hidden">Buscar talento</span>
+            <label class="visually-hidden" for="search-input">Buscar talento</label>
             <input
               id="search-input"
               autocomplete="off"
@@ -53,7 +54,8 @@
               placeholder="Buscar por nombre o descripción"
               type="search"
             />
-            </label>
+            <button id="clear-search" class="search-clear" type="button" aria-label="Limpiar búsqueda" hidden>×</button>
+            </div>
             <details class="site-menu">
               <summary class="site-menu__toggle" aria-label="Abrir menú">
                 <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
@@ -169,7 +171,7 @@
           ></div>
         </header>
 
-        <section
+        <section tabindex="-1"
           id="gallery"
           class="gallery"
           aria-label="Galería de perfiles"
@@ -178,6 +180,7 @@
         <p id="empty-state" class="empty-state" hidden>
           No encontramos perfiles con esos criterios.
         </p>
+        <button id="reset-results" class="reset-results" type="button" hidden>Restablecer búsqueda y filtros</button>
 
         <div id="loader" class="loader" aria-label="Cargando más perfiles" role="status">
           <span class="loader__spinner" aria-hidden="true"></span>
@@ -268,7 +271,7 @@
           </section>
 
           <section id="modal-social-section" class="profile-section">
-            <p class="section-eyebrow">Redes sociales</p>
+            <p class="section-eyebrow">Portafolio y redes</p>
             <div class="social-links">
               <a id="modal-behance" href="#" target="_blank" rel="noopener noreferrer">Behance</a>
               <a id="modal-instagram" href="#" target="_blank" rel="noopener noreferrer">Instagram</a>

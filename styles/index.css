@@ -13,6 +13,8 @@
   --accent: #111;
 }
 
+textarea:focus-visible, input:focus-visible { outline: 3px solid #2359d1; outline-offset: 3px; }
+
 * {
   box-sizing: border-box;
 }
@@ -1211,3 +1213,52 @@ summary {
   font-size: 11px;
   font-weight: 650;
 }
+
+.search:focus-within { box-shadow: 0 0 0 3px #bdd0f3; }
+
+/* Tarjetas y ficha con más aire, manteniendo la cabecera actual del directorio. */
+.directory-topbar { gap: 10px; }
+.search { height: 50px; border: 1px solid #d7d7d7; background: #fafafa; }
+.search:focus-within { border-color: #2359d1; box-shadow: 0 0 0 3px #c7d8f5; }
+.search__input::placeholder { color: #626262; }
+.search-clear { width: 44px; height: 44px; flex: 0 0 auto; border: 0; background: transparent; font-size: 24px; }
+.search__input::-webkit-search-cancel-button { display: none; }
+.category, .control-button, .sort-control select, .check { min-height: 44px; }
+.field span, .section-eyebrow { color: #595959; }
+.clear-button { min-height: 44px; }
+.active-filter { min-height: 40px; color: #333; background: #f1f3f5; }
+.active-filters { justify-content: flex-start; }
+.results-meta { margin-top: 24px; }
+.gallery { gap: 22px; overflow: visible; align-items: stretch; grid-auto-rows: 1fr; }
+.profile-card { display: flex; aspect-ratio: auto; border: 1px solid #e2e2e2; border-radius: 16px; background: #fff; }
+.profile-card::after { display: none; }
+.profile-card__open { display: flex; flex: 1; flex-direction: column; height: auto; text-align: left; }
+.profile-card__open > img { width: 100%; height: auto; aspect-ratio: 3 / 4; }
+.profile-card__info { position: static; display: grid; gap: 5px; width: 100%; padding: 17px; color: #161616; background: #fff; }
+.profile-card:hover .profile-card__info { padding-bottom: 17px; }
+.profile-card:hover img { transform: none; }
+.profile-card__name { font-size: 18px; line-height: 1.35; overflow-wrap: anywhere; }
+.profile-card__meta { color: #333; font-size: 13px; white-space: normal; }
+.profile-card__location, .profile-card__summary { color: #595959; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.profile-card__summary { margin-top: 6px; padding-top: 10px; border-top: 1px solid #ededed; }
+.profile-demo { justify-self: start; color: #654900; background: #fff4ce; font-size: 11px; }
+.card-verified { color: #1b5bc2; }
+.profile-favorite { width: 44px; height: 44px; background: #222b; }
+.profile-card__featured { background: #fff2c5; color: #574000; }
+.empty-state { min-height: auto; padding: 70px 20px 16px; color: #595959; }
+.reset-results { display: block; min-height: 44px; margin: 0 auto 60px; padding: 10px 18px; border: 1px solid #ccc; border-radius: 999px; background: #fff; }
+.profile-details { padding: 28px; }
+.profile-name-line h2 { font-size: 23px; white-space: normal; overflow-wrap: anywhere; }
+.profile-heading__copy > p, .profile-description, .profile-location { font-size: 15px; }
+.profile-tags small { color: #595959; font-size: 10px; }
+.share-button, .favorite-action, .social-links a { min-height: 44px; font-size: 13px; }
+.modal-close, .modal-nav { min-width: 44px; min-height: 44px; background: #171717d9; }
+.modal-close { position: sticky; float: right; top: 12px; margin: 12px; grid-column: 1 / -1; margin-bottom: -56px; justify-self: end; }
+.profile-media { grid-column: 1; }
+.whatsapp-button { display: flex; flex-wrap: wrap; min-height: 48px; gap: 8px 12px; }
+.whatsapp-button strong { font-size: 12px; font-weight: 500; }
+.skip-link { position: fixed; z-index: 20; top: -100px; left: 16px; padding: 14px; background: #111; color: #fff; }
+.skip-link:focus { top: 12px; }
+@media (min-width: 640px) { .gallery { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (min-width: 1024px) { .gallery { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+@media (max-width: 639px) { .profile-details { padding: 22px 20px; } .filter-panel { grid-template-columns: 1fr; } .filter-panel .field { min-width: 0; } }

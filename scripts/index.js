@@ -493,6 +493,7 @@ function updateFilterCount() {
 
 function updateActiveFilters() {
   const filters = [
+    elements.search.value.trim() && ["search", `Búsqueda: ${elements.search.value.trim()}`],
     favoriteOnly && ["favorites", "Favoritos"],
     activeCategory !== "Todos" && ["category", activeCategory],
     elements.department.value && ["department", elements.department.value],
@@ -518,7 +519,9 @@ function updateActiveFilters() {
 }
 
 function removeActiveFilter(filter) {
-  if (filter === "favorites") {
+  if (filter === "search") {
+    elements.search.value = "";
+  } else if (filter === "favorites") {
     favoriteOnly = false;
     updateFavoritesSummary();
   } else if (filter === "category") {
@@ -581,6 +584,8 @@ function updateSortControls() {
 function applyFilters() {
   window.clearTimeout(loadTimer);
   const query = elements.search.value;
+  document.querySelector("#clear-search").hidden = !query;
+  document.querySelector("#reset-results").hidden = true;
 
   filteredProfiles = sortProfiles(
     profiles.filter(
@@ -612,6 +617,7 @@ function applyFilters() {
     : favoriteOnly
       ? "Aún no tienes perfiles favoritos con esos criterios."
       : "No encontramos perfiles con esos criterios.";
+  document.querySelector("#reset-results").hidden = filteredProfiles.length > 0 || profiles.length === 0;
   updateFilterCount();
   updateActiveFilters();
   renderNextBatch({ immediate: true });
@@ -646,8 +652,21 @@ function createProfileCard(profile, index) {
   const meta = document.createElement("span");
   meta.className = "profile-card__meta";
   meta.textContent =
-    `${profile.categoria} · ${profile.distrito}, ${profile.departamento}`;
-  info.append(name, meta);
+    profile.categoria;
+  const location = document.createElement("span");
+  location.className = "profile-card__location";
+  location.textContent = `${profile.distrito}, ${profile.departamento}`;
+  const details = document.createElement("span");
+  details.className = "profile-card__summary";
+  details.textContent = [profile.experiencia, profile.nivel_precio].filter(Boolean).join(" · ");
+  if (profile.verificado) {
+    const verified = document.createElement("span");
+    verified.className = "card-verified";
+    verified.textContent = " ✓";
+    verified.setAttribute("aria-label", "Verificado");
+    name.append(verified);
+  }
+  info.append(name, meta, location, details);
   if (profile.demo) {
     const demo = document.createElement("span");
     demo.className = "profile-demo";
@@ -891,6 +910,13 @@ async function shareActiveProfile() {
 }
 
 function clearFilters() {
+  elements.search.value = "";
+  activeCategory = "Todos";
+  for (const category of elements.categories.querySelectorAll(".category")) {
+    const selected = category.dataset.category === "Todos";
+    category.classList.toggle("is-active", selected);
+    category.setAttribute("aria-pressed", String(selected));
+  }
   elements.department.value = "";
   updateLocationOptions("department");
   elements.province.value = "";
@@ -1060,3 +1086,6 @@ if (siteMenu && siteMenuToggle) {
 }
 
 initializeDirectory();
+
+ document.querySelector("#clear-search").addEventListener("click", () => { elements.search.value=""; applyFilters(); elements.search.focus(); });
+ document.querySelector("#reset-results").addEventListener("click", () => { clearFilters(); elements.search.focus(); });
