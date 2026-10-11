@@ -19,6 +19,7 @@ const MAX_SOURCE_IMAGE_BYTES = 1024 * 1024;
 const MAX_PROCESSING_WIDTH = 1200;
 const MAX_PROCESSING_HEIGHT = 1500;
 const JPEG_QUALITY = 0.86;
+const cropStates = new Map();
 
 function parseCsv(text) {
   const rows = [];
@@ -147,10 +148,111 @@ for (const name of ["correo", "behance_usuario", "instagram_usuario", "linkedin_
 }
 
 for (const input of form.querySelectorAll("input[type='file']")) {
-  input.addEventListener("change", () => {
-    const output = document.querySelector(`[data-file-for="${input.name}"]`);
-    output.textContent = input.files[0] ? input.files[0].name : "";
+  const preview = form.querySelector(`[data-crop-for="${input.name}"]`);
+  const canvas = form.querySelector(`[data-preview-for="${input.name}"]`);
+  const zoomControl = form.querySelector(`[data-zoom-for="${input.name}"]`);
+  const output = form.querySelector(`[data-file-for="${input.name}"]`);
+  const targetDimensions = input.name === "foto_perfil" ? [150, 150] : [540, 720];
+
+  input.addEventListener("change", async () => {
+    clearCropState(input);
+    const file = input.files?.[0];
+    if (!file) return;
+    const fieldName = imageFieldName(input);
+    try {
+      validateImageFile(file, fieldName);
+      const objectUrl = URL.createObjectURL(file);
+      let image;
+      try {
+        image = await decodeImage(objectUrl, fieldName);
+      } catch (error) {
+        URL.revokeObjectURL(objectUrl);
+        throw error;
+      }
+      const state = { file, image, objectUrl, zoom: 1, x: 0.5, y: 0.5, dimensions: targetDimensions };
+      cropStates.set(input.name, state);
+      canvas.width = 360;
+      canvas.height = Math.round(360 * targetDimensions[1] / targetDimensions[0]);
+      preview.hidden = false;
+      output.textContent = "Ajusta el encuadre antes de enviar";
+      renderCropPreview(state, canvas);
+    } catch (error) {
+      output.textContent = error.message;
+    }
   });
+
+  zoomControl.addEventListener("input", () => {
+    const state = cropStates.get(input.name);
+    if (!state) return;
+    state.zoom = Number(zoomControl.value);
+    renderCropPreview(state, canvas);
+  });
+
+  let dragStart;
+  canvas.addEventListener("pointerdown", (event) => {
+    const state = cropStates.get(input.name);
+    if (!state) return;
+    dragStart = { clientX: event.clientX, clientY: event.clientY, x: state.x, y: state.y };
+    canvas.setPointerCapture(event.pointerId);
+  });
+  canvas.addEventListener("pointermove", (event) => {
+    const state = cropStates.get(input.name);
+    if (!state || !dragStart) return;
+    const rect = canvas.getBoundingClientRect();
+    const crop = getCropRect(state.image.naturalWidth, state.image.naturalHeight, targetDimensions, state.zoom, 0.5, 0.5);
+    const movableX = state.image.naturalWidth - crop.width;
+    const movableY = state.image.naturalHeight - crop.height;
+    state.x = movableX ? Math.max(0, Math.min(1, dragStart.x - (event.clientX - dragStart.clientX) * crop.width / rect.width / movableX)) : 0.5;
+    state.y = movableY ? Math.max(0, Math.min(1, dragStart.y - (event.clientY - dragStart.clientY) * crop.height / rect.height / movableY)) : 0.5;
+    renderCropPreview(state, canvas);
+  });
+  canvas.addEventListener("pointerup", () => { dragStart = null; });
+  canvas.addEventListener("pointercancel", () => { dragStart = null; });
+}
+
+function clearCropState(input) {
+  const state = cropStates.get(input.name);
+  if (state?.objectUrl) URL.revokeObjectURL(state.objectUrl);
+  cropStates.delete(input.name);
+  const preview = form.querySelector(`[data-crop-for="${input.name}"]`);
+  if (preview) preview.hidden = true;
+  const zoomControl = form.querySelector(`[data-zoom-for="${input.name}"]`);
+  if (zoomControl) zoomControl.value = "1";
+  const output = form.querySelector(`[data-file-for="${input.name}"]`);
+  if (output) output.textContent = "";
+}
+
+function validateImageFile(file, fieldName) {
+  if (file.size > MAX_SOURCE_IMAGE_BYTES) throw new Error(`${fieldName}: el archivo original no puede superar 1 MB.`);
+}
+
+function decodeImage(objectUrl, fieldName) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => image.naturalWidth && image.naturalHeight
+      ? resolve(image)
+      : reject(new Error(`${fieldName}: la imagen no tiene dimensiones válidas.`));
+    image.onerror = () => reject(new Error(`${fieldName}: no se pudo leer la imagen.`));
+    image.src = objectUrl;
+  });
+}
+
+function getCropRect(sourceWidth, sourceHeight, targetDimensions, zoom, x, y) {
+  const targetRatio = targetDimensions[0] / targetDimensions[1];
+  let width = sourceWidth;
+  let height = sourceHeight;
+  if (sourceWidth / sourceHeight > targetRatio) width = sourceHeight * targetRatio;
+  else height = sourceWidth / targetRatio;
+  width /= zoom;
+  height /= zoom;
+  return { x: (sourceWidth - width) * x, y: (sourceHeight - height) * y, width, height };
+}
+
+function renderCropPreview(state, canvas) {
+  const context = canvas.getContext("2d");
+  const crop = getCropRect(state.image.naturalWidth, state.image.naturalHeight, state.dimensions, state.zoom, state.x, state.y);
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(state.image, crop.x, crop.y, crop.width, crop.height, 0, 0, canvas.width, canvas.height);
 }
 
 function imageFieldName(input) {
@@ -217,53 +319,35 @@ async function processImage(input, expectedDimensions, outputFilename) {
   const file = input.files[0];
   const fieldName = imageFieldName(input);
   if (!file) throw new Error(`Selecciona ${fieldName === "Foto de perfil" ? "una foto de perfil" : "una imagen de portada"}.`);
-  if (file.size > MAX_SOURCE_IMAGE_BYTES) throw new Error(`${fieldName}: el archivo original no puede superar 1 MB.`);
+  validateImageFile(file, fieldName);
 
   const signature = new Uint8Array(await file.slice(0, 12).arrayBuffer());
   const isJpeg = signature[0] === 0xff && signature[1] === 0xd8 && signature[2] === 0xff;
   const isPng = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a].every((byte, index) => signature[index] === byte);
   const isWebp = String.fromCharCode(...signature.slice(0, 4)) === "RIFF"
     && String.fromCharCode(...signature.slice(8, 12)) === "WEBP";
-  const detectedType = isJpeg ? "image/jpeg" : isPng ? "image/png" : isWebp ? "image/webp" : "";
-  if (!detectedType) {
-    throw new Error(`${fieldName}: elige una imagen JPG, PNG o WebP válida.`);
-  }
+  if (!isJpeg && !isPng && !isWebp) throw new Error(`${fieldName}: elige una imagen JPG, PNG o WebP válida.`);
 
-  const image = await new Promise((resolve, reject) => {
+  let state = cropStates.get(input.name);
+  if (!state || state.file !== file) {
     const objectUrl = URL.createObjectURL(file);
-    const decoded = new Image();
-    decoded.onload = () => { URL.revokeObjectURL(objectUrl); resolve(decoded); };
-    decoded.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error(`${fieldName}: no se pudo leer la imagen.`)); };
-    decoded.src = objectUrl;
-  });
-  if (!image.naturalWidth || !image.naturalHeight) throw new Error(`${fieldName}: la imagen no tiene dimensiones válidas.`);
-
-  const processingScale = Math.min(1, MAX_PROCESSING_WIDTH / image.naturalWidth, MAX_PROCESSING_HEIGHT / image.naturalHeight);
-  const processingCanvas = document.createElement("canvas");
-  processingCanvas.width = Math.max(1, Math.round(image.naturalWidth * processingScale));
-  processingCanvas.height = Math.max(1, Math.round(image.naturalHeight * processingScale));
-  const processingContext = processingCanvas.getContext("2d");
-  if (!processingContext) throw new Error("Este navegador no pudo preparar la imagen.");
-  processingContext.drawImage(image, 0, 0, processingCanvas.width, processingCanvas.height);
-
-  const targetRatio = expectedDimensions[0] / expectedDimensions[1];
-  const sourceRatio = processingCanvas.width / processingCanvas.height;
-  let cropWidth = processingCanvas.width;
-  let cropHeight = processingCanvas.height;
-  if (sourceRatio > targetRatio) cropWidth = processingCanvas.height * targetRatio;
-  else cropHeight = processingCanvas.width / targetRatio;
-  const cropX = (processingCanvas.width - cropWidth) / 2;
-  const cropY = (processingCanvas.height - cropHeight) / 2;
+    try {
+      state = { file, image: await decodeImage(objectUrl, fieldName), zoom: 1, x: 0.5, y: 0.5, dimensions: expectedDimensions };
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+    }
+  }
+  const processingScale = Math.min(1, MAX_PROCESSING_WIDTH / state.image.naturalWidth, MAX_PROCESSING_HEIGHT / state.image.naturalHeight);
+  const sourceWidth = Math.max(1, Math.round(state.image.naturalWidth * processingScale));
+  const sourceHeight = Math.max(1, Math.round(state.image.naturalHeight * processingScale));
+  const crop = getCropRect(sourceWidth, sourceHeight, expectedDimensions, state.zoom, state.x, state.y);
 
   const outputCanvas = document.createElement("canvas");
   outputCanvas.width = expectedDimensions[0];
   outputCanvas.height = expectedDimensions[1];
   const outputContext = outputCanvas.getContext("2d");
   if (!outputContext) throw new Error("Este navegador no pudo convertir la imagen.");
-  outputContext.drawImage(processingCanvas, cropX, cropY, cropWidth, cropHeight, 0, 0, outputCanvas.width, outputCanvas.height);
-  processingCanvas.width = 0;
-  processingCanvas.height = 0;
-
+  outputContext.drawImage(state.image, crop.x / processingScale, crop.y / processingScale, crop.width / processingScale, crop.height / processingScale, 0, 0, outputCanvas.width, outputCanvas.height);
   const jpegBlob = await new Promise((resolve) => outputCanvas.toBlob(resolve, "image/jpeg", JPEG_QUALITY));
   outputCanvas.width = 0;
   outputCanvas.height = 0;
@@ -401,7 +485,7 @@ form.addEventListener("submit", async (event) => {
       showMessage(confirmation);
     }
     form.reset();
-    for (const output of form.querySelectorAll("[data-file-for]")) output.textContent = "";
+    for (const input of form.querySelectorAll("input[type='file']")) clearCropState(input);
     setOptions(provinceSelect, [], "Selecciona primero un departamento");
     setOptions(districtSelect, [], "Selecciona primero una provincia");
     provinceSelect.disabled = true;

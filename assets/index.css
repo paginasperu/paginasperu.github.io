@@ -1191,3 +1191,12 @@ a:focus-visible {
     margin-top: 24px;
   }
 }
+
+
+a,
+button,
+input,
+select,
+summary {
+  -webkit-tap-highlight-color: rgb(17 17 17 / 10%);
+}

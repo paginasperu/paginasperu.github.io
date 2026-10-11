@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Registra tu perfil profesional en el Directorio Oficial de Publicidad." />
     <title>Registro | Directorio Oficial de Publicidad</title>
-    <link rel="stylesheet" href="./assets/index.css?v=20261011-4" />
+    <link rel="stylesheet" href="./assets/index.css?v=20261011-6" />
     <link rel="stylesheet" href="./assets/registro.css?v=20261011-3" />
-    <script type="module" src="./assets/registro.js?v=20261011-2"></script>
+    <script type="module" src="./assets/registro.js?v=20261011-4"></script>
   </head>
   <body>
     <main class="page register-page">
@@ -40,8 +40,8 @@
           <section class="register-section" aria-labelledby="section-contact">
             <div class="register-section__heading"><span>03</span><div><h2 id="section-contact">Datos de contacto</h2></div></div>
             <div class="register-grid">
-              <label class="register-field" for="whatsapp_publico"><span>WhatsApp público</span><input id="whatsapp_publico" name="whatsapp_publico" type="tel" inputmode="tel" autocomplete="tel" placeholder="950 141 414" maxlength="20" pattern="[0-9+() -]*" title="Usa solo números, espacios, +, paréntesis o guiones." /><small>Será visible en tu perfil para que te contacten</small></label>
-              <label class="register-field" for="whatsapp_interno"><span>WhatsApp privado <b aria-hidden="true">*</b></span><input id="whatsapp_interno" name="whatsapp_interno" type="tel" inputmode="tel" autocomplete="tel" placeholder="950 141 414" maxlength="20" pattern="[0-9+() -]*" title="Usa solo números, espacios, +, paréntesis o guiones." required /><small>Se usará para gestiones de nuestra agencia</small></label>
+              <label class="register-field" for="whatsapp_publico"><span>WhatsApp público</span><input id="whatsapp_publico" name="whatsapp_publico" type="tel" inputmode="tel" autocomplete="tel" placeholder="950 141 414" maxlength="20" pattern="[0-9+() -]*" title="Usa solo números, espacios, +, paréntesis o guiones." /><small>Sería visible para cualquier persona</small></label>
+              <label class="register-field" for="whatsapp_interno"><span>WhatsApp privado <b aria-hidden="true">*</b></span><input id="whatsapp_interno" name="whatsapp_interno" type="tel" inputmode="tel" autocomplete="tel" placeholder="950 141 414" maxlength="20" pattern="[0-9+() -]*" title="Usa solo números, espacios, +, paréntesis o guiones." required /><small>Será visible solo para nuestra agencia</small></label>
               <label class="register-field" for="correo"><span>Correo <b aria-hidden="true">*</b></span><input id="correo" name="correo" type="email" autocomplete="email" minlength="3" maxlength="50" required /></label>
               <label class="register-field" for="instagram_usuario"><span>Usuario de Instagram</span><input id="instagram_usuario" name="instagram_usuario" minlength="3" maxlength="50" /></label>
               <label class="register-field" for="linkedin_usuario"><span>Usuario de LinkedIn</span><input id="linkedin_usuario" name="linkedin_usuario" minlength="3" maxlength="50" /></label>
@@ -63,10 +63,10 @@
           </section>
 
           <section class="register-section" aria-labelledby="section-images">
-            <div class="register-section__heading"><span>05</span><div><h2 id="section-images">Imágenes <span class="register-optional">Opcional</span></h2><p>Si aún no tienes las fotos, puedes enviar el formulario y coordinaremos cómo agregarlas antes de publicar tu perfil.</p></div></div>
+            <div class="register-section__heading"><span>05</span><div><h2 id="section-images">Imágenes <span class="register-optional">Opcional</span></h2></div></div>
             <div class="register-grid">
-              <label class="register-field register-upload" for="foto_perfil"><span>Foto de perfil</span><input id="foto_perfil" name="foto_perfil" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" /><small>Tamaño 150 x 150 pixeles y formato JPG, PNG o WebP de hasta 1 MB.</small><output data-file-for="foto_perfil"></output></label>
-              <label class="register-field register-upload" for="imagen_portada"><span>Imagen de portada</span><input id="imagen_portada" name="imagen_portada" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" /><small>Tamaño 540 x 720 pixeles y formato JPG, PNG o WebP de hasta 1 MB.</small><output data-file-for="imagen_portada"></output></label>
+              <label class="register-field register-upload" for="foto_perfil"><span>Foto de perfil</span><input id="foto_perfil" name="foto_perfil" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" /><div class="image-crop" data-crop-for="foto_perfil" hidden><canvas class="image-crop__canvas" data-preview-for="foto_perfil" aria-label="Vista previa del recorte de foto de perfil"></canvas><label class="image-crop__zoom">Zoom <input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="foto_perfil" /></label><small class="image-crop__hint">Arrastra la imagen para elegir el encuadre</small></div><small>Tamaño 150 x 150 pixeles y formato JPG, PNG o WebP de hasta 1 MB.</small><output data-file-for="foto_perfil" aria-live="polite"></output></label>
+              <label class="register-field register-upload" for="imagen_portada"><span>Imagen de portada</span><input id="imagen_portada" name="imagen_portada" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" /><div class="image-crop" data-crop-for="imagen_portada" hidden><canvas class="image-crop__canvas" data-preview-for="imagen_portada" aria-label="Vista previa del recorte de imagen de portada"></canvas><label class="image-crop__zoom">Zoom <input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="imagen_portada" /></label><small class="image-crop__hint">Arrastra la imagen para elegir el encuadre</small></div><small>Tamaño 540 x 720 pixeles y formato JPG, PNG o WebP de hasta 1 MB.</small><output data-file-for="imagen_portada" aria-live="polite"></output></label>
             </div>
           </section>
 
@@ -76,7 +76,7 @@
           </section>
 
           <div id="mensaje" class="register-status" role="status" aria-live="polite" hidden></div>
-          <div class="register-actions"><button id="enviar" class="register-submit" type="submit">Enviar para revisión</button><p>Revisaremos la información antes de publicar tu perfil.</p></div>
+          <div class="register-actions"><button id="enviar" class="register-submit" type="submit">Enviar para revisión</button></div>
         </form>
         <footer class="contact-footer" aria-label="Enlaces del sitio">
           <a href="./">Directorio</a>
