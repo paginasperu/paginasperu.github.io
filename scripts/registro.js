@@ -139,7 +139,7 @@ async function loadLocations() {
   const rows = parseCsv(await response.text()).filter((row) => row.departamento && row.provincia && row.distrito);
   if (!rows.length) throw new Error("El catálogo de ubicaciones está vacío o tiene encabezados distintos.");
   locationOptions = prepareLocationOptions(rows);
-  locationStatus.textContent = `${locationOptions.length.toLocaleString("es-PE")} ubicaciones disponibles.`;
+  locationStatus.textContent = "";
 }
 
 function closeLocationList() {
@@ -153,7 +153,7 @@ function selectLocation(option) {
   selectedLocation = option;
   locationInput.value = option.label;
   locationInput.dataset.locationSelected = "true";
-  locationStatus.textContent = `Ubicación seleccionada: ${option.label}`;
+  locationStatus.textContent = "";
   fieldValidation.setError(locationInput, "");
   closeLocationList();
 }
@@ -168,7 +168,7 @@ function renderLocationOptions(query) {
     closeLocationList();
     locationStatus.textContent = query.trim()
       ? "Escribe al menos dos caracteres para buscar."
-      : `${locationOptions.length.toLocaleString("es-PE")} ubicaciones disponibles. Escribe para buscar.`;
+      : "";
     return;
   }
 

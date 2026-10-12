@@ -21,17 +21,16 @@
 
         <form id="registro" class="register-form" novalidate>
           <section class="register-section" aria-labelledby="section-contact">
-            <div class="register-section__heading"><span>01</span><div><h2 id="section-contact">Datos básicos y contactos</h2></div></div>
+            <div class="register-section__heading"><span>01</span><div><h2 id="section-contact">Datos básicos y de contacto</h2></div></div>
             <div class="register-grid">
               <label class="register-field" for="nombres"><span>Nombres <b aria-hidden="true">*</b></span><input id="nombres" name="nombres" autocomplete="given-name" minlength="2" maxlength="150" required /></label>
               <label class="register-field" for="apellidos"><span>Apellidos <b aria-hidden="true">*</b></span><input id="apellidos" name="apellidos" autocomplete="family-name" minlength="2" maxlength="150" required /></label>
               <div class="register-field register-field--wide" id="location-field">
                 <label class="register-field__label" for="ubicacion"><span>Distrito, provincia y departamento <b aria-hidden="true">*</b></span></label>
                 <div class="location-combobox">
-                  <input id="ubicacion" name="ubicacion" type="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ubicacion-listbox" aria-describedby="ubicacion-help" autocomplete="off" placeholder="Busca una ubicación" maxlength="120" required />
+                  <input id="ubicacion" name="ubicacion" type="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ubicacion-listbox" autocomplete="off" placeholder="Busca una ubicación" maxlength="120" required />
                   <ul id="ubicacion-listbox" class="location-options" role="listbox" aria-label="Ubicaciones disponibles" hidden></ul>
                 </div>
-                <small id="ubicacion-help">Escribe el distrito, la provincia o el departamento y selecciona una opción completa.</small>
                 <small id="ubicacion-status" class="location-status" role="status" aria-live="polite"></small>
               </div>
               <label class="register-field" for="whatsapp_publico"><span>WhatsApp público</span><input id="whatsapp_publico" name="whatsapp_publico" type="tel" inputmode="tel" autocomplete="tel" placeholder="950 141 414" maxlength="20" pattern="[0-9+() -]*" title="Usa solo números, espacios, +, paréntesis o guiones." /><small>Será visible para cualquier persona</small></label>
