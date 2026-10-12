@@ -1,4 +1,5 @@
 import { getSupabaseClient, isSupabaseConfigured } from "./supabase-client.js";
+import { invalidatePublicProfileCache } from "./profile-cache.js?v=20261012-1";
 
 const $ = (selector) => document.querySelector(selector);
 const loginView = $("#login-view");
@@ -200,6 +201,7 @@ async function saveRecord(forceStatus = "", advance = false) {
   try {
     const { data, error } = await state.client.from("profiles").update(update).eq("id", Number(state.selectedId)).select("*").single();
     if (error) throw error;
+    invalidatePublicProfileCache();
     const at = state.profiles.findIndex((record) => String(record.id) === state.selectedId);
     if (at >= 0) state.profiles[at] = data;
     const nextRecords = filteredProfiles();
@@ -217,12 +219,13 @@ function applyFilters() {
   if (state.selectedId) renderDetail(state.profiles.find((record) => String(record.id) === state.selectedId));
 }
 
-async function loadProfiles() {
+async function loadProfiles({ notify = false } = {}) {
   setBusy(true);
   list.innerHTML = '<div class="loading">Cargando perfiles…</div>';
   try {
     const { data, error } = await state.client.from("profiles").select("*").order("id", { ascending: true }).limit(1000);
     if (error) throw error;
+    invalidatePublicProfileCache();
     state.profiles = data || [];
     const districts = [...new Set(state.profiles.map((profile) => profile.distrito).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es"));
     $("#district").replaceChildren(new Option("Todos los distritos", ""), ...districts.map((district) => new Option(district, district)));
@@ -230,6 +233,7 @@ async function loadProfiles() {
     if (state.selectedId && state.profiles.some((record) => String(record.id) === state.selectedId)) applyFilters();
     else { state.selectedId = state.profiles[0] ? String(state.profiles[0].id) : null; renderList(); renderDetail(state.profiles[0]); }
     $("#connection-status").textContent = "Conectado a Supabase";
+    if (notify) showToast("Datos actualizados desde Supabase");
   } catch (error) {
     list.innerHTML = `<div class="error-state">No se pudo consultar el directorio. Comprueba la configuración y las políticas de acceso de Supabase.<br>${escapeHtml(error.message || "Error de conexión")}</div>`;
     $("#connection-status").textContent = "Sin conexión";
@@ -307,7 +311,7 @@ $("#sort").addEventListener("change", applyFilters);
 document.querySelectorAll("[data-status]").forEach((button) => button.addEventListener("click", () => { state.status = button.dataset.status; document.querySelectorAll("[data-status]").forEach((item) => item.classList.toggle("is-active", item === button)); applyFilters(); }));
 document.querySelectorAll("[data-category]").forEach((button) => button.addEventListener("click", () => { state.category = button.dataset.category; document.querySelectorAll("[data-category]").forEach((item) => item.classList.toggle("is-active", item === button)); applyFilters(); }));
 $("#clear-filters").addEventListener("click", () => { state.status = "Todos"; state.category = "Todas"; state.district = ""; state.verified = false; state.featured = false; state.search = ""; $("#search").value = ""; $("#district").value = ""; $("#verified").checked = false; $("#featured").checked = false; document.querySelectorAll("[data-status]").forEach((item) => item.classList.toggle("is-active", item.dataset.status === "Todos")); document.querySelectorAll("[data-category]").forEach((item) => item.classList.toggle("is-active", item.dataset.category === "Todas")); applyFilters(); });
-$("#refresh").addEventListener("click", () => { void loadProfiles(); });
+$("#refresh").addEventListener("click", () => { void loadProfiles({ notify: true }); });
 $("#export-csv").addEventListener("click", () => { void exportPublicCsv(); });
 $("#mobile-nav").addEventListener("click", () => $("#sidebar").classList.toggle("is-open"));
 document.addEventListener("click", (event) => { if (event.target.closest("[data-status]")) $("#sidebar").classList.remove("is-open"); });

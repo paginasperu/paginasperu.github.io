@@ -1,7 +1,11 @@
 import { resolveProfileContact } from "./profile-contact.js";
-import { getSupabaseClient } from "./supabase-client.js";
-import { mapPublicProfile } from "./profile-mapper.js";
+import { fetchPublicProfiles } from "./supabase-public-api.js?v=20261012-1";
 import { normalizeText } from "./search.js";
+import {
+  PUBLIC_PROFILE_CACHE_KEY,
+  readPublicProfileCache,
+  writePublicProfileCache,
+} from "./profile-cache.js?v=20261012-1";
 
 const SITE_CONFIG = {
   title: "Directorio Oficial de Publicidad",
@@ -165,7 +169,7 @@ function profilePath(profile) {
   return `${window.location.pathname}${window.location.search}#/perfil/${profileSlug(profile)}`;
 }
 
-function resolveImageUrl(source, imageType = "cover") {
+function resolveImageUrl(source, imageType = "cover", coverWidth = 540) {
   if (!source) return PROFILE_PLACEHOLDER;
   if (/^https:\/\//i.test(source)) {
     try {
@@ -173,7 +177,7 @@ function resolveImageUrl(source, imageType = "cover") {
       if (imageUrl.hostname === "res.cloudinary.com") {
         const transform = imageType === "avatar"
           ? "c_fill,g_face,w_150,h_150,f_auto,q_auto"
-          : "c_fill,w_540,h_720,f_auto,q_auto";
+          : `c_fill,w_${coverWidth},h_${Math.round(coverWidth * 4 / 3)},f_auto,q_auto`;
         return imageUrl.href.replace("/image/upload/", `/image/upload/${transform}/`);
       }
     } catch {
@@ -185,13 +189,28 @@ function resolveImageUrl(source, imageType = "cover") {
   return PROFILE_PLACEHOLDER;
 }
 
-function setImageSource(element, source, alt = "", imageType = "cover") {
+function setImageSource(element, source, alt = "", imageType = "cover", responsive = false) {
   element.alt = alt;
   element.onerror = () => {
     element.onerror = null;
+    element.removeAttribute("srcset");
     element.src = PROFILE_PLACEHOLDER;
   };
-  element.src = resolveImageUrl(source, imageType);
+  if (responsive && imageType === "cover" && /^https:\/\//i.test(source || "")) {
+    try {
+      if (new URL(source).hostname === "res.cloudinary.com") {
+        element.sizes = "(min-width: 1024px) 362px, (min-width: 640px) 48vw, calc(100vw - 24px)";
+        element.srcset = [400, 480, 540]
+          .map((width) => `${resolveImageUrl(source, imageType, width)} ${width}w`)
+          .join(", ");
+      }
+    } catch {
+      // Se conserva el marcador si la URL no es una imagen válida de Cloudinary.
+    }
+  } else {
+    element.removeAttribute("srcset");
+  }
+  element.src = resolveImageUrl(source, imageType, 540);
 }
 
 function profileSlugFromLocation() {
@@ -210,8 +229,15 @@ async function initializeDirectory() {
   )}`;
 
   try {
-    profiles = await fetchProfilesFromSupabase();
-    profilesSnapshot = JSON.stringify(profiles);
+    const cached = readPublicProfileCache();
+    if (cached) {
+      profiles = cached.profiles;
+      profilesSnapshot = JSON.stringify(profiles);
+    } else {
+      profiles = await fetchProfilesFromSupabase();
+      profilesSnapshot = JSON.stringify(profiles);
+      writePublicProfileCache(profiles);
+    }
   } catch (error) {
     elements.resultsCount.textContent = "No se pudo cargar el directorio";
     elements.empty.textContent = "No se pudo conectar con el directorio. Inténtalo de nuevo más tarde.";
@@ -237,15 +263,15 @@ async function initializeDirectory() {
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) refreshProfiles();
   });
+  window.addEventListener("storage", (event) => {
+    if (event.key === PUBLIC_PROFILE_CACHE_KEY && event.newValue === null && !document.hidden) {
+      void refreshProfiles();
+    }
+  });
 }
 
 async function fetchProfilesFromSupabase() {
-  const { data, error } = await getSupabaseClient()
-    .from("directory_public_profiles")
-    .select("*")
-    .order("id", { ascending: true });
-  if (error) throw new Error(`No se pudo cargar el directorio (${error.message}).`);
-  return (data || []).map(mapPublicProfile);
+  return fetchPublicProfiles();
 }
 
 async function refreshProfiles() {
@@ -255,6 +281,7 @@ async function refreshProfiles() {
   try {
     const nextProfiles = await fetchProfilesFromSupabase();
     const nextSnapshot = JSON.stringify(nextProfiles);
+    writePublicProfileCache(nextProfiles);
     if (nextSnapshot === profilesSnapshot) return;
 
     const previousRenderedCount = renderedCount;
@@ -545,7 +572,7 @@ function createProfileCard(profile, index) {
     const card = profileImage.closest(".profile-card");
     if (card) card.classList.add("is-image-loaded");
   }, { once: true });
-  setImageSource(profileImage, profile.imagen_portada, `${profile.nombres} ${profile.apellidos}`, "cover");
+  setImageSource(profileImage, profile.imagen_portada, `${profile.nombres} ${profile.apellidos}`, "cover", true);
 
   const info = document.createElement("span");
   info.className = "profile-card__info";

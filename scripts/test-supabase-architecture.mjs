@@ -8,6 +8,8 @@ const index = read("./index.js");
 const registration = read("./registro.js");
 const admin = read("./admin.js");
 const html = read("../admin/index.html");
+const publicHtml = read("../index.html");
+const registrationHtml = read("../registro.html");
 const config = read("./supabase-config.js");
 
 assert.match(schema, /with \(security_invoker\s*=\s*true\)/i, "la vista pública respeta permisos y RLS del usuario que consulta");
@@ -16,7 +18,17 @@ assert.match(schema, /grant select \([^;]+\) on public\.profiles to anon;/is, "e
 assert.doesNotMatch(schema, /grant\s+(?:all|select\s*,\s*insert|insert)[^;]*public\.profiles[^;]*to\s+anon/i, "el rol anónimo no puede editar perfiles");
 assert.match(schema, /create policy "Admins can manage profiles"[\s\S]+?auth\.uid\(\)[\s\S]+?admin_users/i, "las escrituras requieren membresía de administrador autenticado");
 assert.match(schema, /create table if not exists public\.admin_users/i, "la lista de administradores no se deriva de una clave del frontend");
-assert.match(index, /from\("directory_public_profiles"\)/, "la web pública consume solo la vista filtrada");
+assert.match(index, /fetchPublicProfiles/, "la web pública usa una solicitud REST ligera para consultar la vista filtrada");
+assert.match(read("./supabase-public-api.js"), /directory_public_profiles/, "la consulta pública nunca accede a la tabla privada de perfiles");
+assert.doesNotMatch(publicHtml, /cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js/, "la portada no descarga el SDK completo para una lectura REST");
+assert.match(publicHtml, /rel="preconnect" href="https:\/\/vhsocvvjquikjtmqbkwx\.supabase\.co"/, "la portada anticipa la conexión con Supabase");
+assert.match(publicHtml, /rel="preconnect" href="https:\/\/res\.cloudinary\.com"/, "la portada anticipa la conexión con las imágenes");
+assert.match(html, /supabase-js@[^\"]+" defer/, "el SDK de Auth no bloquea el HTML del panel");
+assert.match(registrationHtml, /supabase-js@[^\"]+" defer/, "el SDK no bloquea el HTML del formulario");
+assert.match(index, /profileImage\.loading = index < 2 \? "eager" : "lazy"/, "solo las imágenes iniciales evitan carga diferida");
+assert.match(index, /profileImage\.fetchPriority = index === 0 \? "high"/, "la primera imagen mantiene prioridad alta");
+assert.match(index, /element\.srcset = \[400, 480, 540\]/, "las fotos de tarjetas se sirven con variantes adaptables sin ampliar las imágenes originales");
+assert.match(index, /element\.sizes = "\(min-width: 1024px\) 362px/, "la galería declara el ancho de imagen que realmente ocupa");
 assert.match(registration, /functions\.invoke\("register-profile"/, "el formulario usa la función de registro de Supabase");
 assert.doesNotMatch(registration, /script\.google\.com\/macros|appsScriptEndpoint/i, "el nuevo formulario no depende de Apps Script");
 assert.match(edge, /SUPABASE_SERVICE_ROLE_KEY/, "la credencial de servicio solo aparece en backend");
@@ -25,5 +37,5 @@ assert.match(admin, /signInWithPassword/, "el panel usa Supabase Auth para inici
 assert.match(admin, /from\("admin_users"\)/, "el panel exige una cuenta autorizada");
 assert.match(registration, /from\("locations"\)/, "el formulario lee el catálogo desde Supabase");
 assert.doesNotMatch(index + registration + admin + html, /appsScriptEndpoint|script\.google\.com|Google Sheets/i, "la aplicación activa no tiene dependencias de Apps Script o Sheets");
-assert.match(index, /mapPublicProfile/, "el directorio transforma los datos de la vista de Supabase");
+assert.match(read("./supabase-public-api.js"), /mapPublicProfile/, "la consulta pública transforma los datos de la vista de Supabase");
 console.log("Arquitectura Supabase: lectura pública permitida, datos privados aislados, Auth y registro de servidor comprobados.");

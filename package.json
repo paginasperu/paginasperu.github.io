@@ -8,7 +8,7 @@
   "scripts": {
     "preview": "node scripts/preview-server.mjs",
     "check:live": "node scripts/healthcheck.mjs",
-    "test": "node scripts/test-registration.mjs && node scripts/test-form-validation.mjs && node scripts/test-location-picker.mjs && node scripts/test-profile-contact.mjs && node scripts/test-search.mjs && node scripts/test-supabase-architecture.mjs && node scripts/check-public.mjs && node scripts/test-preview-server.mjs"
+    "test": "node scripts/test-registration.mjs && node scripts/test-form-validation.mjs && node scripts/test-location-picker.mjs && node scripts/test-profile-contact.mjs && node scripts/test-search.mjs && node scripts/test-profile-cache.mjs && node scripts/test-supabase-public-api.mjs && node scripts/test-supabase-architecture.mjs && node scripts/check-public.mjs && node scripts/test-preview-server.mjs"
   },
   "devDependencies": {}
 }
