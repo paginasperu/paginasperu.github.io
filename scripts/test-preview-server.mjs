@@ -43,13 +43,16 @@ try {
     const response = await fetch(new URL(route, baseUrl));
     const html = await response.text();
     assert.equal(response.status, 200, `${route} debe servir el panel de acceso`);
-    assert.match(html, /script\.google\.com\/macros\/s\//, `${route} debe apuntar al panel privado`);
+    assert.match(html, /Panel de gestión/, `${route} debe servir el panel privado`);
+    assert.match(html, /Supabase Auth/, `${route} debe indicar el proveedor de autenticación`);
     assert.match(html, /noindex,nofollow/, `${route} no debe indexarse`);
   }
 
-  const privateSource = await fetch(new URL("/sheets-admin/AdminClient.html", baseUrl));
-  assert.equal(privateSource.status, 404, "El servidor de vista previa no debe exponer las fuentes privadas");
-  console.log("Vista previa: rutas /admin, /admin/ y acceso a fuentes privadas comprobados.");
+  for (const retiredRoute of ["/apps-script/Code.js", "/sheets-admin/AdminClient.html", "/sandbox/cms-shell/"]) {
+    const retiredResponse = await fetch(new URL(retiredRoute, baseUrl));
+    assert.equal(retiredResponse.status, 404, `${retiredRoute} no debe exponerse como parte de la aplicación activa`);
+  }
+  console.log("Vista previa: rutas /admin, /admin/ y panel con autenticación Supabase comprobados.");
 } finally {
   server.kill();
   await once(server, "exit").catch(() => {});

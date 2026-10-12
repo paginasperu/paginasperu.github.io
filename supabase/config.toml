@@ -1,0 +1,2 @@
+[functions.register-profile]
+verify_jwt = true

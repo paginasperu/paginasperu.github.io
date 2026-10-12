@@ -4,14 +4,80 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex,nofollow">
-    <meta http-equiv="refresh" content="0; url=https://script.google.com/macros/s/AKfycbx7SXS3T-2NWRPHCOjc1rngcePX5NQ1mbSlS-CWBuqDllalYN0yyLU8037TayKelFE0NA/exec">
-    <title>Administración · Oficial</title>
-    <script>
-      window.location.replace('https://script.google.com/macros/s/AKfycbx7SXS3T-2NWRPHCOjc1rngcePX5NQ1mbSlS-CWBuqDllalYN0yyLU8037TayKelFE0NA/exec');
-    </script>
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Gestión · Oficial</title>
+    <link rel="stylesheet" href="../styles/admin.css?v=1">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3"></script>
+    <script type="module" src="../scripts/admin.js?v=1"></script>
   </head>
   <body>
-    <p>Abriendo el panel privado de Oficial…</p>
-    <p><a href="https://script.google.com/macros/s/AKfycbx7SXS3T-2NWRPHCOjc1rngcePX5NQ1mbSlS-CWBuqDllalYN0yyLU8037TayKelFE0NA/exec">Continuar al panel</a></p>
+    <main id="login-view" class="login-view">
+      <section class="login-card" aria-labelledby="login-title">
+        <a class="brand" href="../" aria-label="Oficial, ir al directorio"><span class="brand-mark">O</span><span><strong>OFICIAL</strong><small>GESTIÓN</small></span></a>
+        <p class="eyebrow">ACCESO PRIVADO</p>
+        <h1 id="login-title">Panel de gestión</h1>
+        <p class="login-copy">Entra con la cuenta autorizada para administrar perfiles</p>
+        <form id="login-form" class="login-form">
+          <label for="login-email">Correo</label>
+          <input id="login-email" name="email" type="email" autocomplete="username" required>
+          <label for="login-password">Contraseña</label>
+          <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+          <button class="button primary login-submit" type="submit">Ingresar</button>
+          <p id="login-message" class="message" role="status" aria-live="polite"></p>
+        </form>
+        <p class="login-foot">El acceso se valida con Supabase Auth y permisos de administrador</p>
+      </section>
+    </main>
+
+    <div id="app-view" class="app-shell" hidden>
+      <header class="topbar">
+        <a class="brand" href="../" aria-label="Oficial, ir al directorio"><span class="brand-mark">O</span><span><strong>OFICIAL</strong><small>GESTIÓN</small></span></a>
+        <label class="global-search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Buscar nombre, distrito o ID" autocomplete="off"><kbd>Ctrl K</kbd></label>
+        <div class="account"><span id="account-initial" class="account-avatar">A</span><span id="account-email">Administrador</span><button id="sign-out" class="text-button" type="button">Salir</button></div>
+        <button id="mobile-nav" class="icon-button mobile-nav" type="button" aria-label="Mostrar filtros">☰</button>
+      </header>
+
+      <div class="layout">
+        <aside id="sidebar" class="sidebar" aria-label="Filtros del directorio">
+          <p class="side-label">DIRECTORIO</p>
+          <button class="side-link is-active" type="button" data-status="Todos"><span>▦</span> Todos <b data-count="Todos">0</b></button>
+          <button class="side-link" type="button" data-status="Pendiente"><span>◷</span> Pendientes <b data-count="Pendiente">0</b></button>
+          <button class="side-link" type="button" data-status="Activo"><span>●</span> Activos <b data-count="Activo">0</b></button>
+          <button class="side-link" type="button" data-status="Rechazado"><span>⊘</span> Rechazados <b data-count="Rechazado">0</b></button>
+          <button class="side-link" type="button" data-status="Inactivo"><span>○</span> Inactivos <b data-count="Inactivo">0</b></button>
+          <div class="sidebar-bottom"><span class="online-dot"></span><span id="connection-status">Conectando</span></div>
+        </aside>
+
+        <main class="main-content">
+          <div class="page-heading">
+            <div><p class="eyebrow">DIRECTORIO / ADMINISTRACIÓN</p><h1>Perfiles</h1><p class="subheading">Busca, revisa y organiza las publicaciones</p></div>
+            <div class="heading-actions"><button id="export-csv" class="button secondary" type="button">↓ <span>CSV público</span></button><button id="refresh" class="button secondary" type="button">↻ <span>Actualizar</span></button></div>
+          </div>
+
+          <nav class="category-tabs" aria-label="Filtrar por categoría">
+            <button class="category-tab is-active" type="button" data-category="Todas">Todas las categorías</button>
+            <button class="category-tab" type="button" data-category="Diseñadores gráficos">Diseñadores gráficos</button>
+            <button class="category-tab" type="button" data-category="Volanteras">Volanteras</button>
+            <button class="category-tab" type="button" data-category="Anfitrionas">Anfitrionas</button>
+          </nav>
+
+          <section class="filter-bar" aria-label="Filtros adicionales">
+            <label class="select-filter"><span class="visually-hidden">Distrito</span><select id="district"><option value="">Todos los distritos</option></select></label>
+            <label class="check-filter"><input id="verified" type="checkbox"> Verificados</label>
+            <label class="check-filter"><input id="featured" type="checkbox"> Destacados</label>
+            <button id="clear-filters" class="text-button clear-filter" type="button">Limpiar filtros</button>
+          </section>
+
+          <div class="results-line"><p id="result-count">Cargando perfiles…</p><label><span class="visually-hidden">Ordenar por</span><select id="sort"><option value="newest">Más recientes</option><option value="oldest">Más antiguos</option><option value="name">Nombre</option></select></label></div>
+
+          <div class="workspace-grid">
+            <section id="record-list" class="record-list" aria-label="Resultados" aria-live="polite"><div class="loading">Conectando con el directorio…</div></section>
+            <section id="detail-pane" class="detail-pane" aria-label="Ficha del perfil"><div class="detail-empty"><span>▤</span><strong>Selecciona un perfil</strong><p>Su información y las acciones de revisión aparecerán aquí</p></div></section>
+          </div>
+          <p class="footer-note"><span>Los campos privados solo están disponibles para administradores autorizados</span><a href="../">Ver directorio público ↗</a></p>
+        </main>
+      </div>
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    </div>
   </body>
 </html>

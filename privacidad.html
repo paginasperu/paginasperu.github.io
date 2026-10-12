@@ -52,8 +52,8 @@
 
           <section>
             <h2>5. Proveedores y recorrido de los datos</h2>
-            <p>El formulario envía las fotografías desde el navegador a Cloudinary. Cloudinary devuelve una dirección segura de cada imagen; el formulario envía esa dirección junto con los datos a Google Apps Script, que registra la solicitud en Google Sheets. El responsable revisa la solicitud y, si la aprueba, incorpora los campos públicos a la versión del directorio alojada en GitHub Pages.</p>
-            <p>Por estas operaciones, Google, Cloudinary y GitHub pueden recibir o procesar los datos necesarios para prestar sus servicios. La información pública y las imágenes publicadas quedan disponibles para las personas que visitan el sitio. También pueden aplicarse las políticas de privacidad y condiciones de cada proveedor.</p>
+            <p>El formulario envía las fotografías desde el navegador a Cloudinary. Después remite las direcciones de las imágenes y los datos del perfil a una función de Supabase, que valida la solicitud y guarda el registro como pendiente en una base de datos PostgreSQL. El responsable revisa cada solicitud desde un panel privado y activa los perfiles aprobados. El sitio público consulta únicamente los perfiles activos y los campos destinados a mostrarse.</p>
+            <p>Cloudinary procesa las imágenes; Supabase procesa los registros, la autenticación del panel y las solicitudes; GitHub Pages aloja el código del sitio y del panel. La información pública y las imágenes publicadas quedan disponibles para quienes visitan el directorio. También pueden aplicarse las políticas de privacidad y condiciones de cada proveedor.</p>
             <p>Las gestiones para inscribir el banco de datos personales en el Registro Nacional de Protección de Datos Personales y comunicar los flujos transfronterizos que correspondan están en curso. El responsable está confirmando con los proveedores qué datos se procesan, qué entidades los reciben y cuáles son los países de destino, para consignarlos correctamente ante la Autoridad Nacional de Protección de Datos Personales. Esta política se actualizará con los flujos confirmados y el código de inscripción cuando sea asignado.</p>
           </section>
 
@@ -71,7 +71,7 @@
 
           <section>
             <h2>8. Seguridad y almacenamiento local</h2>
-            <p>El responsable limita el acceso a las hojas y herramientas de administración a quienes gestionan el directorio, utiliza conexiones HTTPS en el formulario y en el sitio, y revisa manualmente los perfiles antes de publicarlos. Ningún sistema conectado a Internet puede garantizar seguridad absoluta.</p>
+            <p>El responsable limita el acceso al panel y a las herramientas de administración a cuentas autorizadas, utiliza conexiones HTTPS en el formulario y en el sitio, y revisa manualmente los perfiles antes de publicarlos. Ningún sistema conectado a Internet puede garantizar seguridad absoluta.</p>
             <p>La función de favoritos guarda en el almacenamiento local del navegador los identificadores de los perfiles que marcas. Esa lista permanece en tu dispositivo y el directorio no la recibe. Puedes borrarla desde los controles de datos del navegador.</p>
           </section>
 

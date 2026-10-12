@@ -6,21 +6,9 @@
     "node": ">=20"
   },
   "scripts": {
-    "postinstall": "node scripts/protect-tooling.mjs",
     "preview": "node scripts/preview-server.mjs",
-    "sync:locations": "node scripts/sync-locations.mjs",
     "check:live": "node scripts/healthcheck.mjs",
-    "backup:public": "node scripts/backup-public.mjs",
-    "test": "node scripts/test-tooling.mjs && node scripts/test-registration.mjs && node scripts/test-form-validation.mjs && node scripts/test-location-picker.mjs && node scripts/test-profile-contact.mjs && node scripts/test-search.mjs && node scripts/test-sheets-admin.mjs && node scripts/check-public.mjs && node scripts/test-preview-server.mjs",
-    "demo:panel": "node scripts/build-panel-demo.mjs",
-    "demo:admin": "node scripts/build-admin-demo.mjs",
-    "test:sheets-admin": "node scripts/test-sheets-admin.mjs",
-    "apps-script:login": "clasp --auth .clasprc.json login",
-    "apps-script:pull": "node scripts/clasp-pull.mjs",
-    "apps-script:push": "clasp --auth .clasprc.json push",
-    "apps-script:open": "clasp --auth .clasprc.json open-script"
+    "test": "node scripts/test-registration.mjs && node scripts/test-form-validation.mjs && node scripts/test-location-picker.mjs && node scripts/test-profile-contact.mjs && node scripts/test-search.mjs && node scripts/test-supabase-architecture.mjs && node scripts/check-public.mjs && node scripts/test-preview-server.mjs"
   },
-  "devDependencies": {
-    "@google/clasp": "3.4.1"
-  }
+  "devDependencies": {}
 }

@@ -1,8 +1,8 @@
 import { attachFieldValidation } from './form-validation.js?v=20261011-2';
 import { prepareLocationOptions, searchLocations } from './location-picker.js';
+import { getSupabaseClient, isSupabaseConfigured } from './supabase-client.js';
 
 const SITE_CONFIG = {
-  appsScriptEndpoint: "https://script.google.com/macros/s/AKfycbyFHXYtrjWYk3QDHj-SoV-lquJI9VQ0dbOSVfA7fJlFIHJGLK8ZXAJ_MlOHkwooYgrFxw/exec",
   cloudinary: {
     // Valores públicos del preset unsigned. Nunca incluir aquí API Secret.
     cloudName: "dahrgg4v5",
@@ -20,7 +20,6 @@ const birthDateInput = form.elements.namedItem("fecha_nacimiento");
 const locationInput = document.querySelector("#ubicacion");
 const locationList = document.querySelector("#ubicacion-listbox");
 const locationStatus = document.querySelector("#ubicacion-status");
-const locationUrl = new URL("../data/distritos.csv", import.meta.url);
 let locationOptions = [];
 let visibleLocations = [];
 let selectedLocation = null;
@@ -81,8 +80,7 @@ privacyDialog?.addEventListener("click", (event) => {
 });
 
 function newSubmissionId() {
-  const bytes = crypto.getRandomValues(new Uint8Array(24));
-  return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
+  return crypto.randomUUID();
 }
 
 function imageFingerprint(input) {
@@ -103,44 +101,6 @@ async function discardUnusedImages(usedUrls = []) {
       if (response.ok && (await response.json()).result === "ok") uploadedImages.delete(key);
     } catch { /* Se conserva la URL para poder reutilizarla en el siguiente intento. */ }
   }
-}
-
-function parseCsv(text) {
-  const rows = [];
-  let row = [];
-  let cell = "";
-  let quoted = false;
-
-  for (let index = 0; index < text.length; index += 1) {
-    const character = text[index];
-    if (character === '"' && quoted && text[index + 1] === '"') {
-      cell += '"';
-      index += 1;
-    } else if (character === '"') {
-      quoted = !quoted;
-    } else if (character === "," && !quoted) {
-      row.push(cell);
-      cell = "";
-    } else if ((character === "\n" || character === "\r") && !quoted) {
-      if (character === "\r" && text[index + 1] === "\n") index += 1;
-      row.push(cell);
-      if (row.some((value) => value.trim())) rows.push(row);
-      row = [];
-      cell = "";
-    } else {
-      cell += character;
-    }
-  }
-
-  if (cell || row.length) {
-    row.push(cell);
-    rows.push(row);
-  }
-
-  const headers = (rows.shift() || []).map((value, index) =>
-    value.trim().replace(index === 0 ? /^\uFEFF/ : /$^/, "").toLowerCase(),
-  );
-  return rows.map((values) => Object.fromEntries(headers.map((header, index) => [header, (values[index] || "").trim()])));
 }
 
 function showMessage(text, state = "success") {
@@ -183,9 +143,21 @@ function trimTextFields() {
 }
 
 async function loadLocations() {
-  const response = await fetch(locationUrl);
-  if (!response.ok) throw new Error("No se pudo cargar data/distritos.csv.");
-  const rows = parseCsv(await response.text()).filter((row) => row.departamento && row.provincia && row.distrito);
+  const client = getSupabaseClient();
+  const rows = [];
+  const pageSize = 1000;
+  for (let start = 0; ; start += pageSize) {
+    const { data, error } = await client
+      .from("locations")
+      .select("departamento, provincia, distrito, ubigeo")
+      .order("departamento")
+      .order("provincia")
+      .order("distrito")
+      .range(start, start + pageSize - 1);
+    if (error) throw new Error("No se pudo cargar el catálogo de ubicaciones desde Supabase.");
+    rows.push(...(data || []));
+    if (!data || data.length < pageSize) break;
+  }
   if (!rows.length) throw new Error("El catálogo de ubicaciones está vacío o tiene encabezados distintos.");
   locationOptions = prepareLocationOptions(rows);
   locationStatus.textContent = "";
@@ -552,60 +524,21 @@ async function uploadRequiredImage(input, dimensions, filename) {
   }
 }
 
-function sendToAppsScript(payload) {
-  const endpoint = SITE_CONFIG.appsScriptEndpoint;
-  const requestId = newSubmissionId();
-
-  return new Promise((resolve, reject) => {
-    const iframe = document.createElement("iframe");
-    iframe.name = `registro-${requestId}`;
-    iframe.title = "Respuesta del registro";
-    iframe.hidden = true;
-
-    const submission = document.createElement("form");
-    submission.method = "POST";
-    submission.action = `${endpoint}?requestId=${encodeURIComponent(requestId)}&clientOrigin=${encodeURIComponent(location.origin)}`;
-    submission.target = iframe.name;
-    submission.hidden = true;
-
-    const payloadInput = document.createElement("input");
-    payloadInput.type = "hidden";
-    payloadInput.name = "payload";
-    payloadInput.value = JSON.stringify(payload);
-    submission.append(payloadInput);
-
-    let timeoutId;
-    const cleanup = () => {
-      window.removeEventListener("message", handleResponse);
-      window.clearTimeout(timeoutId);
-      iframe.remove();
-      submission.remove();
-    };
-
-    const handleResponse = (event) => {
-      let hostname;
-      try { const origin = new URL(event.origin); if (origin.protocol !== "https:") return; hostname = origin.hostname; } catch { return; }
-      if (hostname !== "script.googleusercontent.com" && !hostname.endsWith("-script.googleusercontent.com")) return;
-      const message = event.data;
-      if (!message || message.type !== "registro-response" || message.requestId !== requestId) return;
-      cleanup();
-      if (message.response?.ok) resolve(message.response);
-      else {
-        const error = new Error(message.response?.message || "No se pudo guardar el registro.");
-        error.definitive = message.response?.retryable === false;
-        reject(error);
-      }
-    };
-
-    window.addEventListener("message", handleResponse);
-    timeoutId = window.setTimeout(() => {
-      cleanup();
-      reject(new Error("No pudimos confirmar el envío. Conservamos tus datos: pulsa Enviar para revisión para reintentarlo."));
-    }, 30000);
-
-    document.body.append(iframe, submission);
-    submission.submit();
-  });
+async function sendToSupabase(payload) {
+  const client = getSupabaseClient();
+  const { data, error } = await client.functions.invoke("register-profile", { body: payload });
+  if (error) {
+    const detail = error.context && typeof error.context.json === "function" ? await error.context.json().catch(() => null) : null;
+    const failure = new Error(detail?.message || error.message || "No se pudo guardar el registro.");
+    failure.definitive = detail?.retryable === false;
+    throw failure;
+  }
+  if (!data?.ok) {
+    const failure = new Error(data?.message || "No se pudo guardar el registro.");
+    failure.definitive = data?.retryable === false;
+    throw failure;
+  }
+  return data;
 }
 
 form.addEventListener("submit", async (event) => {
@@ -621,8 +554,8 @@ form.addEventListener("submit", async (event) => {
   }
 
   try {
-    if (!SITE_CONFIG.appsScriptEndpoint) {
-      showMessage("El formulario y Cloudinary están listos. Falta publicar Apps Script y pegar aquí su URL de implementación.", "error");
+    if (!isSupabaseConfigured()) {
+      showMessage("El formulario está listo. Falta configurar Supabase para recibir registros.", "error");
       return;
     }
 
@@ -633,7 +566,7 @@ form.addEventListener("submit", async (event) => {
     if (!pendingSubmission || pendingSubmission.fingerprint !== fingerprint) pendingSubmission = { fingerprint, id: newSubmissionId() };
     Object.assign(payload, { submissionId: pendingSubmission.id, startedAt, website: form.elements.website.value });
     submitButton.textContent = "Validando datos…";
-    await sendToAppsScript({ ...payload, action: "validate" });
+    await sendToSupabase({ ...payload, action: "validate" });
     submitButton.textContent = "Preparando imágenes…";
     const imageResults = await Promise.allSettled([
       uploadRequiredImage(form.foto_perfil, [150, 150], "foto-perfil.jpg"),
@@ -645,7 +578,7 @@ form.addEventListener("submit", async (event) => {
     payload.foto_perfil = profilePhoto.url;
     payload.imagen_portada = coverImage.url;
     submitButton.textContent = "Enviando…";
-    const result = await sendToAppsScript(payload);
+    const result = await sendToSupabase(payload);
     const confirmation = `Solicitud #${result.id} recibida. Tu perfil está pendiente de revisión; aún no es público.`;
     showMessage(confirmation);
     form.reset();
@@ -680,6 +613,6 @@ form.addEventListener("submit", async (event) => {
 loadLocations().catch((error) => {
   locationInput.disabled = true;
   locationStatus.textContent = "No se pudo cargar el catálogo de ubicaciones.";
-  showMessage(`${error.message} Comprueba que el archivo esté disponible en data/distritos.csv.`, "error");
+  showMessage(error.message || "No se pudo cargar el catálogo de ubicaciones.", "error");
 });
 

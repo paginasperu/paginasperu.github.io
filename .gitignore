@@ -6,3 +6,4 @@ node_modules/
 **/.clasprc.json
 backups/
 audit-artifacts/
+supabase/private-profiles.export.json

@@ -79,9 +79,9 @@ async function submissionTest(failure = false, uploadFailure = false) {
     addEventListener: (_, fn) => { submit = fn; }, setAttribute() {}, removeAttribute() {}, reset() { reset = true; }, querySelectorAll: () => [] };
   const context = { form, fieldValidation: {validate:()=>true,reset(){},setError(){}}, clearMessage(){},trimTextFields(){},
     selectedLocation:{departamento:'LIMA',provincia:'LIMA',distrito:'MIRAFLORES'}, locationInput:{dataset:{locationSelected:'true'},focus(){}},
-    SITE_CONFIG:{appsScriptEndpoint:'https://example.test'},submitButton:button,cleanFormValues:()=>({nombres:'Prueba',departamento:'LIMA',provincia:'LIMA',distrito:'MIRAFLORES'}),imageFingerprint:()=>'',
+    isSupabaseConfigured:()=>true,submitButton:button,cleanFormValues:()=>({nombres:'Prueba',departamento:'LIMA',provincia:'LIMA',distrito:'MIRAFLORES'}),imageFingerprint:()=>'',
     pendingSubmission:null,newSubmissionId:()=> 'test-id',startedAt:0, uploadedImages:new Map(),
-    async sendToAppsScript(payload) { if (payload.action === 'validate') return {ok:true}; if (failure) throw new Error('No pudimos confirmar el envío.'); assert.equal(payload.departamento,'LIMA'); assert.equal(payload.provincia,'LIMA'); assert.equal(payload.distrito,'MIRAFLORES'); return {ok:true,id:42}; },
+    async sendToSupabase(payload) { if (payload.action === 'validate') return {ok:true}; if (failure) throw new Error('No pudimos confirmar el envío.'); assert.equal(payload.departamento,'LIMA'); assert.equal(payload.provincia,'LIMA'); assert.equal(payload.distrito,'MIRAFLORES'); return {ok:true,id:42}; },
     async uploadRequiredImage(input) { if (uploadFailure && input === form.foto_perfil) { const error = new Error('Foto de perfil: no se pudo cargar.'); error.definitive = true; throw error; } return {url:`https://res.cloudinary.com/dahrgg4v5/image/upload/${input === form.foto_perfil ? 'profile' : 'cover'}.jpg`}; },
     showMessage(text){confirmation=text;},message:{focus(){focused=true;},scrollIntoView(){}},
     discardUnusedImages:async()=>{},clearCropState(){},setOptions(){},Date,JSON,Boolean,Promise };

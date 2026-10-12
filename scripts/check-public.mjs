@@ -1,57 +1,22 @@
-import fs from 'node:fs';
-import assert from 'node:assert/strict';
-import vm from 'node:vm';
-const source = fs.readFileSync(new URL('./index.js', import.meta.url), 'utf8');
-const parser = source.slice(source.indexOf('function parseCsv('), source.indexOf('function profileSlugFromLocation('));
-const context = { demoIds: new Set(), normalizeText: text => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() };
-vm.createContext(context);
-vm.runInContext(parser, context);
-const csv = fs.readFileSync(new URL('../data/perfiles.csv', import.meta.url), 'utf8');
-const headers = csv.replace(/^\uFEFF/, '').split(/\r?\n/)[0].replaceAll('"', '').split(',');
-assert.equal(headers.length, 16, 'el CSV local existente conserva sus 16 columnas, sin editar registros');
-for (const field of ['correo', 'whatsapp_interno', 'fecha_nacimiento', 'genero', 'notas', 'estado', 'acepta_privacidad', 'canva_url']) assert(!headers.includes(field), `campo privado: ${field}`);
-assert(headers.includes('portafolio_url'));
-assert.equal(new Set(headers).size, headers.length);
-const demo = JSON.parse(fs.readFileSync(new URL('../data/perfiles-demo.json', import.meta.url), 'utf8'));
-context.demoIds = new Set(demo.ids);
-const profiles = context.parseCsv(csv);
-assert(profiles.length > 0);
-assert(profiles.filter(profile => profile.demo).every(profile => !profile.portafolio_url), 'los perfiles de demostración no reciben enlaces personales migrados');
-assert(profiles.every(profile => profile.demo || !profile.portafolio_url || /^https:\/\//.test(profile.portafolio_url)), 'los perfiles reales solo exponen URL segura del portafolio');
-assert.equal(profiles.find(profile => profile.id === 17)?.portafolio_url, 'https://www.instagram.com/nathyy2029');
-assert.equal(profiles.find(profile => profile.id === 18)?.portafolio_url, 'https://www.instagram.com/esmillones27');
-const extendedHeaders = [...headers, 'instagram_usuario', 'linkedin_usuario', 'behance_usuario', 'productos_servicios', 'nivel_experiencia', 'nivel_precio'];
-const extendedRow = headers.map(header => header === 'id' ? '900' : header === 'nombres' ? 'Perfil' : header === 'apellidos' ? 'Temporal' : '');
-extendedRow.push('perfil.inst', 'perfil-li', 'perfil-be', 'Diseño editorial', 'Experto', 'Premium');
-const extendedCsv = [extendedHeaders, extendedRow].map(row => row.map(value => `"${String(value).replaceAll('"', '""')}"`).join(',')).join('\n');
-const extendedProfile = context.parseCsv(extendedCsv)[0];
-assert.equal(extendedProfile.productos_servicios, 'Diseño editorial');
-assert.equal(extendedProfile.nivel_experiencia, 'Experto');
-assert.equal(extendedProfile.nivel_precio, 'Premium');
-assert.equal(extendedProfile.instagram_usuario, 'perfil.inst');
-assert.equal(extendedProfile.linkedin_usuario, 'perfil-li');
-assert.equal(extendedProfile.behance_usuario, 'perfil-be');
-assert(extendedProfile.searchText.includes('diseno editorial'), 'los productos y servicios son buscables');
-assert(demo.ids.every(id => Number.isSafeInteger(id) && id > 0));
-for (const page of ['index.html', 'registro.html', 'contacto.html', 'privacidad.html']) {
-  const html = fs.readFileSync(new URL('../' + page, import.meta.url), 'utf8');
-  assert(html.includes('rel="canonical"'), `${page}: canonical ausente`);
-  assert(html.includes('rel="canonical" href="https://www.oficial.pe'), `${page}: canonical no usa el dominio principal elegido`);
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import { mapPublicProfile } from "./profile-mapper.js";
+
+const schema = fs.readFileSync(new URL("../supabase/schema.sql", import.meta.url), "utf8");
+const sample = mapPublicProfile({
+  id: 42, nombres: "Ana", apellidos: "Prueba", departamento: "LIMA", provincia: "LIMA",
+  distrito: "MIRAFLORES", categoria: "Diseñadores gráficos", whatsapp_publico: "51900000000",
+  correo: "privado@example.test", whatsapp_interno: "51911111111", notas: "nota privada",
+  estado: "Activo", es_demo: true, es_verificado: false, es_destacado: true, posicion: 2,
+  portafolio_url: "https://www.instagram.com/prueba", foto_perfil: "https://res.cloudinary.com/dahrgg4v5/image/upload/profile.jpg",
+}, 0);
+assert.equal(sample.id, 42);
+assert.equal(sample.demo, true);
+assert.equal(sample.searchText.includes("ana prueba"), true);
+for (const privateField of ["correo", "whatsapp_interno", "notas", "fecha_nacimiento", "genero", "acepta_privacidad"]) {
+  assert.equal(Object.hasOwn(sample, privateField), false, `${privateField} no debe formar parte del perfil público`);
 }
-const homeHtml = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-assert(!homeHtml.includes('experience-filter') && !homeHtml.includes('price-filter'), 'no se reactivaron filtros profesionales');
-for (const id of ['modal-experience', 'modal-price', 'modal-services']) assert(homeHtml.includes(`id="${id}"`), `detalle de perfil ausente: ${id}`);
-const privacyHtml = fs.readFileSync(new URL('../privacidad.html', import.meta.url), 'utf8');
-assert(privacyHtml.includes('Los productos y servicios y los niveles de experiencia y precios son opcionales, pero sí forman parte de la información pública'), 'la política informa que los datos profesionales pueden publicarse');
-assert(privacyHtml.includes('No mostramos el WhatsApp privado, género, fecha de nacimiento, correo, aceptación de privacidad ni notas internas'), 'la política identifica los datos privados');
-assert(privacyHtml.includes('los usuarios de Instagram, LinkedIn y Behance'), 'la política informa que los usuarios sociales son públicos');
-const registrationHtml = fs.readFileSync(new URL('../registro.html', import.meta.url), 'utf8');
-for (const network of ['Instagram', 'LinkedIn', 'Behance']) assert(registrationHtml.includes(`Usuario de ${network}`));
-assert(registrationHtml.includes('Solo para gestión, no se publica'));
-assert.equal(registrationHtml.includes('El correo y los usuarios de redes son solo para gestión'), false);
-const firstFormSection = registrationHtml.match(/<section class="register-section" aria-labelledby="([^"]+)">/)?.[1];
-assert.equal(firstFormSection, 'section-images', 'las imágenes aparecen primero en el formulario');
-const socialHelpers = [...registrationHtml.matchAll(/<small>(Solo para gestión, no se publica|Se mostrará públicamente en tu perfil)<\/small>/g)].map((match) => match[1]);
-assert.equal(socialHelpers.length, 4, 'correo y las tres redes explican su visibilidad junto al campo');
-assert(socialHelpers.every((helper) => !/[.;]$/.test(helper)), 'las ayudas no terminan en punto ni usan punto y coma');
-console.log(`Publicación: ${profiles.length} perfiles, columnas privadas excluidas, IDs y páginas comprobados.`);
+assert.match(schema, /where estado\s*=\s*'Activo'/i, "la vista pública filtra solicitudes no aprobadas");
+assert.match(schema, /es_demo/, "la marca de demostración reside en Supabase");
+assert.match(schema, /create or replace view public\.directory_public_profiles/i, "la publicación usa una vista explícita de columnas públicas");
+console.log("Perfil público: campos, marca demo y filtros de publicación comprobados sin depender del CSV antiguo.");

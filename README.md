@@ -1,71 +1,45 @@
-# Directorio Oficial de Publicidad
+# Oficial.pe
 
-Sitio estático publicado con GitHub Pages. El sitio no requiere compilación; Node se usa solo para las herramientas locales de vista previa y sincronización del backend.
+Directorio profesional con sitio público y panel privado. El frontend se publica como HTML, CSS y JavaScript estáticos en GitHub Pages; Supabase ofrece PostgreSQL, autenticación y la función de registro; Cloudinary almacena las imágenes.
 
-## Herramientas del proyecto
+## Capas
 
-- Repositorio: `https://github.com/paginasperu/paginasperu.github.io`
-- Dominio principal preparado localmente: `https://www.oficial.pe` (pendiente de guardarlo en la configuración de GitHub Pages y publicar los cambios).
-- Base de datos: Google Sheets, documento `directorio`; la pestaña `perfiles` guarda datos de gestión y `publico` es la vista destinada a publicación.
-- Backend: Google Apps Script, proyecto `registro`. Su código se gestiona desde `apps-script/` con `clasp`.
-- Hosting de imágenes: Cloudinary, cloud name `dahrgg4v5`; [abrir Media Library](https://console.cloudinary.com/app/c-f32bcfa51f430c6fcfe18ca29cdbfa/assets/media_library/search?q=&view_mode=mosaic). El formulario usa el preset unsigned `directorio`. No incluyas el API Secret en GitHub.
+- **Sitio público:** `index.html`, `registro.html`, `contacto.html` y `privacidad.html` en `https://www.oficial.pe`.
+- **Panel de administración:** `admin/index.html` en `https://www.oficial.pe/admin/`. La interfaz es pública como archivo estático; Supabase Auth, la lista `admin_users`, los permisos y RLS protegen los datos y operaciones.
+- **Datos:** `public.profiles` guarda los perfiles y su estado; `public.locations` guarda el catálogo geográfico; `public.directory_public_profiles` expone únicamente columnas públicas de perfiles `Activo`.
+- **Registro:** el navegador sube las imágenes a Cloudinary y envía los datos a la Edge Function `register-profile`. El backend valida ubicación, enlaces, campos, duplicados y frecuencia, y siempre crea el estado `Pendiente`.
+- **Administración:** al iniciar sesión, el panel consulta y actualiza perfiles usando la sesión Auth. El rol anónimo no puede leer campos privados ni escribir perfiles.
 
-## Estructura
+## Conexión de Supabase
 
-- `index.html`, `contacto.html`, `registro.html` y `privacidad.html`: páginas públicas en la raíz para que GitHub Pages resuelva las rutas limpias.
-- `styles/`: estilos compartidos y estilos específicos por página.
-- `scripts/`: módulos del directorio y del formulario de registro.
-- `scripts/preview-server.mjs`: vista previa local con soporte para las rutas limpias de GitHub Pages.
-- `apps-script/`: ubicación de la copia local del backend de Google Apps Script, sincronizada con `clasp` después de autorizar la cuenta.
-- `.clasp.json`: identifica el proyecto remoto y su carpeta local; el Script ID no es una credencial.
-- `package.json` y `package-lock.json`: fijan la versión de Node tooling necesaria para vista previa y sincronización. No son necesarios para servir el sitio publicado.
-- `data/`: catálogo público de perfiles y catálogo de departamentos, provincias y distritos.
-- `404.html`: página de error y redirecciones de enlaces cortos como `/instagram`. Las rutas limpias de las páginas las resuelve GitHub Pages usando los HTML de la raíz.
-- `CNAME`: dominio personalizado de GitHub Pages.
+`scripts/supabase-config.js` contiene la URL del proyecto y la clave pública publishable heredada `anon`. La clave pública puede estar en el navegador; no es una contraseña. Nunca incluir `service_role`, `sb_secret` ni credenciales administrativas en archivos publicados. La clave de servicio solo se usa en el entorno de Edge Functions y en procesos locales de migración.
 
-## Datos y comportamiento
+La cuenta administrativa se crea en Supabase Authentication y se autoriza agregando su UUID a `public.admin_users`. No existe registro público de administradores. La primera cuenta ya está autorizada; el panel usa el correo y la contraseña de Supabase Auth.
 
-El directorio lee `data/perfiles.csv`; el formulario lee `data/distritos.csv`. Conserva los encabezados actuales de estos archivos: los módulos los usan para mostrar perfiles y enviar registros al Apps Script configurado. El formulario también usa el nombre del bucket y el preset unsigned de Cloudinary definidos en `scripts/registro.js`. No guardes secretos de API en archivos públicos.
+## Datos migrados
 
-## Retomar el proyecto en otra laptop
+El proyecto conectado es `Publicidad` (`vhsocvvjquikjtmqbkwx`). Se migraron 20 perfiles y se añadió una solicitud sintética de prueba (#23), para un total de 21: 17 activos y 4 pendientes. La prueba está marcada `DEMO` y no aparece en la vista pública. La importación conservó los IDs, estados, marcas demo y separación de datos privados. El catálogo fuente para reconstruir `locations` está en `supabase/seed/locations.csv`.
 
-1. Instala Git, Node.js 20 o posterior y un navegador moderno.
-2. Clona el repositorio y entra a la carpeta:
+La exportación de origen con datos personales se conserva únicamente en `supabase/private-profiles.export.json`, ignorada por Git. `scripts/migrate-supabase-data.mjs` permite validar el archivo local; solo su opción explícita `--apply` escribe datos y exige variables `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY`. No ejecutes la importación otra vez sobre la base que ya contiene registros.
 
-   ```powershell
-   git clone https://github.com/paginasperu/paginasperu.github.io.git
-   Set-Location paginasperu.github.io
-   ```
+## Desarrollo y verificación
 
-3. Instala las herramientas fijadas por el proyecto e inicia el servidor local:
+Requiere Node.js 20 o posterior:
 
-   ```powershell
-   npm ci
-   npm run preview
-   ```
+```powershell
+npm install
+npm run preview
+```
 
-4. Abre `http://127.0.0.1:8000`. El servidor local entrega las páginas, módulos y CSV, y permite probar `/registro`, `/contacto` y `/privacidad`. Usa `Ctrl+C` para detenerlo. Si el puerto 8000 está ocupado, inicia PowerShell con `$env:PORT = 8001` y vuelve a ejecutar el comando.
-5. Revisa el estado antes de editar o publicar:
+Abre `http://127.0.0.1:8000`. Ejecuta `npm test` para las pruebas locales. `npm run check:live` comprueba las rutas publicadas, la vista pública de Supabase y el preflight CORS de la Edge Function. El chequeo en vivo necesita acceso a Internet.
 
-   ```powershell
-   git status --short --branch
-   git pull --ff-only
-   ```
+Archivos centrales:
 
-   Si `git status` muestra cambios propios, revísalos antes de actualizar para no sobrescribir trabajo pendiente.
+- `scripts/index.js`, `scripts/profile-mapper.js` y `scripts/search.js`: lectura, adaptación y búsqueda de la vista pública.
+- `scripts/registro.js` y `scripts/location-picker.js`: formulario, carga de ubicaciones y subida de imágenes.
+- `scripts/admin.js`, `styles/admin.css` y `admin/index.html`: panel administrativo con Supabase Auth.
+- `supabase/schema.sql`: esquema documentado y RLS.
+- `supabase/functions/register-profile/index.ts`: validación y recepción del formulario.
+- `scripts/migrate-supabase-data.mjs`: migración local de datos de origen.
 
-## Qué necesita acceso adicional
-
-- **Publicar el sitio:** acceso de escritura al repositorio de GitHub. GitHub Pages debe estar habilitado para publicar la rama `main` desde la raíz. Comprueba esto en Settings → Pages; no publiques secretos en el repositorio.
-- **Recibir registros:** el proyecto de Google Apps Script y la hoja privada están identificados. El código se descarga a `apps-script/` después de autorizar `clasp`.
-- **Sincronizar el backend:** ejecuta `npm run apps-script:login` una vez en cada equipo y autoriza `clasp` con la cuenta Google propietaria. Después usa `npm run apps-script:pull` para descargar el código. La autenticación queda en `.clasprc.json`, excluido de Git. `npm run apps-script:push` sube el código local al proyecto remoto; revisa siempre el diff antes de usarlo. La publicación de una nueva versión web es un paso aparte.
-- **Subir imágenes:** acceso administrativo a Cloudinary para revisar el preset unsigned que usa el formulario. El cloud name y preset son identificadores públicos del flujo, no claves privadas. Nunca incluyas el API Secret en este repositorio.
-- **Trabajar con una IA nueva:** comparte el enlace del repositorio y esta guía. Indica que el sitio es estático, que las páginas deben mantener sus rutas públicas, que `data/perfiles.csv` es público y que el Apps Script y la hoja contienen lógica/datos privados fuera de este repo. Pide revisar `git status` antes de cambiar archivos.
-
-## Comprobación antes de publicar
-
-Ejecuta `npm test` y consulta [la revisión crítica y recuperación](REVISION-CRITICA.md). `npm run check:live` comprueba disponibilidad; `npm run backup:public` respalda el CSV y sus imágenes públicas. Al modificar `data/distritos.csv`, ejecuta `npm run sync:locations` antes de desplegar el backend.
-
-`npm ci` aplica una mitigación local de profundidad para la dependencia `braces` de clasp. `npm audit` conserva el aviso oficial; las pruebas verifican el parche y los patrones normales. Revisa `scripts/protect-tooling.mjs` al actualizar clasp o sus dependencias.
-
-Revisa en local el directorio, el formulario, contacto y privacidad; confirma las rutas limpias, filtros, búsqueda, modal y vista móvil. Después inspecciona `git diff`, confirma que el CSV público no contiene datos internos, y publica solo cuando los cambios estén aprobados. La publicación ocurre al subir los cambios a la fuente configurada en Settings → Pages.
+Sheets y Apps Script ya no forman parte del flujo activo del código. La actualización del dominio queda pendiente de la publicación GitHub Pages; el sitio publicado seguirá mostrando la versión anterior hasta publicar este conjunto de cambios.

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { normalizeLocationSearch, prepareLocationOptions, searchLocations } from './location-picker.js';
 
-const rows = fs.readFileSync(new URL('../data/distritos.csv', import.meta.url), 'utf8').trim().split(/\r?\n/).slice(1).map(line => {
+const rows = fs.readFileSync(new URL('../supabase/seed/locations.csv', import.meta.url), 'utf8').trim().split(/\r?\n/).slice(1).map(line => {
   const [distrito, provincia, departamento] = line.split(',');
   return { distrito, provincia, departamento };
 });

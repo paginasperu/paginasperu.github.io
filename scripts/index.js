@@ -1,11 +1,13 @@
 import { resolveProfileContact } from "./profile-contact.js";
+import { getSupabaseClient } from "./supabase-client.js";
+import { mapPublicProfile } from "./profile-mapper.js";
+import { normalizeText } from "./search.js";
 
 const SITE_CONFIG = {
   title: "Directorio Oficial de Publicidad",
   brandLabel: "Directorio Oficial",
   description: "Encuentra diseñadores gráficos, anfitrionas y volanteras para tus proyectos y eventos en Perú.",
   subscriptionWhatsapp: "51950141414",
-  profilesCsv: "../data/perfiles.csv",
 };
 
 const PROFILES_PER_PAGE = 6;
@@ -14,8 +16,7 @@ const PROFILE_REFRESH_INTERVAL = 5 * 60 * 1000;
 const FAVORITES_STORAGE_KEY = "directorio-creativo:favorites:v1";
 const PROFILE_PLACEHOLDER = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200"><rect width="900" height="1200" fill="#eeeae4"/><circle cx="450" cy="380" r="145" fill="#c8beb2"/><path fill="#b2a69a" d="M185 1200c18-282 112-446 265-446s247 164 265 446Z"/></svg>');
 let profiles = [];
-let demoIds = new Set();
-let profilesCsvSnapshot = "";
+let profilesSnapshot = "";
 let refreshingProfiles = false;
 
 const elements = {
@@ -193,104 +194,6 @@ function setImageSource(element, source, alt = "", imageType = "cover") {
   element.src = resolveImageUrl(source, imageType);
 }
 
-function parseCsv(text) {
-  const rows = [];
-  let row = [];
-  let value = "";
-  let quoted = false;
-  const source = text.replace(/^\uFEFF/, "");
-
-  for (let index = 0; index < source.length; index += 1) {
-    const char = source[index];
-    if (quoted && char === '"' && source[index + 1] === '"') {
-      value += '"';
-      index += 1;
-    } else if (char === '"') {
-      quoted = !quoted;
-    } else if (char === "," && !quoted) {
-      row.push(value);
-      value = "";
-    } else if ((char === "\n" || char === "\r") && !quoted) {
-      if (char === "\r" && source[index + 1] === "\n") index += 1;
-      row.push(value);
-      if (row.some((cell) => cell !== "")) rows.push(row);
-      row = [];
-      value = "";
-    } else {
-      value += char;
-    }
-  }
-
-  if (quoted) throw new Error("El CSV contiene un campo entre comillas sin cerrar.");
-  if (value !== "" || row.length > 0) {
-    row.push(value);
-    rows.push(row);
-  }
-  if (rows.length === 0) throw new Error("El CSV está vacío.");
-
-  const headers = rows.shift().map((header) => header.trim());
-  const required = [
-    "id", "nombres", "apellidos", "departamento", "provincia", "distrito",
-    "whatsapp_publico", "portafolio_url", "categoria", "descripcion_corta", "descripcion_larga", "foto_perfil", "imagen_portada",
-    "es_verificado", "es_destacado", "posicion",
-  ];
-  const missing = required.filter((header) => !headers.includes(header));
-  if (missing.length) throw new Error(`Faltan columnas: ${missing.join(", ")}.`);
-  if (rows.length === 0) return [];
-
-  const seenIds = new Set();
-  const toBoolean = (value) => /^(true|1|si|sí|yes)$/i.test(value.trim());
-  return rows.map((cells, csvOrder) => {
-    const record = Object.fromEntries(headers.map((header, index) => [header, cells[index] ?? ""]));
-    const id = Number(record.id);
-    if (!Number.isInteger(id) || id <= 0 || seenIds.has(id)) {
-      throw new Error("Cada perfil debe tener un id numérico, positivo y único.");
-    }
-    seenIds.add(id);
-    return {
-      id,
-      demo: demoIds.has(id),
-      nombres: record.nombres.trim(),
-      apellidos: record.apellidos.trim(),
-      departamento: record.departamento.trim(),
-      provincia: record.provincia.trim(),
-      distrito: record.distrito.trim(),
-      whatsapp: record.whatsapp_publico.trim(),
-      portafolio_url: record.portafolio_url.trim(),
-      instagram_usuario: (record.instagram_usuario || "").trim(),
-      linkedin_usuario: (record.linkedin_usuario || "").trim(),
-      behance_usuario: (record.behance_usuario || "").trim(),
-      categoria: record.categoria.trim(),
-      descripcion_corta: record.descripcion_corta.trim(),
-      descripcion_larga: record.descripcion_larga.trim(),
-      productos_servicios: (record.productos_servicios || "").trim(),
-      nivel_experiencia: (record.nivel_experiencia || "").trim(),
-      nivel_precio: (record.nivel_precio || "").trim(),
-      foto_perfil: record.foto_perfil.trim(),
-      imagen_portada: record.imagen_portada.trim(),
-      verificado: toBoolean(record.es_verificado),
-      destacado: toBoolean(record.es_destacado),
-      posicion: record.posicion.trim() === "" ? null : Number(record.posicion),
-      csvOrder,
-      nameSearchText: normalizeText([record.nombres, record.apellidos].join(" ")),
-      searchText: normalizeText([
-        record.nombres,
-        record.apellidos,
-        record.categoria,
-        record.descripcion_corta,
-        record.descripcion_larga,
-        record.productos_servicios || "",
-        record.nivel_experiencia || "",
-        record.nivel_precio || "",
-        record.departamento,
-        record.provincia,
-        record.distrito,
-        record.whatsapp_publico,
-      ].join(" ")),
-    };
-  });
-}
-
 function profileSlugFromLocation() {
   return window.location.hash.match(/^#\/perfil\/([^/?#]+)\/?$/)?.[1]
     ?? window.location.pathname.match(/^\/perfil\/([^/]+)\/?$/)?.[1]
@@ -307,15 +210,11 @@ async function initializeDirectory() {
   )}`;
 
   try {
-    const demoResponse = await fetch(new URL("../data/perfiles-demo.json", import.meta.url));
-    if (!demoResponse.ok) throw new Error("No se pudo comprobar qué perfiles son de demostración.");
-    const demoData = await demoResponse.json();
-    demoIds = new Set(demoData.ids);
-    profilesCsvSnapshot = await fetchProfilesCsv();
-    profiles = parseCsv(profilesCsvSnapshot);
+    profiles = await fetchProfilesFromSupabase();
+    profilesSnapshot = JSON.stringify(profiles);
   } catch (error) {
     elements.resultsCount.textContent = "No se pudo cargar el directorio";
-    elements.empty.textContent = "Abre esta web desde GitHub Pages o mediante un servidor local para cargar el CSV.";
+    elements.empty.textContent = "No se pudo conectar con el directorio. Inténtalo de nuevo más tarde.";
     elements.empty.hidden = false;
     elements.loader.hidden = true;
     console.error("Error al cargar el directorio:", error);
@@ -340,12 +239,13 @@ async function initializeDirectory() {
   });
 }
 
-async function fetchProfilesCsv() {
-  const csvUrl = new URL(SITE_CONFIG.profilesCsv, import.meta.url);
-  csvUrl.searchParams.set("v", String(Date.now()));
-  const response = await fetch(csvUrl, { cache: "no-store" });
-  if (!response.ok) throw new Error(`No se pudo leer el CSV (HTTP ${response.status}).`);
-  return response.text();
+async function fetchProfilesFromSupabase() {
+  const { data, error } = await getSupabaseClient()
+    .from("directory_public_profiles")
+    .select("*")
+    .order("id", { ascending: true });
+  if (error) throw new Error(`No se pudo cargar el directorio (${error.message}).`);
+  return (data || []).map(mapPublicProfile);
 }
 
 async function refreshProfiles() {
@@ -353,12 +253,12 @@ async function refreshProfiles() {
   refreshingProfiles = true;
 
   try {
-    const nextSnapshot = await fetchProfilesCsv();
-    if (nextSnapshot === profilesCsvSnapshot) return;
+    const nextProfiles = await fetchProfilesFromSupabase();
+    const nextSnapshot = JSON.stringify(nextProfiles);
+    if (nextSnapshot === profilesSnapshot) return;
 
-    const nextProfiles = parseCsv(nextSnapshot);
     const previousRenderedCount = renderedCount;
-    profilesCsvSnapshot = nextSnapshot;
+    profilesSnapshot = nextSnapshot;
     profiles = nextProfiles;
 
     const currentIds = new Set(profiles.map((profile) => profile.id));
@@ -389,16 +289,6 @@ async function refreshProfiles() {
   } finally {
     refreshingProfiles = false;
   }
-}
-
-function normalizeText(value) {
-  return String(value)
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLocaleLowerCase("es")
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
 }
 
 function editDistance(a, b) {
