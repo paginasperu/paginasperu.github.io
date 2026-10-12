@@ -8,15 +8,23 @@ vm.createContext(context);
 vm.runInContext(parser, context);
 const csv = fs.readFileSync(new URL('../data/perfiles.csv', import.meta.url), 'utf8');
 const headers = csv.replace(/^\uFEFF/, '').split(/\r?\n/)[0].replaceAll('"', '').split(',');
-assert.equal(headers.length, 22);
-for (const field of ['correo', 'whatsapp_interno', 'fecha_nacimiento', 'genero', 'notas', 'estado', 'acepta_privacidad']) assert(!headers.includes(field), `campo privado: ${field}`);
+assert.equal(headers.length, 16);
+for (const field of ['correo', 'whatsapp_interno', 'fecha_nacimiento', 'genero', 'notas', 'estado', 'acepta_privacidad', 'behance_usuario', 'instagram_usuario', 'linkedin_usuario', 'canva_url', 'productos_servicios', 'nivel_experiencia', 'nivel_precio']) assert(!headers.includes(field), `campo privado/retirado: ${field}`);
+assert(headers.includes('portafolio_url'));
 assert.equal(new Set(headers).size, headers.length);
+const demo = JSON.parse(fs.readFileSync(new URL('../data/perfiles-demo.json', import.meta.url), 'utf8'));
+context.demoIds = new Set(demo.ids);
 const profiles = context.parseCsv(csv);
 assert(profiles.length > 0);
-const demo = JSON.parse(fs.readFileSync(new URL('../data/perfiles-demo.json', import.meta.url), 'utf8'));
+assert(profiles.filter(profile => profile.demo).every(profile => !profile.portafolio_url), 'los perfiles de demostración no reciben enlaces personales migrados');
+assert(profiles.every(profile => profile.demo || !profile.portafolio_url || /^https:\/\//.test(profile.portafolio_url)), 'los perfiles reales solo exponen URL segura del portafolio');
+assert.equal(profiles.find(profile => profile.id === 17)?.portafolio_url, 'https://www.instagram.com/nathyy2029');
+assert.equal(profiles.find(profile => profile.id === 18)?.portafolio_url, 'https://www.instagram.com/esmillones27');
 assert(demo.ids.every(id => Number.isSafeInteger(id) && id > 0));
 for (const page of ['index.html', 'registro.html', 'contacto.html', 'privacidad.html']) {
   const html = fs.readFileSync(new URL('../' + page, import.meta.url), 'utf8');
   assert(html.includes('rel="canonical"'), `${page}: canonical ausente`);
 }
+const homeHtml = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+assert(!homeHtml.includes('experience-filter') && !homeHtml.includes('price-filter'), 'se retiraron filtros de campos eliminados');
 console.log(`Publicación: ${profiles.length} perfiles, columnas privadas excluidas, IDs y páginas comprobados.`);

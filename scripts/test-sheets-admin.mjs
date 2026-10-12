@@ -10,7 +10,7 @@ const headers = Array.from(vm.runInContext('REVIEW_HEADERS', context));
 const publicHeaders = Array.from(vm.runInContext('PUBLIC_HEADERS', context));
 const records = [
   makeRow({ id: '17', nombres: 'Prueba', apellidos: 'Pendiente', estado: 'Pendiente', correo: 'privado@example.test', whatsapp_interno: '51900000017' }),
-  makeRow({ id: '18', nombres: 'Prueba', apellidos: 'Activo', estado: 'Activo', correo: 'activo@example.test' }),
+  makeRow({ id: '18', nombres: 'Prueba', apellidos: 'Activo', estado: 'Activo', correo: 'activo@example.test', portafolio_url: 'https://example.pe/Portfolio' }),
 ];
 const publicRows = [publicHeaders, publicHeaders.map((header) => header === 'id' ? '17' : header === 'nombres' ? 'Prueba' : '')];
 const writes = [];
@@ -83,6 +83,11 @@ const csvData = context.getPublicCsvData();
 assert.equal(csvData.length, 3);
 assert.deepEqual(Array.from(csvData[0]), publicHeaders);
 assert.equal(publicHeaders.includes('correo'), false, 'la descarga se limita a la lista pública');
+assert.equal(publicHeaders.includes('portafolio_url'), true, 'la descarga incluye el portafolio genérico');
+assert.equal(publicHeaders.includes('instagram_usuario'), false, 'las redes antiguas no se exportan');
+const portfolioIndex = publicHeaders.indexOf('portafolio_url');
+const activeRow = csvData.find(row => row[publicHeaders.indexOf('id')] === '18');
+assert.equal(activeRow[portfolioIndex], 'https://example.pe/Portfolio', 'exporta el portafolio desde la columna conservada');
 records[0][headers.indexOf('estado')] = 'Inactivo';
 assert.equal(context.getPublicCsvData().length, 2, 'un perfil inactivo debe desaparecer del CSV');
 records[0][headers.indexOf('estado')] = 'Pendiente';

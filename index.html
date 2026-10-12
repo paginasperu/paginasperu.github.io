@@ -24,8 +24,8 @@
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23000'/%3E%3C/svg%3E"
     />
-    <link rel="stylesheet" href="./styles/index.css?v=20261011-13" />
-    <script src="./scripts/index.js?v=20261011-5" type="module"></script>
+    <link rel="stylesheet" href="./styles/index.css?v=20261011-14" />
+    <script src="./scripts/index.js?v=20261011-6" type="module"></script>
     <link rel="canonical" href="https://oficial.pe/" />
     <meta property="og:url" content="https://oficial.pe/" />
   </head>
@@ -133,24 +133,6 @@
               <span>Distrito</span>
               <select id="district-filter"><option value="">Todos</option></select>
             </label>
-            <label class="field">
-              <span>Experiencia</span>
-              <select id="experience-filter">
-                <option value="">Todas</option>
-                <option value="Principiante">Principiante</option>
-                <option value="Intermedio">Intermedio</option>
-                <option value="Experto">Experto</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Nivel de precio</span>
-              <select id="price-filter">
-                <option value="">Todos</option>
-                <option value="Económico">Económico</option>
-                <option value="Estándar">Estándar</option>
-                <option value="Premium">Premium</option>
-              </select>
-            </label>
             <div class="check-group">
               <label class="check"><input id="verified-filter" type="checkbox" /> Verificados</label>
               <label class="check"><input id="featured-filter" type="checkbox" /> Destacados</label>
@@ -245,10 +227,6 @@
 
           <section class="profile-section profile-intro">
             <p id="modal-short-description"></p>
-            <div class="profile-tags">
-              <span><small>Experiencia</small><strong id="modal-experience"></strong></span>
-              <span><small>Nivel de precio</small><strong id="modal-price"></strong></span>
-            </div>
           </section>
 
           <section class="profile-section">
@@ -271,14 +249,9 @@
             <small id="modal-contact-note" class="contact-note" hidden></small>
           </section>
 
-          <section id="modal-social-section" class="profile-section">
-            <p class="section-eyebrow">Portafolio y redes</p>
-            <div class="social-links">
-              <a id="modal-behance" href="#" target="_blank" rel="noopener noreferrer">Behance</a>
-              <a id="modal-instagram" href="#" target="_blank" rel="noopener noreferrer">Instagram</a>
-              <a id="modal-linkedin" href="#" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-              <a id="modal-canva" href="#" target="_blank" rel="noopener noreferrer">Canva</a>
-            </div>
+          <section id="modal-portfolio-section" class="profile-section" hidden>
+            <p class="section-eyebrow">Portafolio</p>
+            <a id="modal-portfolio" href="#" target="_blank" rel="noopener noreferrer">Ver portafolio</a>
           </section>
 
           <section id="modal-description-section" class="profile-section">
@@ -286,10 +259,6 @@
             <p id="modal-long-description" class="profile-description"></p>
           </section>
 
-          <section id="modal-services-section" class="profile-section">
-            <p class="section-eyebrow">Productos y servicios</p>
-            <p id="modal-services" class="profile-description"></p>
-          </section>
         </article>
 
         <button id="modal-next" class="modal-nav modal-nav--next" aria-label="Perfil siguiente" type="button">›</button>

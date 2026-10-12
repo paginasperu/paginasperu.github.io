@@ -1,4 +1,5 @@
 import { attachFieldValidation } from './form-validation.js';
+import { prepareLocationOptions, searchLocations } from './location-picker.js';
 
 const SITE_CONFIG = {
   appsScriptEndpoint: "https://script.google.com/macros/s/AKfycbyFHXYtrjWYk3QDHj-SoV-lquJI9VQ0dbOSVfA7fJlFIHJGLK8ZXAJ_MlOHkwooYgrFxw/exec",
@@ -13,11 +14,14 @@ const form = document.querySelector("#registro");
 const fieldValidation = attachFieldValidation(form);
 const message = document.querySelector("#mensaje");
 const submitButton = document.querySelector("#enviar");
-const departmentSelect = document.querySelector("#departamento");
-const provinceSelect = document.querySelector("#provincia");
-const districtSelect = document.querySelector("#distrito");
+const locationInput = document.querySelector("#ubicacion");
+const locationList = document.querySelector("#ubicacion-listbox");
+const locationStatus = document.querySelector("#ubicacion-status");
 const locationUrl = new URL("../data/distritos.csv", import.meta.url);
-const locationRows = [];
+let locationOptions = [];
+let visibleLocations = [];
+let selectedLocation = null;
+let activeLocationIndex = -1;
 const MAX_SOURCE_IMAGE_BYTES = 1024 * 1024;
 const MAX_PROCESSING_WIDTH = 1200;
 const MAX_PROCESSING_HEIGHT = 1500;
@@ -90,10 +94,6 @@ function parseCsv(text) {
   return rows.map((values) => Object.fromEntries(headers.map((header, index) => [header, (values[index] || "").trim()])));
 }
 
-function setOptions(select, values, prompt) {
-  select.replaceChildren(new Option(prompt, ""), ...values.map((value) => new Option(value, value)));
-}
-
 function showMessage(text, state = "success") {
   message.textContent = text;
   message.dataset.state = state;
@@ -138,24 +138,115 @@ async function loadLocations() {
   if (!response.ok) throw new Error("No se pudo cargar data/distritos.csv.");
   const rows = parseCsv(await response.text()).filter((row) => row.departamento && row.provincia && row.distrito);
   if (!rows.length) throw new Error("El catálogo de ubicaciones está vacío o tiene encabezados distintos.");
-  locationRows.push(...rows);
-  setOptions(departmentSelect, [...new Set(rows.map((row) => row.departamento))].sort(), "Selecciona departamento");
+  locationOptions = prepareLocationOptions(rows);
+  locationStatus.textContent = `${locationOptions.length.toLocaleString("es-PE")} ubicaciones disponibles.`;
 }
 
-departmentSelect.addEventListener("change", () => {
-  const provinces = locationRows.filter((row) => row.departamento === departmentSelect.value).map((row) => row.provincia);
-  setOptions(provinceSelect, [...new Set(provinces)].sort(), "Selecciona provincia");
-  provinceSelect.disabled = !departmentSelect.value;
-  setOptions(districtSelect, [], "Selecciona distrito");
-  districtSelect.disabled = true;
-});
+function closeLocationList() {
+  locationList.hidden = true;
+  locationInput.setAttribute("aria-expanded", "false");
+  locationInput.removeAttribute("aria-activedescendant");
+  activeLocationIndex = -1;
+}
 
-provinceSelect.addEventListener("change", () => {
-  const districts = locationRows
-    .filter((row) => row.departamento === departmentSelect.value && row.provincia === provinceSelect.value)
-    .map((row) => row.distrito);
-  setOptions(districtSelect, [...new Set(districts)].sort(), "Selecciona distrito");
-  districtSelect.disabled = !provinceSelect.value;
+function selectLocation(option) {
+  selectedLocation = option;
+  locationInput.value = option.label;
+  locationInput.dataset.locationSelected = "true";
+  locationStatus.textContent = `Ubicación seleccionada: ${option.label}`;
+  fieldValidation.setError(locationInput, "");
+  closeLocationList();
+}
+
+function renderLocationOptions(query) {
+  locationList.replaceChildren();
+  visibleLocations = [];
+  activeLocationIndex = -1;
+  locationInput.removeAttribute("aria-activedescendant");
+
+  if (query.trim().length < 2) {
+    closeLocationList();
+    locationStatus.textContent = query.trim()
+      ? "Escribe al menos dos caracteres para buscar."
+      : `${locationOptions.length.toLocaleString("es-PE")} ubicaciones disponibles. Escribe para buscar.`;
+    return;
+  }
+
+  const result = searchLocations(locationOptions, query, 25);
+  visibleLocations = result.matches;
+  if (!result.total) {
+    closeLocationList();
+    locationStatus.textContent = "No encontramos esa ubicación. Prueba con otro distrito, provincia o departamento.";
+    return;
+  }
+
+  result.matches.forEach((option, index) => {
+    const item = document.createElement("li");
+    item.id = `ubicacion-option-${index}`;
+    item.className = "location-option";
+    item.setAttribute("role", "option");
+    item.setAttribute("aria-selected", "false");
+    item.textContent = option.label;
+    item.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      selectLocation(option);
+    });
+    locationList.append(item);
+  });
+
+  locationInput.setAttribute("aria-expanded", "true");
+  locationList.hidden = false;
+  locationStatus.textContent = `${result.total.toLocaleString("es-PE")} resultados${result.total > result.matches.length ? `; mostrando ${result.matches.length}` : ""}. Usa las flechas y Enter para elegir.`;
+}
+
+function setActiveLocation(index) {
+  if (!visibleLocations.length) return;
+  activeLocationIndex = (index + visibleLocations.length) % visibleLocations.length;
+  locationList.querySelectorAll('[role="option"]').forEach((item, itemIndex) => {
+    const active = itemIndex === activeLocationIndex;
+    item.setAttribute("aria-selected", String(active));
+    if (active) {
+      locationInput.setAttribute("aria-activedescendant", item.id);
+      item.scrollIntoView({ block: "nearest" });
+    }
+  });
+}
+
+locationInput.addEventListener("input", () => {
+  selectedLocation = null;
+  delete locationInput.dataset.locationSelected;
+  renderLocationOptions(locationInput.value);
+});
+locationInput.addEventListener("focus", () => {
+  if (!selectedLocation) renderLocationOptions(locationInput.value);
+});
+locationInput.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    if (locationList.hidden) renderLocationOptions(locationInput.value);
+    setActiveLocation(activeLocationIndex + 1);
+  } else if (event.key === "ArrowUp" && !locationList.hidden) {
+    event.preventDefault();
+    setActiveLocation(activeLocationIndex < 0 ? visibleLocations.length - 1 : activeLocationIndex - 1);
+  } else if (event.key === "Enter" && !locationList.hidden) {
+    const exactMatch = visibleLocations.find((option) => option.label.toLocaleLowerCase("es-PE") === locationInput.value.trim().toLocaleLowerCase("es-PE"));
+    const option = visibleLocations[activeLocationIndex] || exactMatch;
+    if (option) {
+      event.preventDefault();
+      selectLocation(option);
+    }
+  } else if (event.key === "Escape" && !locationList.hidden) {
+    event.preventDefault();
+    closeLocationList();
+  }
+});
+locationInput.addEventListener("blur", () => {
+  if (!selectedLocation) closeLocationList();
+});
+form.addEventListener("reset", () => {
+  selectedLocation = null;
+  delete locationInput.dataset.locationSelected;
+  closeLocationList();
 });
 
 function normalizePhone(input) {
@@ -170,12 +261,6 @@ for (const name of ["whatsapp_publico", "whatsapp_interno"]) {
     event.currentTarget.value = event.currentTarget.value.replace(/[^0-9()+\-\s]/g, "");
   });
   input.addEventListener("blur", (event) => normalizePhone(event.currentTarget));
-}
-
-for (const name of ["correo", "behance_usuario", "instagram_usuario", "linkedin_usuario"]) {
-  document.querySelector(`#${name}`).addEventListener("blur", (event) => {
-    event.currentTarget.value = event.currentTarget.value.trim().toLocaleLowerCase("es-PE");
-  });
 }
 
 for (const input of form.querySelectorAll("input[type='file']")) {
@@ -306,34 +391,22 @@ function imageFieldName(input) {
   return heading.replace(/\s*\*\s*/g, "").trim();
 }
 
-function configureBirthDateLimits() {
-  const input = document.querySelector("#fecha_nacimiento");
-  const today = new Date();
-  const toIso = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-  const latest = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
-  const earliest = new Date(today.getFullYear() - 51, today.getMonth(), today.getDate() + 1);
-  input.max = toIso(latest);
-  input.min = toIso(earliest);
-}
-
 function cleanFormValues() {
   const payload = {};
   const fields = [
-    "nombres", "apellidos", "genero", "fecha_nacimiento", "departamento", "provincia", "distrito",
-    "whatsapp_publico", "whatsapp_interno", "correo", "behance_usuario", "instagram_usuario", "linkedin_usuario", "canva_url",
-    "categoria", "descripcion_corta", "descripcion_larga", "productos_servicios",
-    "nivel_experiencia", "nivel_precio",
+    "nombres", "apellidos", "whatsapp_publico", "whatsapp_interno", "portafolio_url",
+    "categoria", "descripcion_corta", "descripcion_larga",
   ];
   for (const name of fields) {
     const value = form.elements.namedItem(name).value.trim();
     payload[name] = value || null;
   }
+  payload.departamento = selectedLocation?.departamento || null;
+  payload.provincia = selectedLocation?.provincia || null;
+  payload.distrito = selectedLocation?.distrito || null;
   for (const name of ["whatsapp_publico", "whatsapp_interno"]) {
     if (payload[name]) payload[name] = payload[name].replace(/[\s()+-]/g, "");
     if (payload[name] && /^9\d{8}$/.test(payload[name])) payload[name] = `51${payload[name]}`;
-  }
-  for (const name of ["correo", "behance_usuario", "instagram_usuario", "linkedin_usuario"]) {
-    if (payload[name]) payload[name] = payload[name].toLocaleLowerCase("es-PE");
   }
   payload.acepta_privacidad = form.acepta_privacidad.checked;
   return payload;
@@ -479,11 +552,9 @@ form.addEventListener("submit", async (event) => {
   trimTextFields();
   if (!fieldValidation.validate()) return;
 
-  const isLocationValid = locationRows.some((row) => row.departamento === departmentSelect.value
-    && row.provincia === provinceSelect.value && row.distrito === districtSelect.value);
-  if (!isLocationValid) {
-    fieldValidation.setError(districtSelect, "Selecciona una combinación válida de ubicación.");
-    districtSelect.focus();
+  if (!selectedLocation || locationInput.dataset.locationSelected !== "true") {
+    fieldValidation.setError(locationInput, "Selecciona una ubicación completa de la lista.");
+    locationInput.focus();
     return;
   }
 
@@ -533,10 +604,6 @@ form.addEventListener("submit", async (event) => {
     pendingSubmission = null;
     startedAt = Date.now();
     for (const input of form.querySelectorAll("input[type='file']")) clearCropState(input);
-    setOptions(provinceSelect, [], "Selecciona primero un departamento");
-    setOptions(districtSelect, [], "Selecciona primero una provincia");
-    provinceSelect.disabled = true;
-    districtSelect.disabled = true;
   } catch (error) {
     for (const control of form.elements) {
       if (control.name && control.name !== "website" && error.message?.includes(control.name)) fieldValidation.setError(control, error.message);
@@ -556,9 +623,9 @@ form.addEventListener("submit", async (event) => {
   }
 });
 
-configureBirthDateLimits();
 loadLocations().catch((error) => {
-  departmentSelect.replaceChildren(new Option("No se pudo cargar", ""));
+  locationInput.disabled = true;
+  locationStatus.textContent = "No se pudo cargar el catálogo de ubicaciones.";
   showMessage(`${error.message} Comprueba que el archivo esté disponible en data/distritos.csv.`, "error");
 });
 

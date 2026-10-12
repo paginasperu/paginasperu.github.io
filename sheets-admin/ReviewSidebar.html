@@ -154,8 +154,13 @@
         const link = document.createElement('a'); link.href = text; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = 'Abrir imagen';
         const image = document.createElement('img'); image.className = 'image'; image.src = text; image.alt = label; image.loading = 'lazy'; image.referrerPolicy = 'no-referrer';
         content.append(link, image);
-      } else if (label === 'Canva' && /^https:\/\/(?:www\.)?canva\.com\//i.test(text)) {
-        const link = document.createElement('a'); link.href = text; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = 'Abrir proyecto de Canva'; content.appendChild(link);
+      } else if (label === 'Portafolio') {
+        try {
+          const url = new URL(text);
+          if (url.protocol === 'https:' && url.hostname.includes('.') && !url.username && !url.password) {
+            const link = document.createElement('a'); link.href = url.href; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = 'Abrir portafolio'; content.appendChild(link);
+          } else content.textContent = text;
+        } catch { content.textContent = text; }
       } else { content.textContent = text; }
       wrapper.append(title, content); fieldsEl.appendChild(wrapper);
     }
@@ -168,11 +173,11 @@
         const labels = {
           nombres: 'Nombres', apellidos: 'Apellidos', genero: 'Género', fecha_nacimiento: 'Fecha de nacimiento',
           departamento: 'Departamento', provincia: 'Provincia', distrito: 'Distrito', whatsapp_publico: 'WhatsApp público',
-          whatsapp_interno: 'WhatsApp interno', correo: 'Correo', behance_usuario: 'Behance', instagram_usuario: 'Instagram',
-          linkedin_usuario: 'LinkedIn', categoria: 'Categoría', descripcion_corta: 'Descripción corta',
-          descripcion_larga: 'Descripción', productos_servicios: 'Productos y servicios', nivel_experiencia: 'Experiencia',
-          nivel_precio: 'Nivel de precio', foto_perfil: 'Foto de perfil', imagen_portada: 'Imagen de portada',
-          acepta_privacidad: 'Aceptó la política de privacidad', fecha_registro: 'Fecha de registro', canva_url: 'Canva'
+          whatsapp_interno: 'WhatsApp interno', correo: 'Correo (histórico)', behance_usuario: 'Behance (histórico)', instagram_usuario: 'Instagram (histórico)',
+          linkedin_usuario: 'LinkedIn (histórico)', categoria: 'Categoría', descripcion_corta: 'Descripción corta',
+          descripcion_larga: 'Descripción larga', productos_servicios: 'Productos y servicios (histórico)', nivel_experiencia: 'Experiencia (histórico)',
+          nivel_precio: 'Nivel de precio (histórico)', foto_perfil: 'Foto de perfil', imagen_portada: 'Imagen de portada',
+          acepta_privacidad: 'Aceptó la política de privacidad', fecha_registro: 'Fecha de registro', canva_url: 'Canva (histórico)', portafolio_url: 'Portafolio'
         };
         Object.keys(data).forEach(function (key) {
           if (!OMIT.has(key)) addField(labels[key] || key, key === 'acepta_privacidad' ? (data[key] === 'TRUE' ? 'Sí' : 'No') : data[key]);

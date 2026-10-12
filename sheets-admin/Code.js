@@ -9,12 +9,11 @@ const REVIEW_HEADERS = [
   "whatsapp_publico", "whatsapp_interno", "correo", "behance_usuario", "instagram_usuario", "linkedin_usuario",
   "categoria", "descripcion_corta", "descripcion_larga", "productos_servicios", "nivel_experiencia", "nivel_precio",
   "foto_perfil", "imagen_portada", "acepta_privacidad", "calificacion_interna", "es_verificado", "es_destacado",
-  "posicion", "estado", "notas", "fecha_registro", "canva_url",
+  "posicion", "estado", "notas", "fecha_registro", "portafolio_url",
 ];
 const PUBLIC_HEADERS = [
-  "id", "nombres", "apellidos", "departamento", "provincia", "distrito", "whatsapp_publico", "behance_usuario",
-  "instagram_usuario", "linkedin_usuario", "categoria", "descripcion_corta", "descripcion_larga", "productos_servicios",
-  "nivel_experiencia", "nivel_precio", "foto_perfil", "imagen_portada", "es_verificado", "es_destacado", "posicion", "canva_url",
+  "id", "nombres", "apellidos", "departamento", "provincia", "distrito", "whatsapp_publico", "portafolio_url",
+  "categoria", "descripcion_corta", "descripcion_larga", "foto_perfil", "imagen_portada", "es_verificado", "es_destacado", "posicion",
 ];
 const REVIEW_STATUSES = ["Pendiente", "Activo", "Rechazado", "Inactivo"];
 

@@ -5,7 +5,6 @@
  */
 const SPREADSHEET_ID = "1HUWM3j-RvhrBJlufeUwycP04ZKHZANEuOwVTHNps754";
 const SHEET_NAME = "perfiles";
-const TIME_ZONE = "America/Lima";
 const NEXT_ID_PROPERTY = "DIRECTORY_NEXT_PROFILE_ID";
 const CLOUDINARY_IMAGE_PREFIX = "https://res.cloudinary.com/dahrgg4v5/image/upload/";
 const HEADERS = [
@@ -13,24 +12,20 @@ const HEADERS = [
   "whatsapp_publico", "whatsapp_interno", "correo", "behance_usuario", "instagram_usuario", "linkedin_usuario",
   "categoria", "descripcion_corta", "descripcion_larga", "productos_servicios", "nivel_experiencia", "nivel_precio",
   "foto_perfil", "imagen_portada", "acepta_privacidad", "calificacion_interna", "es_verificado", "es_destacado",
-  "posicion", "estado", "notas", "fecha_registro", "canva_url",
+  "posicion", "estado", "notas", "fecha_registro", "portafolio_url",
 ];
 const PUBLIC_FORM_FIELDS = [
-  "nombres", "apellidos", "genero", "fecha_nacimiento", "departamento", "provincia", "distrito",
-  "whatsapp_publico", "whatsapp_interno", "correo", "behance_usuario", "instagram_usuario", "linkedin_usuario",
-  "categoria", "descripcion_corta", "descripcion_larga", "productos_servicios", "nivel_experiencia", "nivel_precio",
-  "foto_perfil", "imagen_portada", "acepta_privacidad", "canva_url",
+  "nombres", "apellidos", "departamento", "provincia", "distrito",
+  "whatsapp_publico", "whatsapp_interno", "portafolio_url", "categoria",
+  "descripcion_corta", "descripcion_larga", "foto_perfil", "imagen_portada", "acepta_privacidad",
 ];
 const OPTIONS = {
-  genero: ["Mujer", "Hombre"],
   categoria: ["Diseñadores gráficos", "Anfitrionas", "Volanteras"],
-  nivel_experiencia: ["Principiante", "Intermedio", "Experto"],
-  nivel_precio: ["Económico", "Estándar", "Premium"],
 };
-const UNIQUE_FIELDS = ["whatsapp_publico", "whatsapp_interno", "correo", "behance_usuario", "instagram_usuario", "linkedin_usuario"];
+const UNIQUE_FIELDS = ["whatsapp_interno"];
 
 function doGet() {
-  return jsonOutput_({ ok: true, service: "registro", version: "20261011-security", message: "Servicio de registro disponible." });
+  return jsonOutput_({ ok: true, service: "registro", version: "20261011-form-v1", message: "Servicio de registro disponible." });
 }
 
 function doPost(event) {
@@ -58,7 +53,7 @@ function doPost(event) {
         if (idExists) return responseOutput_({ ok: true, message: "Recibimos tu perfil para revisión.", id: previous.id }, requestId, event);
         delete requests[payload.submissionId];
       }
-      checkRateLimit_(record.correo);
+      checkRateLimit_(record.whatsapp_interno);
       assertUnique_(sheet, record);
       if (payload.action === "validate") return responseOutput_({ ok: true, validated: true }, requestId, event);
       record.id = nextId_(sheet);
@@ -105,23 +100,17 @@ function validateAndNormalize_(payload) {
     record[field] = Object.prototype.hasOwnProperty.call(payload, field) ? payload[field] : null;
   });
 
-  ["nombres", "apellidos", "departamento", "provincia", "distrito", "whatsapp_publico", "whatsapp_interno", "correo",
-    "behance_usuario", "instagram_usuario", "linkedin_usuario", "categoria", "descripcion_corta", "descripcion_larga",
-    "productos_servicios", "nivel_experiencia", "nivel_precio", "foto_perfil", "imagen_portada", "canva_url"].forEach(function (field) {
+  ["nombres", "apellidos", "departamento", "provincia", "distrito", "whatsapp_publico", "whatsapp_interno",
+    "portafolio_url", "categoria", "descripcion_corta", "descripcion_larga", "foto_perfil", "imagen_portada"].forEach(function (field) {
     record[field] = cleanText_(record[field]);
   });
 
-  record.correo = lower_(record.correo);
-  record.behance_usuario = lower_(record.behance_usuario);
-  record.instagram_usuario = lower_(record.instagram_usuario);
-  record.linkedin_usuario = lower_(record.linkedin_usuario);
   record.whatsapp_publico = normalizePhone_(record.whatsapp_publico);
   record.whatsapp_interno = normalizePhone_(record.whatsapp_interno);
   record.acepta_privacidad = record.acepta_privacidad === true || record.acepta_privacidad === "Sí" || record.acepta_privacidad === "true";
 
-  const required = ["nombres", "apellidos", "genero", "fecha_nacimiento", "departamento", "provincia", "distrito",
-    "whatsapp_interno", "correo", "categoria", "descripcion_corta", "productos_servicios", "nivel_experiencia",
-    "nivel_precio"];
+  const required = ["nombres", "apellidos", "departamento", "provincia", "distrito",
+    "whatsapp_interno", "categoria", "descripcion_corta"];
   required.forEach(function (field) {
     if (record[field] === null || record[field] === "") throw inputError_("Completa el campo obligatorio: " + field + ".");
   });
@@ -129,8 +118,6 @@ function validateAndNormalize_(payload) {
 
   validateName_("nombres", record.nombres);
   validateName_("apellidos", record.apellidos);
-  validateChoice_("genero", record.genero);
-  validateBirthDate_(record.fecha_nacimiento);
   validateLocation_("departamento", record.departamento, 3, 13, /^[\p{L}\p{M} ]+$/u);
   validateLocation_("provincia", record.provincia, 3, 25, /^[\p{L}\p{M} ]+$/u);
   validateLocation_("distrito", record.distrito, 3, 36, /^[\p{L}\p{M} _()\-]+$/u);
@@ -139,19 +126,12 @@ function validateAndNormalize_(payload) {
   }
   validatePhone_("whatsapp_publico", record.whatsapp_publico, false);
   validatePhone_("whatsapp_interno", record.whatsapp_interno, true);
-  if (record.correo !== null && (record.correo.length < 3 || record.correo.length > 50 || !/^[^\s@]{1,}@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(record.correo))) throw inputError_("Ingresa un correo de 3 a 50 caracteres.");
   validateChoice_("categoria", record.categoria);
-  validateUsername_("behance_usuario", record.behance_usuario);
-  validateUsername_("instagram_usuario", record.instagram_usuario);
-  validateUsername_("linkedin_usuario", record.linkedin_usuario);
   validateTextLength_("descripcion_corta", record.descripcion_corta, 10, 150, true);
   validateTextLength_("descripcion_larga", record.descripcion_larga, 1, 1000, false);
-  validateTextLength_("productos_servicios", record.productos_servicios, 1, 500, true);
-  validateChoice_("nivel_experiencia", record.nivel_experiencia);
-  validateChoice_("nivel_precio", record.nivel_precio);
   validateImageUrl_("foto_perfil", record.foto_perfil);
   validateImageUrl_("imagen_portada", record.imagen_portada);
-  validateCanvaUrl_(record.canva_url);
+  validatePortfolioUrl_(record.portafolio_url);
   return record;
 }
 
@@ -160,10 +140,6 @@ function cleanText_(value) {
   if (typeof value !== "string" && typeof value !== "number") throw inputError_("El formato de un campo no es válido.");
   const text = String(value).normalize("NFC").replace(/^[\s\uFEFF]+|[\s\uFEFF]+$/gu, "");
   return text === "" ? null : text;
-}
-
-function lower_(value) {
-  return value === null ? null : value.toLocaleLowerCase("es-PE");
 }
 
 function normalizePhone_(value) {
@@ -190,13 +166,6 @@ function validatePhone_(field, value, required) {
   if (value === null || !/^519\d{8}$/.test(value)) throw inputError_(field + ": usa un número peruano de 11 dígitos que empiece por 519.");
 }
 
-function validateUsername_(field, value) {
-  if (value === null) return;
-  if (value.length < 3 || value.length > 50 || !/^[a-z0-9._-]+$/.test(value)) {
-    throw inputError_(field + ": usa 3 a 50 letras, números, puntos, guiones o guiones bajos.");
-  }
-}
-
 function validateTextLength_(field, value, min, max, required) {
   if (value === null && !required) return;
   if (value === null || value.length < min || value.length > max) {
@@ -206,19 +175,6 @@ function validateTextLength_(field, value, min, max, required) {
 
 function validateChoice_(field, value) {
   if (!OPTIONS[field] || OPTIONS[field].indexOf(value) === -1) throw inputError_("Selecciona una opción válida para " + field + ".");
-}
-
-function validateBirthDate_(value) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) throw inputError_("La fecha de nacimiento no es válida.");
-  const parts = value.split("-").map(Number);
-  const birthDate = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
-  const normalized = birthDate.getUTCFullYear() + "-" + String(birthDate.getUTCMonth() + 1).padStart(2, "0") + "-" + String(birthDate.getUTCDate()).padStart(2, "0");
-  if (Number.isNaN(birthDate.getTime()) || normalized !== value) throw inputError_("La fecha de nacimiento no es válida.");
-  const todayText = Utilities.formatDate(new Date(), TIME_ZONE, "yyyy-MM-dd");
-  const todayParts = todayText.split("-").map(Number);
-  const beforeBirthday = todayParts[1] < parts[1] || (todayParts[1] === parts[1] && todayParts[2] < parts[2]);
-  const age = todayParts[0] - parts[0] - (beforeBirthday ? 1 : 0);
-  if (age < 18 || age > 50) throw inputError_("La edad debe estar entre 18 y 50 años.");
 }
 
 function validateImageUrl_(field, value) {
@@ -232,13 +188,26 @@ function validateImageUrl_(field, value) {
   }
 }
 
-function validateCanvaUrl_(value) {
+function validatePortfolioUrl_(value) {
   if (value === null) return;
-  // Apps Script V8 tampoco implementa URL; ancla el host para evitar dominios
-  // parecidos como canva.com.ejemplo.test o credenciales antes del dominio.
-  if (typeof value !== "string" || value.length > 500
-      || !/^https:\/\/(?:www\.)?canva\.com\/[^\s]*$/i.test(value)) {
-    throw inputError_("El enlace debe ser HTTPS y pertenecer a canva.com.");
+  if (typeof value !== "string" || value.length > 500 || /[\s\\\u0000-\u001F\u007F]/.test(value)) {
+    throw inputError_("El portafolio debe ser una URL pública HTTPS válida.");
+  }
+  const match = /^https:\/\/([^/?#]+)(?:[/?#][^\s\\]*)?$/i.exec(value);
+  if (!match || match[1].indexOf("@") !== -1) {
+    throw inputError_("El portafolio debe ser una URL pública HTTPS válida.");
+  }
+  const authority = match[1];
+  const portMatch = authority.match(/:(\d+)$/);
+  const host = portMatch ? authority.slice(0, -portMatch[0].length) : authority;
+  if (portMatch && (Number(portMatch[1]) < 1 || Number(portMatch[1]) > 65535)) {
+    throw inputError_("El portafolio debe ser una URL pública HTTPS válida.");
+  }
+  const labels = host.split(".");
+  if (host.length > 253 || labels.length < 2 || labels.some(function (label) {
+    return label.length > 63 || !/^[\p{L}\p{M}\p{N}](?:[\p{L}\p{M}\p{N}-]*[\p{L}\p{M}\p{N}])?$/u.test(label);
+  })) {
+    throw inputError_("El portafolio debe ser una URL pública HTTPS válida.");
   }
 }
 
@@ -332,10 +301,10 @@ function digest_(value) {
   return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, value).map(function (byte) { return (byte + 256).toString(16).slice(-2); }).join("");
 }
 
-function checkRateLimit_(email) {
+function checkRateLimit_(contact) {
   const cache = CacheService.getScriptCache();
   const bucket = Math.floor(Date.now() / 600000);
-  const contactKey = "rate:" + bucket + ":" + digest_(email);
+  const contactKey = "rate:" + bucket + ":" + digest_(contact);
   const globalKey = "rate:" + bucket + ":global";
   const contactCount = Number(cache.get(contactKey) || 0);
   const globalCount = Number(cache.get(globalKey) || 0);

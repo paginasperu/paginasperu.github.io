@@ -13,13 +13,6 @@ const LOAD_DELAY = 350;
 const PROFILE_REFRESH_INTERVAL = 5 * 60 * 1000;
 const FAVORITES_STORAGE_KEY = "directorio-creativo:favorites:v1";
 const PROFILE_PLACEHOLDER = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200"><rect width="900" height="1200" fill="#eeeae4"/><circle cx="450" cy="380" r="145" fill="#c8beb2"/><path fill="#b2a69a" d="M185 1200c18-282 112-446 265-446s247 164 265 446Z"/></svg>');
-const SOCIAL_HOSTS = {
-  behance: new Set(["behance.net", "www.behance.net"]),
-  instagram: new Set(["instagram.com", "www.instagram.com"]),
-  linkedin: new Set(["linkedin.com", "www.linkedin.com"]),
-  canva: new Set(["canva.com", "www.canva.com"]),
-};
-
 let profiles = [];
 let demoIds = new Set();
 let profilesCsvSnapshot = "";
@@ -47,8 +40,6 @@ const elements = {
   department: document.querySelector("#department-filter"),
   province: document.querySelector("#province-filter"),
   district: document.querySelector("#district-filter"),
-  experience: document.querySelector("#experience-filter"),
-  price: document.querySelector("#price-filter"),
   verified: document.querySelector("#verified-filter"),
   featured: document.querySelector("#featured-filter"),
   modal: document.querySelector("#profile-modal"),
@@ -64,22 +55,15 @@ const elements = {
   modalFavorite: document.querySelector("#modal-favorite"),
   modalShare: document.querySelector("#modal-share"),
   modalShort: document.querySelector("#modal-short-description"),
-  modalExperience: document.querySelector("#modal-experience"),
-  modalPrice: document.querySelector("#modal-price"),
   modalLocation: document.querySelector("#modal-location"),
   modalContactSection: document.querySelector("#modal-contact-section"),
   modalWhatsapp: document.querySelector("#modal-whatsapp"),
   modalPhone: document.querySelector("#modal-phone"),
   modalContactNote: document.querySelector("#modal-contact-note"),
-  modalSocialSection: document.querySelector("#modal-social-section"),
-  modalBehance: document.querySelector("#modal-behance"),
-  modalInstagram: document.querySelector("#modal-instagram"),
-  modalLinkedin: document.querySelector("#modal-linkedin"),
-  modalCanva: document.querySelector("#modal-canva"),
+  modalPortfolioSection: document.querySelector("#modal-portfolio-section"),
+  modalPortfolio: document.querySelector("#modal-portfolio"),
   modalDescriptionSection: document.querySelector("#modal-description-section"),
   modalLong: document.querySelector("#modal-long-description"),
-  modalServicesSection: document.querySelector("#modal-services-section"),
-  modalServices: document.querySelector("#modal-services"),
   backToTop: document.querySelector("#back-to-top"),
 };
 
@@ -238,9 +222,7 @@ function parseCsv(text) {
   const headers = rows.shift().map((header) => header.trim());
   const required = [
     "id", "nombres", "apellidos", "departamento", "provincia", "distrito",
-    "whatsapp_publico", "behance_usuario", "instagram_usuario", "linkedin_usuario", "canva_url",
-    "categoria", "descripcion_corta", "descripcion_larga", "productos_servicios",
-    "nivel_experiencia", "nivel_precio", "foto_perfil", "imagen_portada",
+    "whatsapp_publico", "portafolio_url", "categoria", "descripcion_corta", "descripcion_larga", "foto_perfil", "imagen_portada",
     "es_verificado", "es_destacado", "posicion",
   ];
   const missing = required.filter((header) => !headers.includes(header));
@@ -265,16 +247,10 @@ function parseCsv(text) {
       provincia: record.provincia.trim(),
       distrito: record.distrito.trim(),
       whatsapp: record.whatsapp_publico.trim(),
-      usuario_behance: record.behance_usuario.trim(),
-      usuario_instagram: record.instagram_usuario.trim(),
-      usuario_linkedin: record.linkedin_usuario.trim(),
-      canva_url: record.canva_url.trim(),
+      portafolio_url: record.portafolio_url.trim(),
       categoria: record.categoria.trim(),
       descripcion_corta: record.descripcion_corta.trim(),
       descripcion_larga: record.descripcion_larga.trim(),
-      productos_servicios: record.productos_servicios.trim(),
-      experiencia: record.nivel_experiencia.trim(),
-      nivel_precio: record.nivel_precio.trim(),
       foto_perfil: record.foto_perfil.trim(),
       imagen_portada: record.imagen_portada.trim(),
       verificado: toBoolean(record.es_verificado),
@@ -287,9 +263,6 @@ function parseCsv(text) {
         record.categoria,
         record.descripcion_corta,
         record.descripcion_larga,
-        record.productos_servicios,
-        record.nivel_experiencia,
-        record.nivel_precio,
         record.departamento,
         record.provincia,
         record.distrito,
@@ -481,8 +454,6 @@ function countActiveFilters() {
     elements.department.value,
     elements.province.value,
     elements.district.value,
-    elements.experience.value,
-    elements.price.value,
     elements.verified.checked,
     elements.featured.checked,
   ].filter(Boolean).length;
@@ -502,8 +473,6 @@ function updateActiveFilters() {
     elements.department.value && ["department", elements.department.value],
     elements.province.value && ["province", elements.province.value],
     elements.district.value && ["district", elements.district.value],
-    elements.experience.value && ["experience", elements.experience.value],
-    elements.price.value && ["price", elements.price.value],
     elements.verified.checked && ["verified", "Verificados"],
     elements.featured.checked && ["featured", "Destacados"],
   ].filter(Boolean);
@@ -542,10 +511,6 @@ function removeActiveFilter(filter) {
     updateLocationOptions("province");
   } else if (filter === "district") {
     elements.district.value = "";
-  } else if (filter === "experience") {
-    elements.experience.value = "";
-  } else if (filter === "price") {
-    elements.price.value = "";
   } else if (filter === "verified") {
     elements.verified.checked = false;
   } else if (filter === "featured") {
@@ -599,9 +564,6 @@ function applyFilters() {
           profile.departamento === elements.department.value) &&
         (!elements.province.value || profile.provincia === elements.province.value) &&
         (!elements.district.value || profile.distrito === elements.district.value) &&
-        (!elements.experience.value ||
-          profile.experiencia === elements.experience.value) &&
-        (!elements.price.value || profile.nivel_precio === elements.price.value) &&
         (!elements.verified.checked || profile.verificado) &&
         (!elements.featured.checked || profile.destacado) &&
         (!favoriteOnly || isFavorite(profile.id)),
@@ -663,9 +625,6 @@ function createProfileCard(profile, index) {
   const location = document.createElement("span");
   location.className = "profile-card__location";
   location.textContent = `${profile.distrito}, ${profile.departamento}`;
-  const details = document.createElement("span");
-  details.className = "profile-card__summary";
-  details.textContent = [profile.experiencia, profile.nivel_precio].filter(Boolean).join(" · ");
   if (profile.verificado) {
     const verified = document.createElement("span");
     verified.className = "card-verified";
@@ -673,7 +632,7 @@ function createProfileCard(profile, index) {
     verified.setAttribute("aria-label", "Verificado");
     name.append(verified);
   }
-  info.append(name, meta, location, details);
+  info.append(name, meta, location);
 
   openButton.append(profileImage, info);
   card.append(openButton);
@@ -744,32 +703,13 @@ function renderNextBatch({ immediate = false } = {}) {
   else loadTimer = window.setTimeout(appendBatch, LOAD_DELAY);
 }
 
-function profileLink(network, username) {
-  if (!SOCIAL_HOSTS[network]) return "#";
-  let handle = String(username).trim();
-  if (/^https?:\/\//i.test(handle)) {
-    try {
-      const suppliedUrl = new URL(handle);
-      if (suppliedUrl.protocol !== "https:" || !SOCIAL_HOSTS[network].has(suppliedUrl.hostname)) return "#";
-      if (network === "canva") return suppliedUrl.href;
-      const pathParts = suppliedUrl.pathname.split("/").filter(Boolean);
-      if (network === "linkedin") {
-        handle = pathParts[0]?.toLowerCase() === "in" ? pathParts[1] || "" : "";
-      } else {
-        handle = pathParts[0] || "";
-      }
-    } catch {
-      return "#";
-    }
-  }
-  handle = handle.replace(/^@/, "");
-  if (!/^[\p{L}\p{N}._-]{1,100}$/u.test(handle)) return "#";
-  const destinations = {
-    behance: { host: "www.behance.net", path: handle },
-    instagram: { host: "www.instagram.com", path: handle },
-    linkedin: { host: "www.linkedin.com", path: `in/${handle}` },
-  };
-  return `https://${destinations[network].host}/${destinations[network].path}`;
+function safePortfolioUrl(value) {
+  if (!value) return "";
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:" || !url.hostname.includes(".") || url.username || url.password) return "";
+    return url.href;
+  } catch { return ""; }
 }
 
 function openProfile(
@@ -811,8 +751,6 @@ function openProfile(
 
   elements.modalShort.textContent = profile.descripcion_corta || "";
   elements.modalShort.hidden = !profile.descripcion_corta;
-  elements.modalExperience.textContent = profile.experiencia;
-  elements.modalPrice.textContent = profile.nivel_precio;
   elements.modalLocation.textContent =
     `${profile.distrito}, ${profile.provincia} · ${profile.departamento}`;
 
@@ -826,23 +764,12 @@ function openProfile(
     elements.modalContactNote.hidden = !contact.note;
   }
 
-  const socialProfiles = [
-    [elements.modalBehance, "behance", profile.usuario_behance],
-    [elements.modalInstagram, "instagram", profile.usuario_instagram],
-    [elements.modalLinkedin, "linkedin", profile.usuario_linkedin],
-    [elements.modalCanva, "canva", profile.canva_url],
-  ];
-  socialProfiles.forEach(([element, network, username]) => {
-    const url = username ? profileLink(network, username) : "#";
-    element.hidden = profile.demo || !username || url === "#";
-    if (!element.hidden) element.href = url;
-  });
-  elements.modalSocialSection.hidden = socialProfiles.every(([element]) => element.hidden);
+  const portfolioUrl = safePortfolioUrl(profile.portafolio_url);
+  elements.modalPortfolioSection.hidden = profile.demo || !portfolioUrl;
+  elements.modalPortfolio.href = portfolioUrl || "#";
 
   elements.modalDescriptionSection.hidden = !profile.descripcion_larga;
   elements.modalLong.textContent = profile.descripcion_larga || "";
-  elements.modalServicesSection.hidden = !profile.productos_servicios;
-  elements.modalServices.textContent = profile.productos_servicios || "";
   elements.modalPrev.hidden = filteredProfiles.length < 2;
   elements.modalNext.hidden = filteredProfiles.length < 2;
   window.clearTimeout(shareFeedbackTimer);
@@ -930,8 +857,6 @@ function clearFilters() {
   updateLocationOptions("department");
   elements.province.value = "";
   elements.district.value = "";
-  elements.experience.value = "";
-  elements.price.value = "";
   elements.verified.checked = false;
   elements.featured.checked = false;
   favoriteOnly = false;
@@ -992,8 +917,6 @@ elements.province.addEventListener("change", () => {
 });
 [
   elements.district,
-  elements.experience,
-  elements.price,
   elements.verified,
   elements.featured,
 ].forEach((control) => control.addEventListener("change", applyFilters));

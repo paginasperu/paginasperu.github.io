@@ -7,20 +7,21 @@ export function fieldError(control, today = new Date()) {
   if (control.minLength > 0 && value.length < control.minLength) return `Escribe al menos ${control.minLength} caracteres.`;
   if (control.maxLength > 0 && value.length > control.maxLength) return `Usa como máximo ${control.maxLength} caracteres.`;
   if (['nombres', 'apellidos'].includes(control.name) && !/^[\p{L}\p{M} '\-]+$/u.test(value)) return 'Usa letras, espacios, guiones o apóstrofos.';
+  if (control.name === 'ubicacion' && control.dataset?.locationSelected !== 'true') return 'Selecciona una ubicación completa de la lista.';
   if (control.name.startsWith('whatsapp_')) {
     let phone = value.replace(/[\s()+-]/g, '');
     if (/^9\d{8}$/.test(phone)) phone = '51' + phone;
     if (!/^519\d{8}$/.test(phone)) return 'Ingresa un celular peruano de 9 dígitos, con o sin +51.';
   }
-  if (control.name.endsWith('_usuario') && !/^[a-z0-9._-]{3,50}$/i.test(value)) return 'Usa de 3 a 50 letras, números, puntos o guiones, sin @ ni enlaces.';
-  if (control.name === 'canva_url' && !/^https:\/\/(?:www\.)?canva\.com\/[^\s]*$/i.test(value)) return 'Ingresa un enlace HTTPS de canva.com.';
-  if (control.name === 'fecha_nacimiento') {
-    const born = new Date(value + 'T00:00:00');
-    let age = today.getFullYear() - born.getFullYear();
-    if (today.getMonth() < born.getMonth() || (today.getMonth() === born.getMonth() && today.getDate() < born.getDate())) age--;
-    if (!Number.isFinite(age) || age < 18 || age > 50) return 'La edad debe estar entre 18 y 50 años.';
+  if (control.name === 'portafolio_url') {
+    try {
+      const url = new URL(value);
+      if (url.protocol !== 'https:' || !url.hostname.includes('.') || url.username || url.password) return 'Ingresa una URL pública HTTPS válida.';
+    } catch {
+      return 'Ingresa una URL pública HTTPS válida.';
+    }
   }
-  if (control.validity?.typeMismatch) return control.type === 'email' ? 'Ingresa un correo válido.' : 'Ingresa un enlace válido.';
+  if (control.validity?.typeMismatch) return 'Ingresa un enlace válido.';
   if (control.validity?.patternMismatch) return 'Revisa el formato de este campo.';
   if (control.validity?.badInput) return 'Ingresa un valor válido.';
   return '';
