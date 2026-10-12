@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-const urls = ['https://oficial.pe/', 'https://oficial.pe/registro', 'https://oficial.pe/contacto', 'https://oficial.pe/privacidad', 'https://oficial.pe/data/perfiles.csv'];
+const urls = ['https://www.oficial.pe/', 'https://www.oficial.pe/registro', 'https://www.oficial.pe/contacto', 'https://www.oficial.pe/privacidad', 'https://www.oficial.pe/data/perfiles.csv'];
 for (const url of urls) {
   const start = performance.now();
   const response = await fetch(url, { signal: AbortSignal.timeout(30000) });

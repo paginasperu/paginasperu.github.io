@@ -8,8 +8,8 @@ vm.createContext(context);
 vm.runInContext(parser, context);
 const csv = fs.readFileSync(new URL('../data/perfiles.csv', import.meta.url), 'utf8');
 const headers = csv.replace(/^\uFEFF/, '').split(/\r?\n/)[0].replaceAll('"', '').split(',');
-assert.equal(headers.length, 16);
-for (const field of ['correo', 'whatsapp_interno', 'fecha_nacimiento', 'genero', 'notas', 'estado', 'acepta_privacidad', 'behance_usuario', 'instagram_usuario', 'linkedin_usuario', 'canva_url', 'productos_servicios', 'nivel_experiencia', 'nivel_precio']) assert(!headers.includes(field), `campo privado/retirado: ${field}`);
+assert.equal(headers.length, 16, 'el CSV local existente conserva sus 16 columnas, sin editar registros');
+for (const field of ['correo', 'whatsapp_interno', 'fecha_nacimiento', 'genero', 'notas', 'estado', 'acepta_privacidad', 'behance_usuario', 'instagram_usuario', 'linkedin_usuario', 'canva_url']) assert(!headers.includes(field), `campo privado: ${field}`);
 assert(headers.includes('portafolio_url'));
 assert.equal(new Set(headers).size, headers.length);
 const demo = JSON.parse(fs.readFileSync(new URL('../data/perfiles-demo.json', import.meta.url), 'utf8'));
@@ -20,11 +20,25 @@ assert(profiles.filter(profile => profile.demo).every(profile => !profile.portaf
 assert(profiles.every(profile => profile.demo || !profile.portafolio_url || /^https:\/\//.test(profile.portafolio_url)), 'los perfiles reales solo exponen URL segura del portafolio');
 assert.equal(profiles.find(profile => profile.id === 17)?.portafolio_url, 'https://www.instagram.com/nathyy2029');
 assert.equal(profiles.find(profile => profile.id === 18)?.portafolio_url, 'https://www.instagram.com/esmillones27');
+const extendedHeaders = [...headers, 'productos_servicios', 'nivel_experiencia', 'nivel_precio'];
+const extendedRow = headers.map(header => header === 'id' ? '900' : header === 'nombres' ? 'Perfil' : header === 'apellidos' ? 'Temporal' : '');
+extendedRow.push('Diseño editorial', 'Experto', 'Premium');
+const extendedCsv = [extendedHeaders, extendedRow].map(row => row.map(value => `"${String(value).replaceAll('"', '""')}"`).join(',')).join('\n');
+const extendedProfile = context.parseCsv(extendedCsv)[0];
+assert.equal(extendedProfile.productos_servicios, 'Diseño editorial');
+assert.equal(extendedProfile.nivel_experiencia, 'Experto');
+assert.equal(extendedProfile.nivel_precio, 'Premium');
+assert(extendedProfile.searchText.includes('diseno editorial'), 'los productos y servicios son buscables');
 assert(demo.ids.every(id => Number.isSafeInteger(id) && id > 0));
 for (const page of ['index.html', 'registro.html', 'contacto.html', 'privacidad.html']) {
   const html = fs.readFileSync(new URL('../' + page, import.meta.url), 'utf8');
   assert(html.includes('rel="canonical"'), `${page}: canonical ausente`);
+  assert(html.includes('rel="canonical" href="https://www.oficial.pe'), `${page}: canonical no usa el dominio principal elegido`);
 }
 const homeHtml = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-assert(!homeHtml.includes('experience-filter') && !homeHtml.includes('price-filter'), 'se retiraron filtros de campos eliminados');
+assert(!homeHtml.includes('experience-filter') && !homeHtml.includes('price-filter'), 'no se reactivaron filtros profesionales');
+for (const id of ['modal-experience', 'modal-price', 'modal-services']) assert(homeHtml.includes(`id="${id}"`), `detalle de perfil ausente: ${id}`);
+const privacyHtml = fs.readFileSync(new URL('../privacidad.html', import.meta.url), 'utf8');
+assert(privacyHtml.includes('Los productos y servicios y los niveles de experiencia y precios son opcionales, pero sí forman parte de la información pública'), 'la política informa que los datos profesionales pueden publicarse');
+assert(privacyHtml.includes('No mostramos el WhatsApp privado, género, fecha de nacimiento, correo, usuarios de Instagram, LinkedIn y Behance'), 'la política identifica los datos privados');
 console.log(`Publicación: ${profiles.length} perfiles, columnas privadas excluidas, IDs y páginas comprobados.`);

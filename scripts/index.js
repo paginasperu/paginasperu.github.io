@@ -64,6 +64,13 @@ const elements = {
   modalPortfolio: document.querySelector("#modal-portfolio"),
   modalDescriptionSection: document.querySelector("#modal-description-section"),
   modalLong: document.querySelector("#modal-long-description"),
+  modalExperience: document.querySelector("#modal-experience"),
+  modalPrice: document.querySelector("#modal-price"),
+  modalTags: document.querySelector("#modal-tags"),
+  modalExperienceTag: document.querySelector("#modal-experience-tag"),
+  modalPriceTag: document.querySelector("#modal-price-tag"),
+  modalServicesSection: document.querySelector("#modal-services-section"),
+  modalServices: document.querySelector("#modal-services"),
   backToTop: document.querySelector("#back-to-top"),
 };
 
@@ -251,6 +258,9 @@ function parseCsv(text) {
       categoria: record.categoria.trim(),
       descripcion_corta: record.descripcion_corta.trim(),
       descripcion_larga: record.descripcion_larga.trim(),
+      productos_servicios: (record.productos_servicios || "").trim(),
+      nivel_experiencia: (record.nivel_experiencia || "").trim(),
+      nivel_precio: (record.nivel_precio || "").trim(),
       foto_perfil: record.foto_perfil.trim(),
       imagen_portada: record.imagen_portada.trim(),
       verificado: toBoolean(record.es_verificado),
@@ -263,6 +273,9 @@ function parseCsv(text) {
         record.categoria,
         record.descripcion_corta,
         record.descripcion_larga,
+        record.productos_servicios || "",
+        record.nivel_experiencia || "",
+        record.nivel_precio || "",
         record.departamento,
         record.provincia,
         record.distrito,
@@ -625,6 +638,11 @@ function createProfileCard(profile, index) {
   const location = document.createElement("span");
   location.className = "profile-card__location";
   location.textContent = `${profile.distrito}, ${profile.departamento}`;
+  const summaryText = [profile.nivel_experiencia, profile.nivel_precio].filter(Boolean).join(" · ");
+  const summary = document.createElement("span");
+  summary.className = "profile-card__summary";
+  summary.textContent = summaryText;
+  summary.hidden = profile.categoria === "Diseñadores gráficos" || !summaryText;
   if (profile.verificado) {
     const verified = document.createElement("span");
     verified.className = "card-verified";
@@ -632,7 +650,7 @@ function createProfileCard(profile, index) {
     verified.setAttribute("aria-label", "Verificado");
     name.append(verified);
   }
-  info.append(name, meta, location);
+  info.append(name, meta, location, summary);
 
   openButton.append(profileImage, info);
   card.append(openButton);
@@ -770,6 +788,13 @@ function openProfile(
 
   elements.modalDescriptionSection.hidden = !profile.descripcion_larga;
   elements.modalLong.textContent = profile.descripcion_larga || "";
+  elements.modalExperience.textContent = profile.nivel_experiencia || "";
+  elements.modalPrice.textContent = profile.nivel_precio || "";
+  elements.modalExperienceTag.hidden = !profile.nivel_experiencia;
+  elements.modalPriceTag.hidden = !profile.nivel_precio;
+  elements.modalTags.hidden = !profile.nivel_experiencia && !profile.nivel_precio;
+  elements.modalServices.textContent = profile.productos_servicios || "";
+  elements.modalServicesSection.hidden = !profile.productos_servicios;
   elements.modalPrev.hidden = filteredProfiles.length < 2;
   elements.modalNext.hidden = filteredProfiles.length < 2;
   window.clearTimeout(shareFeedbackTimer);

@@ -10,7 +10,7 @@ const headers = Array.from(vm.runInContext('REVIEW_HEADERS', context));
 const publicHeaders = Array.from(vm.runInContext('PUBLIC_HEADERS', context));
 const records = [
   makeRow({ id: '17', nombres: 'Prueba', apellidos: 'Pendiente', estado: 'Pendiente', correo: 'privado@example.test', whatsapp_interno: '51900000017' }),
-  makeRow({ id: '18', nombres: 'Prueba', apellidos: 'Activo', estado: 'Activo', correo: 'activo@example.test', portafolio_url: 'https://example.pe/Portfolio' }),
+  makeRow({ id: '18', nombres: 'Prueba', apellidos: 'Activo', estado: 'Activo', correo: 'activo@example.test', portafolio_url: 'https://example.pe/Portfolio', productos_servicios: 'Diseño editorial', nivel_experiencia: 'Experto', nivel_precio: 'Premium' }),
 ];
 const publicRows = [publicHeaders, publicHeaders.map((header) => header === 'id' ? '17' : header === 'nombres' ? 'Prueba' : '')];
 const writes = [];
@@ -85,9 +85,16 @@ assert.deepEqual(Array.from(csvData[0]), publicHeaders);
 assert.equal(publicHeaders.includes('correo'), false, 'la descarga se limita a la lista pública');
 assert.equal(publicHeaders.includes('portafolio_url'), true, 'la descarga incluye el portafolio genérico');
 assert.equal(publicHeaders.includes('instagram_usuario'), false, 'las redes antiguas no se exportan');
+for (const field of ['genero', 'fecha_nacimiento', 'whatsapp_interno', 'correo', 'behance_usuario', 'instagram_usuario', 'linkedin_usuario', 'acepta_privacidad', 'notas']) {
+  assert.equal(publicHeaders.includes(field), false, `${field} permanece privado`);
+}
+for (const field of ['productos_servicios', 'nivel_experiencia', 'nivel_precio']) assert(publicHeaders.includes(field), `${field} forma parte de los datos públicos restaurados`);
 const portfolioIndex = publicHeaders.indexOf('portafolio_url');
 const activeRow = csvData.find(row => row[publicHeaders.indexOf('id')] === '18');
 assert.equal(activeRow[portfolioIndex], 'https://example.pe/Portfolio', 'exporta el portafolio desde la columna conservada');
+for (const [field, expected] of Object.entries({ productos_servicios: 'Diseño editorial', nivel_experiencia: 'Experto', nivel_precio: 'Premium' })) {
+  assert.equal(activeRow[publicHeaders.indexOf(field)], expected, `exporta ${field} desde la columna de gestión`);
+}
 records[0][headers.indexOf('estado')] = 'Inactivo';
 assert.equal(context.getPublicCsvData().length, 2, 'un perfil inactivo debe desaparecer del CSV');
 records[0][headers.indexOf('estado')] = 'Pendiente';

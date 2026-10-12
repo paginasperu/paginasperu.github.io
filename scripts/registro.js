@@ -14,6 +14,9 @@ const form = document.querySelector("#registro");
 const fieldValidation = attachFieldValidation(form);
 const message = document.querySelector("#mensaje");
 const submitButton = document.querySelector("#enviar");
+const privacyDialog = document.querySelector("#privacy-dialog");
+const privacyDialogContent = document.querySelector("#privacy-dialog-content");
+const birthDateInput = form.elements.namedItem("fecha_nacimiento");
 const locationInput = document.querySelector("#ubicacion");
 const locationList = document.querySelector("#ubicacion-listbox");
 const locationStatus = document.querySelector("#ubicacion-status");
@@ -30,6 +33,52 @@ const cropStates = new Map();
 const uploadedImages = new Map();
 let startedAt = Date.now();
 let pendingSubmission = null;
+birthDateInput.max = new Date().toISOString().slice(0, 10);
+
+let privacyPolicyLoaded = false;
+document.querySelector("[data-privacy-dialog-open]")?.addEventListener("click", async (event) => {
+  event.preventDefault();
+  if (!privacyDialog || typeof privacyDialog.showModal !== "function") {
+    window.location.href = "./privacidad";
+    return;
+  }
+
+  if (!privacyPolicyLoaded) {
+    privacyDialogContent.setAttribute("aria-busy", "true");
+    try {
+      const response = await fetch(new URL("../privacidad.html?v=20261011-2", import.meta.url));
+      if (!response.ok) throw new Error("No se pudo cargar la política.");
+      const policyDocument = new DOMParser().parseFromString(await response.text(), "text/html");
+      const source = policyDocument.querySelector(".privacy-document");
+      if (!source) throw new Error("No se encontró el contenido de la política.");
+      const article = document.createElement("article");
+      article.className = "privacy-document";
+      article.append(...Array.from(source.children, (section) => document.importNode(section, true)));
+      privacyDialogContent.replaceChildren(article);
+      privacyPolicyLoaded = true;
+    } catch {
+      const fallback = document.createElement("p");
+      fallback.setAttribute("role", "status");
+      fallback.append("No pudimos cargar la política aquí. Puedes ");
+      const link = document.createElement("a");
+      link.href = "./privacidad";
+      link.textContent = "leerla en su página";
+      fallback.append(link, ".");
+      privacyDialogContent.replaceChildren(fallback);
+    } finally {
+      privacyDialogContent.setAttribute("aria-busy", "false");
+    }
+  }
+
+  privacyDialog.showModal();
+});
+
+privacyDialog?.querySelectorAll("[data-privacy-dialog-close]").forEach((button) => {
+  button.addEventListener("click", () => privacyDialog.close());
+});
+privacyDialog?.addEventListener("click", (event) => {
+  if (event.target === privacyDialog) privacyDialog.close();
+});
 
 function newSubmissionId() {
   const bytes = crypto.getRandomValues(new Uint8Array(24));
@@ -263,6 +312,12 @@ for (const name of ["whatsapp_publico", "whatsapp_interno"]) {
   input.addEventListener("blur", (event) => normalizePhone(event.currentTarget));
 }
 
+for (const name of ["correo", "instagram_usuario", "linkedin_usuario", "behance_usuario"]) {
+  document.querySelector(`#${name}`).addEventListener("blur", (event) => {
+    event.currentTarget.value = event.currentTarget.value.trim().toLocaleLowerCase("es-PE");
+  });
+}
+
 for (const input of form.querySelectorAll("input[type='file']")) {
   const preview = form.querySelector(`[data-crop-for="${input.name}"]`);
   const canvas = form.querySelector(`[data-preview-for="${input.name}"]`);
@@ -394,8 +449,9 @@ function imageFieldName(input) {
 function cleanFormValues() {
   const payload = {};
   const fields = [
-    "nombres", "apellidos", "whatsapp_publico", "whatsapp_interno", "portafolio_url",
-    "categoria", "descripcion_corta", "descripcion_larga",
+    "nombres", "apellidos", "genero", "fecha_nacimiento", "whatsapp_publico", "whatsapp_interno",
+    "correo", "instagram_usuario", "linkedin_usuario", "behance_usuario", "portafolio_url",
+    "categoria", "descripcion_corta", "descripcion_larga", "productos_servicios", "nivel_experiencia", "nivel_precio",
   ];
   for (const name of fields) {
     const value = form.elements.namedItem(name).value.trim();
@@ -404,6 +460,9 @@ function cleanFormValues() {
   payload.departamento = selectedLocation?.departamento || null;
   payload.provincia = selectedLocation?.provincia || null;
   payload.distrito = selectedLocation?.distrito || null;
+  for (const name of ["correo", "instagram_usuario", "linkedin_usuario", "behance_usuario"]) {
+    if (payload[name]) payload[name] = payload[name].toLocaleLowerCase("es-PE");
+  }
   for (const name of ["whatsapp_publico", "whatsapp_interno"]) {
     if (payload[name]) payload[name] = payload[name].replace(/[\s()+-]/g, "");
     if (payload[name] && /^9\d{8}$/.test(payload[name])) payload[name] = `51${payload[name]}`;

@@ -15,14 +15,18 @@ const HEADERS = [
   "posicion", "estado", "notas", "fecha_registro", "portafolio_url",
 ];
 const PUBLIC_FORM_FIELDS = [
-  "nombres", "apellidos", "departamento", "provincia", "distrito",
-  "whatsapp_publico", "whatsapp_interno", "portafolio_url", "categoria",
-  "descripcion_corta", "descripcion_larga", "foto_perfil", "imagen_portada", "acepta_privacidad",
+  "nombres", "apellidos", "genero", "fecha_nacimiento", "departamento", "provincia", "distrito",
+  "whatsapp_publico", "whatsapp_interno", "correo", "behance_usuario", "instagram_usuario", "linkedin_usuario",
+  "portafolio_url", "categoria", "descripcion_corta", "descripcion_larga", "productos_servicios",
+  "nivel_experiencia", "nivel_precio", "foto_perfil", "imagen_portada", "acepta_privacidad",
 ];
 const OPTIONS = {
+  genero: ["Mujer", "Hombre"],
   categoria: ["Diseñadores gráficos", "Anfitrionas", "Volanteras"],
+  nivel_experiencia: ["Principiante", "Intermedio", "Experto"],
+  nivel_precio: ["Económico", "Estándar", "Premium"],
 };
-const UNIQUE_FIELDS = ["whatsapp_interno"];
+const UNIQUE_FIELDS = ["whatsapp_publico", "whatsapp_interno", "correo", "behance_usuario", "instagram_usuario", "linkedin_usuario"];
 
 function doGet() {
   return jsonOutput_({ ok: true, service: "registro", version: "20261011-form-v1", message: "Servicio de registro disponible." });
@@ -100,11 +104,15 @@ function validateAndNormalize_(payload) {
     record[field] = Object.prototype.hasOwnProperty.call(payload, field) ? payload[field] : null;
   });
 
-  ["nombres", "apellidos", "departamento", "provincia", "distrito", "whatsapp_publico", "whatsapp_interno",
-    "portafolio_url", "categoria", "descripcion_corta", "descripcion_larga", "foto_perfil", "imagen_portada"].forEach(function (field) {
+  ["nombres", "apellidos", "genero", "fecha_nacimiento", "departamento", "provincia", "distrito", "whatsapp_publico", "whatsapp_interno",
+    "correo", "behance_usuario", "instagram_usuario", "linkedin_usuario", "portafolio_url", "categoria", "descripcion_corta",
+    "descripcion_larga", "productos_servicios", "nivel_experiencia", "nivel_precio", "foto_perfil", "imagen_portada"].forEach(function (field) {
     record[field] = cleanText_(record[field]);
   });
 
+  ["correo", "behance_usuario", "instagram_usuario", "linkedin_usuario"].forEach(function (field) {
+    if (record[field] !== null) record[field] = record[field].toLocaleLowerCase("es-PE");
+  });
   record.whatsapp_publico = normalizePhone_(record.whatsapp_publico);
   record.whatsapp_interno = normalizePhone_(record.whatsapp_interno);
   record.acepta_privacidad = record.acepta_privacidad === true || record.acepta_privacidad === "Sí" || record.acepta_privacidad === "true";
@@ -119,6 +127,8 @@ function validateAndNormalize_(payload) {
 
   validateName_("nombres", record.nombres);
   validateName_("apellidos", record.apellidos);
+  validateChoice_("genero", record.genero, false);
+  validateBirthDate_(record.fecha_nacimiento);
   validateLocation_("departamento", record.departamento, 3, 13, /^[\p{L}\p{M} ]+$/u);
   validateLocation_("provincia", record.provincia, 3, 25, /^[\p{L}\p{M} ]+$/u);
   validateLocation_("distrito", record.distrito, 3, 36, /^[\p{L}\p{M} _()\-]+$/u);
@@ -127,9 +137,16 @@ function validateAndNormalize_(payload) {
   }
   validatePhone_("whatsapp_publico", record.whatsapp_publico, false);
   validatePhone_("whatsapp_interno", record.whatsapp_interno, true);
+  validateEmail_(record.correo);
+  validateUsername_("behance_usuario", record.behance_usuario);
+  validateUsername_("instagram_usuario", record.instagram_usuario);
+  validateUsername_("linkedin_usuario", record.linkedin_usuario);
   validateChoice_("categoria", record.categoria);
   validateTextLength_("descripcion_corta", record.descripcion_corta, 10, 150, true);
   validateTextLength_("descripcion_larga", record.descripcion_larga, 1, 1000, false);
+  validateTextLength_("productos_servicios", record.productos_servicios, 1, 500, false);
+  validateChoice_("nivel_experiencia", record.nivel_experiencia, false);
+  validateChoice_("nivel_precio", record.nivel_precio, false);
   validateImageUrl_("foto_perfil", record.foto_perfil);
   validateImageUrl_("imagen_portada", record.imagen_portada);
   validatePortfolioUrl_(record.portafolio_url);
@@ -156,6 +173,31 @@ function validateName_(field, value) {
   }
 }
 
+function validateBirthDate_(value) {
+  if (value === null) return;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) throw inputError_("La fecha de nacimiento no es válida.");
+  const parts = value.split("-").map(Number);
+  const birthDate = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+  const normalized = birthDate.getUTCFullYear() + "-" + String(birthDate.getUTCMonth() + 1).padStart(2, "0") + "-" + String(birthDate.getUTCDate()).padStart(2, "0");
+  if (Number.isNaN(birthDate.getTime()) || normalized !== value || value > Utilities.formatDate(new Date(), "America/Lima", "yyyy-MM-dd")) {
+    throw inputError_("La fecha de nacimiento debe ser válida y no futura.");
+  }
+}
+
+function validateEmail_(value) {
+  if (value === null) return;
+  if (value.length < 3 || value.length > 50 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) {
+    throw inputError_("Ingresa un correo válido de hasta 50 caracteres.");
+  }
+}
+
+function validateUsername_(field, value) {
+  if (value === null) return;
+  if (value.length < 3 || value.length > 50 || !/^[a-z0-9._-]+$/.test(value)) {
+    throw inputError_(field + ": usa 3 a 50 letras, números, puntos, guiones o guiones bajos.");
+  }
+}
+
 function validateLocation_(field, value, min, max, pattern) {
   if (value !== value.toLocaleUpperCase("es-PE") || value.length < min || value.length > max || !pattern.test(value)) {
     throw inputError_(field + ": revisa el formato y la longitud permitidos.");
@@ -174,7 +216,8 @@ function validateTextLength_(field, value, min, max, required) {
   }
 }
 
-function validateChoice_(field, value) {
+function validateChoice_(field, value, required = true) {
+  if (value === null && !required) return;
   if (!OPTIONS[field] || OPTIONS[field].indexOf(value) === -1) throw inputError_("Selecciona una opción válida para " + field + ".");
 }
 
@@ -285,7 +328,7 @@ function jsonOutput_(data) {
 function responseOutput_(data, requestId, event) {
   if (!requestId) return jsonOutput_(data);
   const origin = event && event.parameter && event.parameter.clientOrigin;
-  const target = /^(https:\/\/(?:www\.)?oficial\.pe|http:\/\/(?:localhost|127\.0\.0\.1):\d{2,5})$/.test(origin || "") ? origin : "https://oficial.pe";
+  const target = /^(https:\/\/(?:www\.)?oficial\.pe|http:\/\/(?:localhost|127\.0\.0\.1):\d{2,5})$/.test(origin || "") ? origin : "https://www.oficial.pe";
   const message = JSON.stringify({ type: "registro-response", requestId: requestId, response: data }).replace(/</g, "\\u003c");
   const html = "<!doctype html><html lang=\"es\"><head><meta charset=\"utf-8\"></head><body><script>window.top.postMessage(" + message + ", " + JSON.stringify(target) + ");</script></body></html>";
   return HtmlService.createHtmlOutput(html).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);

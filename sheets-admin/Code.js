@@ -13,7 +13,8 @@ const REVIEW_HEADERS = [
 ];
 const PUBLIC_HEADERS = [
   "id", "nombres", "apellidos", "departamento", "provincia", "distrito", "whatsapp_publico", "portafolio_url",
-  "categoria", "descripcion_corta", "descripcion_larga", "foto_perfil", "imagen_portada", "es_verificado", "es_destacado", "posicion",
+  "categoria", "descripcion_corta", "descripcion_larga", "productos_servicios", "nivel_experiencia", "nivel_precio",
+  "foto_perfil", "imagen_portada", "es_verificado", "es_destacado", "posicion",
 ];
 const REVIEW_STATUSES = ["Pendiente", "Activo", "Rechazado", "Inactivo"];
 

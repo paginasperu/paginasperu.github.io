@@ -7,6 +7,21 @@ export function fieldError(control, today = new Date()) {
   if (control.minLength > 0 && value.length < control.minLength) return `Escribe al menos ${control.minLength} caracteres.`;
   if (control.maxLength > 0 && value.length > control.maxLength) return `Usa como máximo ${control.maxLength} caracteres.`;
   if (['nombres', 'apellidos'].includes(control.name) && !/^[\p{L}\p{M} '\-]+$/u.test(value)) return 'Usa letras, espacios, guiones o apóstrofos.';
+  if (control.name === 'genero' && !['Mujer', 'Hombre'].includes(value)) return 'Selecciona una opción válida.';
+  if (control.name === 'fecha_nacimiento') {
+    const parsed = new Date(`${value}T00:00:00Z`);
+    if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== value) return 'Ingresa una fecha válida.';
+    if (control.validity?.rangeOverflow || value > today.toISOString().slice(0, 10)) return 'La fecha no puede ser futura.';
+  }
+  if (control.name === 'correo' && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) return 'Ingresa un correo válido.';
+  if (['instagram_usuario', 'linkedin_usuario', 'behance_usuario'].includes(control.name)
+      && !/^[a-z0-9._-]{3,50}$/i.test(value)) return 'Usa de 3 a 50 letras, números, puntos, guiones o guiones bajos.';
+  if (control.name === 'productos_servicios' && value.length > 500) return 'Usa como máximo 500 caracteres.';
+  const choices = {
+    nivel_experiencia: ['Principiante', 'Intermedio', 'Experto'],
+    nivel_precio: ['Económico', 'Estándar', 'Premium'],
+  }[control.name];
+  if (choices && !choices.includes(value)) return 'Selecciona una opción válida.';
   if (control.name === 'ubicacion' && control.dataset?.locationSelected !== 'true') return 'Selecciona una ubicación completa de la lista.';
   if (control.name.startsWith('whatsapp_')) {
     let phone = value.replace(/[\s()+-]/g, '');
@@ -24,7 +39,7 @@ export function fieldError(control, today = new Date()) {
       return 'Usa un enlace HTTPS de Instagram, TikTok, LinkedIn o Behance.';
     }
   }
-  if (control.validity?.typeMismatch) return 'Ingresa un enlace válido.';
+  if (control.validity?.typeMismatch) return control.type === 'email' ? 'Ingresa un correo válido.' : 'Ingresa un enlace válido.';
   if (control.validity?.patternMismatch) return 'Revisa el formato de este campo.';
   if (control.validity?.badInput) return 'Ingresa un valor válido.';
   return '';

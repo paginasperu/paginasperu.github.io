@@ -31,9 +31,11 @@ const sheet = {
 };
 context.SpreadsheetApp = { openById: () => ({ getSheetByName: () => sheet }) };
 const payload = {
-  nombres: 'Prueba', apellidos: 'Registro',
+  nombres: 'Prueba', apellidos: 'Registro', genero: 'Mujer', fecha_nacimiento: '1988-12-27',
   departamento: 'LIMA', provincia: 'LIMA', distrito: 'MIRAFLORES', whatsapp_interno: '51900000123',
+  correo: 'Prueba@Example.Test', instagram_usuario: 'Perfil.Inst', linkedin_usuario: 'Perfil-Li', behance_usuario: 'Perfil.Be',
   portafolio_url: 'https://www.instagram.com/PerfilPrueba/',
+  productos_servicios: 'Diseño de piezas publicitarias', nivel_experiencia: 'Experto', nivel_precio: 'Premium',
   foto_perfil: 'https://res.cloudinary.com/dahrgg4v5/image/upload/prueba-profile.jpg',
   imagen_portada: 'https://res.cloudinary.com/dahrgg4v5/image/upload/prueba-cover.jpg',
   categoria: 'Diseñadores gráficos', descripcion_corta: 'Descripción de prueba válida', acepta_privacidad: true,
@@ -51,27 +53,37 @@ assert.equal(submit({ ...payload, portafolio_url: 'https://lnkd.in/PerfilPrueba'
 assert.equal(submit({ ...payload, portafolio_url: 'https://instagram.com.evil.test/PerfilPrueba', action: 'validate' }).ok, false, 'rechaza dominios que imitan una red permitida');
 assert.equal(submit({ ...payload, portafolio_url: 'https://mi-sitio.pe/PerfilPrueba', action: 'validate' }).ok, false, 'rechaza sitios que no son redes permitidas');
 assert.equal(submit({ ...payload, portafolio_url: 'https://usuario@instagram.com/perfil' }).ok, false, 'rechaza credenciales en el enlace');
+assert.equal(submit({ ...payload, fecha_nacimiento: '2018-12-27', action: 'validate' }).validated, true, 'no impone edad mínima al dato opcional');
+assert.equal(submit({ ...payload, fecha_nacimiento: '2027-01-01', action: 'validate' }).ok, false, 'rechaza fechas futuras sin limitar la edad');
+assert.equal(submit({ ...payload, genero: 'Otro', action: 'validate' }).ok, false, 'valida opciones de género permitidas');
+assert.equal(submit({ ...payload, correo: 'correo-invalido', action: 'validate' }).ok, false, 'valida el correo opcional');
+assert.equal(submit({ ...payload, instagram_usuario: 'usuario con espacios', action: 'validate' }).ok, false, 'valida usuarios de redes');
+assert.equal(submit({ ...payload, nivel_experiencia: 'Avanzado', action: 'validate' }).ok, false, 'valida opciones de experiencia');
+assert.equal(submit({ ...payload, nivel_precio: 'Gratis', action: 'validate' }).ok, false, 'valida opciones de precios');
+assert.equal(submit({ ...payload, productos_servicios: 'x'.repeat(501), action: 'validate' }).ok, false, 'limita productos y servicios');
 assert.equal(submit({ ...payload, portafolio_url: null, action: 'validate' }).ok, false, 'el portafolio es obligatorio incluso en la prevalidación');
 assert.equal(submit({ ...payload, foto_perfil: null, imagen_portada: null, action: 'validate' }).validated, true, 'permite prevalidar antes de que el navegador suba las imágenes');
 assert.equal(submit({ ...payload, foto_perfil: null }).ok, false, 'el envío final exige foto de perfil');
 assert.equal(submit({ ...payload, imagen_portada: null }).ok, false, 'el envío final exige imagen de portada');
 assert.equal(submit({ ...payload, action: 'validate' }).validated, true);
-assert.equal(submit({ ...payload, action: 'validate', correo: 'correo-antiguo@example.test', genero: 'Mujer', fecha_nacimiento: '1988-12-27', instagram_usuario: 'perfil', productos_servicios: 'Diseño', nivel_experiencia: 'Experto', nivel_precio: 'Premium' }).validated, true, 'ignora campos retirados de formularios antiguos');
+assert.equal(submit({ ...payload, action: 'validate' }).validated, true, 'acepta los datos adicionales correctos');
+assert.equal(submit({ ...payload, whatsapp_interno: '51900000124', submissionId: 'optional-empty-0123456789abcdef', genero: null, fecha_nacimiento: null, correo: null, instagram_usuario: null, linkedin_usuario: null, behance_usuario: null, productos_servicios: null, nivel_experiencia: null, nivel_precio: null, action: 'validate' }).validated, true, 'todos los campos recuperados son opcionales');
 assert.equal(rows.length, 1, 'la validación previa no escribe registros');
+cache.clear();
 const first = submit({ ...payload, estado: 'Activo', es_verificado: true });
-assert.equal(first.ok, true);
+assert.equal(first.ok, true, first.message);
 assert.equal(rows[1][headers.indexOf('estado')], 'Pendiente');
 assert.equal(rows[1][headers.indexOf('es_verificado')], false);
 assert.equal(rows[1][headers.indexOf('portafolio_url')], payload.portafolio_url, 'conserva el enlace sin alterar mayúsculas del path');
-for (const field of ['genero', 'fecha_nacimiento', 'correo', 'instagram_usuario', 'productos_servicios', 'nivel_experiencia', 'nivel_precio']) {
-  assert.equal(rows[1][headers.indexOf(field)], '', `${field} queda vacío para registros nuevos`);
+for (const [field, expected] of Object.entries({ genero: 'Mujer', fecha_nacimiento: '1988-12-27', correo: 'prueba@example.test', instagram_usuario: 'perfil.inst', linkedin_usuario: 'perfil-li', behance_usuario: 'perfil.be', productos_servicios: 'Diseño de piezas publicitarias', nivel_experiencia: 'Experto', nivel_precio: 'Premium' })) {
+  assert.equal(rows[1][headers.indexOf(field)], expected, `${field} se conserva para gestión privada`);
 }
 assert.equal(submit(payload).id, first.id, 'reintentar el mismo envío devuelve su ID');
 assert.equal(rows.length, 2, 'un reintento no crea una segunda fila');
 assert.equal(submit({ ...payload, action: 'validate' }).ok, true, 'se puede prevalidar un reintento confirmado');
 assert.equal(submit({ ...payload, submissionId: 'other123456789abcdef0123456789abcdef' }).ok, false, 'no admite un contacto duplicado');
 assert.equal(submit({ ...payload, nombres: 'Cambio' }).ok, false, 'un ID de envío no se puede reutilizar para otros datos');
-const interrupted = { ...payload, whatsapp_interno: '51900000456', submissionId: 'interrupted0123456789abcdef0123456789' };
+const interrupted = { ...payload, whatsapp_interno: '51900000456', correo: null, instagram_usuario: null, linkedin_usuario: null, behance_usuario: null, submissionId: 'interrupted0123456789abcdef0123456789' };
 sheet.appendRow = values => { rows.push(values); throw new Error('Respuesta perdida después de guardar'); };
 assert.equal(submit(interrupted).retryable, true);
 const countAfterInterruption = rows.length;
@@ -81,7 +93,7 @@ assert.equal(rows.length, countAfterInterruption, 'la recuperación tampoco dupl
 const placeholder = headers.map(header => ['es_verificado', 'es_destacado'].includes(header) ? false : '');
 rows.push(placeholder);
 const rowBeforePrepared = rows.length;
-const prepared = submit({ ...payload, whatsapp_interno: '51900000789', submissionId: 'prepared0123456789abcdef0123456789' });
+const prepared = submit({ ...payload, whatsapp_interno: '51900000789', correo: null, instagram_usuario: null, linkedin_usuario: null, behance_usuario: null, submissionId: 'prepared0123456789abcdef0123456789' });
 assert.equal(prepared.ok, true);
 assert.equal(rows.length, rowBeforePrepared, 'utiliza la fila vacía preparada con casillas');
 assert.equal(rows.at(-1)[0], prepared.id);
@@ -89,6 +101,8 @@ cache.clear();
 for (let i = 0; i < 8; i++) context.checkRateLimit_('51900000888');
 assert.throws(() => context.checkRateLimit_('51900000888'), /demasiados intentos/);
 assert.throws(() => context.parsePayload_({ parameter: { payload: 'x'.repeat(16001) } }), /tamaño/);
-assert.equal(context.responseOutput_({ ok: true }, '0123456789abcdef', { parameter: { clientOrigin: 'https://attacker.test' } }).text.includes('"https://oficial.pe"'), true);
+assert.equal(context.responseOutput_({ ok: true }, '0123456789abcdef', { parameter: { clientOrigin: 'https://attacker.test' } }).text.includes('"https://www.oficial.pe"'), true);
+assert.equal(context.responseOutput_({ ok: true }, '0123456789abcdef', { parameter: { clientOrigin: 'https://www.oficial.pe' } }).text.includes('"https://www.oficial.pe"'), true, 'acepta el origen www como dirección principal');
+assert.equal(context.responseOutput_({ ok: true }, '0123456789abcdef', { parameter: { clientOrigin: 'https://oficial.pe' } }).text.includes('"https://oficial.pe"'), true, 'mantiene compatible el dominio raíz durante la redirección');
 assert.equal(context.responseOutput_({ ok: true }, '0123456789abcdef', {}).text.includes(', "*"'), false);
 console.log('Registro: campos simplificados, redes sociales permitidas, ubicaciones, privacidad, duplicados y reintentos comprobados.');

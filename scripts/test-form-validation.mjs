@@ -10,6 +10,23 @@ const error = (name, value, extra) => fieldError(field(name, value, extra), toda
 assert.ok(error('nombres', '', { required: true }));
 assert.equal(error('nombres', 'María-José'), '');
 assert.ok(error('nombres', 'María123'));
+assert.equal(error('genero', '', { type: 'select-one' }), '');
+assert.equal(error('genero', 'Mujer', { type: 'select-one' }), '');
+assert.ok(error('genero', 'Otro', { type: 'select-one' }));
+assert.equal(error('fecha_nacimiento', '', { type: 'date' }), '');
+assert.equal(error('fecha_nacimiento', '2000-05-20', { type: 'date' }), '');
+assert.ok(error('fecha_nacimiento', '2027-01-01', { type: 'date' }));
+assert.equal(error('correo', 'contacto@example.pe', { type: 'email' }), '');
+assert.ok(error('correo', 'no-es-correo', { type: 'email' }));
+for (const name of ['instagram_usuario', 'linkedin_usuario', 'behance_usuario']) {
+  assert.equal(error(name, 'Perfil.demo_1'), '');
+  assert.ok(error(name, 'usuario con espacios'));
+}
+assert.equal(error('nivel_experiencia', '', { type: 'select-one' }), '');
+assert.equal(error('nivel_experiencia', 'Experto', { type: 'select-one' }), '');
+assert.ok(error('nivel_experiencia', 'Avanzado', { type: 'select-one' }));
+assert.equal(error('nivel_precio', 'Premium', { type: 'select-one' }), '');
+assert.ok(error('nivel_precio', 'Gratis', { type: 'select-one' }));
 assert.equal(error('whatsapp_publico', '+51 987 654 321'), '');
 assert.equal(error('whatsapp_publico', '987654321'), '');
 assert.ok(error('whatsapp_publico', '12345'));
@@ -40,6 +57,15 @@ for (const name of ['whatsapp_publico', 'whatsapp_interno', 'portafolio_url']) {
   assert.ok(control, `Existe el campo ${name}`);
   assert.doesNotMatch(control, /\bplaceholder\s*=/i, `${name} no tiene texto de ejemplo`);
 }
+for (const name of ['genero', 'fecha_nacimiento', 'correo', 'instagram_usuario', 'linkedin_usuario', 'behance_usuario', 'productos_servicios', 'nivel_experiencia', 'nivel_precio']) {
+  const control = registrationHtml.match(new RegExp(`<(?:(?:input|select|textarea))[^>]*name="${name}"[^>]*>`))?.[0] ?? '';
+  assert.ok(control, `Existe el campo opcional ${name}`);
+  assert.doesNotMatch(control, /\brequired\b/i, `${name} es opcional`);
+}
+assert.equal((registrationHtml.match(/<details class="register-more">/g) || []).length, 3, 'cada sección ofrece desplegables opcionales');
+assert.match(registrationHtml, /<h2 id="section-basic">Datos básicos<\/h2>/);
+assert.match(registrationHtml, /<h2 id="section-contact">Datos de contacto<\/h2>/);
+assert.match(registrationHtml, /<h2 id="section-profile">Perfil profesional<\/h2>/);
 assert.match(fs.readFileSync(new URL('../styles/registro.css', import.meta.url), 'utf8'), /input:not\(\[type="file"\]\)\[aria-invalid="true"\]/, 'todos los inputs deben recibir estilo de error');
 console.log('Formulario: campos, teléfono, redes sociales, ubicación e imágenes comprobados; sin filtro de edad.');
 

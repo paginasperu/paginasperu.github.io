@@ -5,7 +5,7 @@ Sitio estático publicado con GitHub Pages. El sitio no requiere compilación; N
 ## Herramientas del proyecto
 
 - Repositorio: `https://github.com/paginasperu/paginasperu.github.io`
-- Sitio publicado: `https://oficial.pe` (GitHub Pages).
+- Dominio principal preparado localmente: `https://www.oficial.pe` (pendiente de guardarlo en la configuración de GitHub Pages y publicar los cambios).
 - Base de datos: Google Sheets, documento `directorio`; la pestaña `perfiles` guarda datos de gestión y `publico` es la vista destinada a publicación.
 - Backend: Google Apps Script, proyecto `registro`. Su código se gestiona desde `apps-script/` con `clasp`.
 - Hosting de imágenes: Cloudinary, cloud name `dahrgg4v5`; [abrir Media Library](https://console.cloudinary.com/app/c-f32bcfa51f430c6fcfe18ca29cdbfa/assets/media_library/search?q=&view_mode=mosaic). El formulario usa el preset unsigned `directorio`. No incluyas el API Secret en GitHub.
