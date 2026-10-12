@@ -272,6 +272,7 @@ function parseCsv(text) {
       destacado: toBoolean(record.es_destacado),
       posicion: record.posicion.trim() === "" ? null : Number(record.posicion),
       csvOrder,
+      nameSearchText: normalizeText([record.nombres, record.apellidos].join(" ")),
       searchText: normalizeText([
         record.nombres,
         record.apellidos,
@@ -421,18 +422,39 @@ function editDistance(a, b) {
   return row[b.length];
 }
 
-function fuzzyMatches(profile, rawQuery) {
+function profileSearchScore(profile, rawQuery) {
   const query = normalizeText(rawQuery);
-  if (!query) return true;
+  if (!query) return 0;
 
   const words = profile.searchText.split(" ");
-  return query.split(" ").every((token) =>
-    words.some((word) =>
-      word === token ||
-      (token.length >= 2 && word.startsWith(token)) ||
-      (token.length >= 6 && word.length >= 6 && editDistance(token, word) <= 1),
-    ),
-  );
+  const nameWords = profile.nameSearchText.split(" ");
+  const tokens = query.split(" ");
+  let score = 0;
+
+  for (const token of tokens) {
+    let bestTextMatch = 0;
+    let bestNameMatch = 0;
+    for (const word of words) {
+      let match = 0;
+      if (word === token) match = 4;
+      else if (word.startsWith(token)) match = 3;
+      else if (word.includes(token)) match = 2;
+      else if (token.length >= 6 && word.length >= 6 && editDistance(token, word) <= 1) match = 1;
+      bestTextMatch = Math.max(bestTextMatch, match);
+    }
+    for (const word of nameWords) {
+      let match = 0;
+      if (word === token) match = 4;
+      else if (word.startsWith(token)) match = 3;
+      else if (word.includes(token)) match = 2;
+      else if (token.length >= 6 && word.length >= 6 && editDistance(token, word) <= 1) match = 1;
+      bestNameMatch = Math.max(bestNameMatch, match);
+    }
+    if (!bestTextMatch) return null;
+    score += bestNameMatch ? 100 + bestNameMatch : bestTextMatch * 10;
+  }
+
+  return score / tokens.length;
 }
 
 function fillSelect(select, values, firstLabel) {
@@ -570,23 +592,27 @@ function updateSortControls() {
 function applyFilters() {
   window.clearTimeout(loadTimer);
   const query = elements.search.value;
+  const searchScores = new Map();
   document.querySelector("#clear-search").hidden = !query;
   document.querySelector("#reset-results").hidden = true;
 
   filteredProfiles = sortProfiles(
-    profiles.filter(
-      (profile) =>
-        (activeCategory === "Todos" || profile.categoria === activeCategory) &&
-        fuzzyMatches(profile, query) &&
-        (!elements.department.value ||
-          profile.departamento === elements.department.value) &&
+    profiles.filter((profile) => {
+      const searchScore = profileSearchScore(profile, query);
+      if (searchScore === null) return false;
+      searchScores.set(profile.id, searchScore);
+      return (activeCategory === "Todos" || profile.categoria === activeCategory) &&
+        (!elements.department.value || profile.departamento === elements.department.value) &&
         (!elements.province.value || profile.provincia === elements.province.value) &&
         (!elements.district.value || profile.distrito === elements.district.value) &&
         (!elements.verified.checked || profile.verificado) &&
         (!elements.featured.checked || profile.destacado) &&
-        (!favoriteOnly || isFavorite(profile.id)),
-    ),
+        (!favoriteOnly || isFavorite(profile.id));
+    }),
   );
+  if (query.trim() && elements.sort.value !== "random") {
+    filteredProfiles.sort((a, b) => searchScores.get(b.id) - searchScores.get(a.id));
+  }
 
   renderedCount = 0;
   loading = false;

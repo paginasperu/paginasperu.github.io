@@ -11,7 +11,7 @@
     "sync:locations": "node scripts/sync-locations.mjs",
     "check:live": "node scripts/healthcheck.mjs",
     "backup:public": "node scripts/backup-public.mjs",
-    "test": "node scripts/test-tooling.mjs && node scripts/test-registration.mjs && node scripts/test-form-validation.mjs && node scripts/test-location-picker.mjs && node scripts/test-profile-contact.mjs && node scripts/test-sheets-admin.mjs && node scripts/check-public.mjs",
+    "test": "node scripts/test-tooling.mjs && node scripts/test-registration.mjs && node scripts/test-form-validation.mjs && node scripts/test-location-picker.mjs && node scripts/test-profile-contact.mjs && node scripts/test-search.mjs && node scripts/test-sheets-admin.mjs && node scripts/check-public.mjs",
     "demo:panel": "node scripts/build-panel-demo.mjs",
     "test:sheets-admin": "node scripts/test-sheets-admin.mjs",
     "apps-script:login": "clasp --auth .clasprc.json login",
