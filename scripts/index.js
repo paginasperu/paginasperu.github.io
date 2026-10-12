@@ -62,6 +62,8 @@ const elements = {
   modalContactNote: document.querySelector("#modal-contact-note"),
   modalPortfolioSection: document.querySelector("#modal-portfolio-section"),
   modalPortfolio: document.querySelector("#modal-portfolio"),
+  modalSocialSection: document.querySelector("#modal-social-section"),
+  modalSocialLinks: document.querySelector("#modal-social-links"),
   modalDescriptionSection: document.querySelector("#modal-description-section"),
   modalLong: document.querySelector("#modal-long-description"),
   modalExperience: document.querySelector("#modal-experience"),
@@ -255,6 +257,9 @@ function parseCsv(text) {
       distrito: record.distrito.trim(),
       whatsapp: record.whatsapp_publico.trim(),
       portafolio_url: record.portafolio_url.trim(),
+      instagram_usuario: (record.instagram_usuario || "").trim(),
+      linkedin_usuario: (record.linkedin_usuario || "").trim(),
+      behance_usuario: (record.behance_usuario || "").trim(),
       categoria: record.categoria.trim(),
       descripcion_corta: record.descripcion_corta.trim(),
       descripcion_larga: record.descripcion_larga.trim(),
@@ -785,6 +790,21 @@ function openProfile(
   const portfolioUrl = safePortfolioUrl(profile.portafolio_url);
   elements.modalPortfolioSection.hidden = profile.demo || !portfolioUrl;
   elements.modalPortfolio.href = portfolioUrl || "#";
+
+  const socialProfiles = [
+    ["Instagram", profile.instagram_usuario, "https://www.instagram.com/", /^[a-z0-9._-]{3,50}$/i],
+    ["LinkedIn", profile.linkedin_usuario, "https://www.linkedin.com/in/", /^[a-z0-9._-]{3,50}$/i],
+    ["Behance", profile.behance_usuario, "https://www.behance.net/", /^[a-z0-9._-]{3,50}$/i],
+  ].filter(([, username, , pattern]) => username && pattern.test(username));
+  elements.modalSocialLinks.replaceChildren(...socialProfiles.map(([label, username, baseUrl]) => {
+    const link = document.createElement("a");
+    link.href = `${baseUrl}${encodeURIComponent(username)}`;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = `${label} · @${username}`;
+    return link;
+  }));
+  elements.modalSocialSection.hidden = profile.demo || socialProfiles.length === 0;
 
   elements.modalDescriptionSection.hidden = !profile.descripcion_larga;
   elements.modalLong.textContent = profile.descripcion_larga || "";

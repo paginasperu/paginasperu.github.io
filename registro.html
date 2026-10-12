@@ -20,15 +20,22 @@
         </header>
 
         <form id="registro" class="register-form" novalidate>
+          <section class="register-section" aria-labelledby="section-images">
+            <div class="register-section__heading"><span>01</span><div><h2 id="section-images">Imágenes</h2></div></div>
+            <div class="register-grid">
+              <div class="register-field register-upload"><label for="foto_perfil"><span>Foto de perfil <b aria-hidden="true">*</b></span><input id="foto_perfil" name="foto_perfil" aria-describedby="foto_perfil-help" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" required /></label><div class="image-crop" data-crop-for="foto_perfil" hidden><canvas class="image-crop__canvas" data-preview-for="foto_perfil" aria-label="Vista previa del recorte de foto de perfil"></canvas><label class="image-crop__zoom">Zoom<input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="foto_perfil" /></label><small class="image-crop__hint">Arrastra o usa las flechas del teclado para encuadrar</small></div><small id="foto_perfil-help">JPG, PNG o WebP · hasta 1 MB. Recortamos y ajustamos a 150 × 150 px.</small><output data-file-for="foto_perfil" aria-live="polite"></output></div>
+              <div class="register-field register-upload"><label for="imagen_portada"><span>Imagen de portada <b aria-hidden="true">*</b></span><input id="imagen_portada" name="imagen_portada" aria-describedby="imagen_portada-help" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" required /></label><div class="image-crop" data-crop-for="imagen_portada" hidden><canvas class="image-crop__canvas" data-preview-for="imagen_portada" aria-label="Vista previa del recorte de imagen de portada"></canvas><label class="image-crop__zoom">Zoom<input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="imagen_portada" /></label><small class="image-crop__hint">Arrastra o usa las flechas del teclado para encuadrar</small></div><small id="imagen_portada-help">JPG, PNG o WebP · hasta 1 MB. Recortamos y ajustamos a 540 × 720 px.</small><output data-file-for="imagen_portada" aria-live="polite"></output></div>
+            </div>
+          </section>
           <section class="register-section" aria-labelledby="section-basic">
-            <div class="register-section__heading"><span>01</span><div><h2 id="section-basic">Datos básicos</h2></div></div>
+            <div class="register-section__heading"><span>02</span><div><h2 id="section-basic">Datos básicos</h2></div></div>
             <div class="register-grid">
               <label class="register-field" for="nombres"><span>Nombres <b aria-hidden="true">*</b></span><input id="nombres" name="nombres" autocomplete="given-name" minlength="2" maxlength="150" required /></label>
               <label class="register-field" for="apellidos"><span>Apellidos <b aria-hidden="true">*</b></span><input id="apellidos" name="apellidos" autocomplete="family-name" minlength="2" maxlength="150" required /></label>
               <div class="register-field register-field--wide" id="location-field">
                 <label class="register-field__label" for="ubicacion"><span>Distrito, provincia y departamento <b aria-hidden="true">*</b></span></label>
                 <div class="location-combobox">
-                  <input id="ubicacion" name="ubicacion" type="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ubicacion-listbox" autocomplete="off" placeholder="Busca una ubicación" maxlength="120" required />
+                  <input id="ubicacion" name="ubicacion" type="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ubicacion-listbox" autocomplete="off" placeholder="Busca un distrito" maxlength="120" required />
                   <ul id="ubicacion-listbox" class="location-options" role="listbox" aria-label="Ubicaciones disponibles" hidden></ul>
                 </div>
                 <small id="ubicacion-status" class="location-status" role="status" aria-live="polite"></small>
@@ -45,7 +52,7 @@
           </section>
 
           <section class="register-section" aria-labelledby="section-contact">
-            <div class="register-section__heading"><span>02</span><div><h2 id="section-contact">Datos de contacto</h2></div></div>
+            <div class="register-section__heading"><span>03</span><div><h2 id="section-contact">Datos de contacto</h2></div></div>
             <div class="register-grid">
               <label class="register-field" for="whatsapp_publico"><span>WhatsApp público <span class="register-optional">Opcional</span></span><input id="whatsapp_publico" name="whatsapp_publico" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" pattern="[0-9+() -]*" title="Usa solo números, espacios, +, paréntesis o guiones." /><small>Será visible para cualquier persona</small></label>
               <label class="register-field" for="whatsapp_interno"><span>WhatsApp privado <b aria-hidden="true">*</b></span><input id="whatsapp_interno" name="whatsapp_interno" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" pattern="[0-9+() -]*" title="Usa solo números, espacios, +, paréntesis o guiones." required /><small>Será visible solo para nuestra agencia</small></label>
@@ -53,18 +60,17 @@
             </div>
             <details class="register-more">
               <summary>Agregar información opcional</summary>
-              <p class="register-more__note">El correo y los usuarios de redes son solo para gestión; no se publican.</p>
               <div class="register-grid register-more__fields">
-                <label class="register-field" for="correo"><span>Correo <span class="register-optional">Opcional</span></span><input id="correo" name="correo" type="email" autocomplete="email" maxlength="50" /></label>
-                <label class="register-field" for="instagram_usuario"><span>Usuario de Instagram <span class="register-optional">Opcional</span></span><input id="instagram_usuario" name="instagram_usuario" autocomplete="off" maxlength="50" /></label>
-                <label class="register-field" for="linkedin_usuario"><span>Usuario de LinkedIn <span class="register-optional">Opcional</span></span><input id="linkedin_usuario" name="linkedin_usuario" autocomplete="off" maxlength="50" /></label>
-                <label class="register-field" for="behance_usuario"><span>Usuario de Behance <span class="register-optional">Opcional</span></span><input id="behance_usuario" name="behance_usuario" autocomplete="off" maxlength="50" /></label>
+                <label class="register-field" for="correo"><span>Correo <span class="register-optional">Opcional</span></span><input id="correo" name="correo" type="email" autocomplete="email" maxlength="50" /><small>Solo para gestión, no se publica</small></label>
+                <label class="register-field" for="instagram_usuario"><span>Usuario de Instagram <span class="register-optional">Opcional</span></span><input id="instagram_usuario" name="instagram_usuario" autocomplete="off" maxlength="50" /><small>Se mostrará públicamente en tu perfil</small></label>
+                <label class="register-field" for="linkedin_usuario"><span>Usuario de LinkedIn <span class="register-optional">Opcional</span></span><input id="linkedin_usuario" name="linkedin_usuario" autocomplete="off" maxlength="50" /><small>Se mostrará públicamente en tu perfil</small></label>
+                <label class="register-field" for="behance_usuario"><span>Usuario de Behance <span class="register-optional">Opcional</span></span><input id="behance_usuario" name="behance_usuario" autocomplete="off" maxlength="50" /><small>Se mostrará públicamente en tu perfil</small></label>
               </div>
             </details>
           </section>
 
           <section class="register-section" aria-labelledby="section-profile">
-            <div class="register-section__heading"><span>03</span><div><h2 id="section-profile">Perfil profesional</h2></div></div>
+            <div class="register-section__heading"><span>04</span><div><h2 id="section-profile">Perfil profesional</h2></div></div>
             <div class="register-grid">
               <label class="register-field" for="categoria"><span>Categoría <b aria-hidden="true">*</b></span><select id="categoria" name="categoria" required><option value="">Selecciona</option><option>Diseñadores gráficos</option><option>Anfitrionas</option><option>Volanteras</option></select></label>
               <label class="register-field register-field--wide" for="descripcion_corta"><span>Descripción corta <b aria-hidden="true">*</b></span><textarea id="descripcion_corta" name="descripcion_corta" rows="3" minlength="10" maxlength="150" required></textarea></label>
@@ -81,13 +87,6 @@
             </details>
           </section>
 
-          <section class="register-section" aria-labelledby="section-images">
-            <div class="register-section__heading"><span>04</span><div><h2 id="section-images">Imágenes</h2></div></div>
-            <div class="register-grid">
-              <div class="register-field register-upload"><label for="foto_perfil"><span>Foto de perfil <b aria-hidden="true">*</b></span><input id="foto_perfil" name="foto_perfil" aria-describedby="foto_perfil-help" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" required /></label><div class="image-crop" data-crop-for="foto_perfil" hidden><canvas class="image-crop__canvas" data-preview-for="foto_perfil" aria-label="Vista previa del recorte de foto de perfil"></canvas><label class="image-crop__zoom">Zoom<input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="foto_perfil" /></label><small class="image-crop__hint">Arrastra o usa las flechas del teclado para encuadrar</small></div><small id="foto_perfil-help">JPG, PNG o WebP · hasta 1 MB. Recortamos y ajustamos a 150 × 150 px.</small><output data-file-for="foto_perfil" aria-live="polite"></output></div>
-              <div class="register-field register-upload"><label for="imagen_portada"><span>Imagen de portada <b aria-hidden="true">*</b></span><input id="imagen_portada" name="imagen_portada" aria-describedby="imagen_portada-help" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" required /></label><div class="image-crop" data-crop-for="imagen_portada" hidden><canvas class="image-crop__canvas" data-preview-for="imagen_portada" aria-label="Vista previa del recorte de imagen de portada"></canvas><label class="image-crop__zoom">Zoom<input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="imagen_portada" /></label><small class="image-crop__hint">Arrastra o usa las flechas del teclado para encuadrar</small></div><small id="imagen_portada-help">JPG, PNG o WebP · hasta 1 MB. Recortamos y ajustamos a 540 × 720 px.</small><output data-file-for="imagen_portada" aria-live="polite"></output></div>
-            </div>
-          </section>
 
           <section class="register-section" aria-labelledby="section-privacy">
             <div class="register-section__heading"><span>05</span><div><h2 id="section-privacy">Privacidad</h2><p>Necesitamos tu aceptación para recibir el registro.</p></div></div>

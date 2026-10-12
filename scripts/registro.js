@@ -225,7 +225,7 @@ function renderLocationOptions(query) {
   visibleLocations = result.matches;
   if (!result.total) {
     closeLocationList();
-    locationStatus.textContent = "No encontramos esa ubicación. Prueba con otro distrito, provincia o departamento.";
+      locationStatus.textContent = "No encontramos ese distrito. Prueba con otro nombre de distrito.";
     return;
   }
 

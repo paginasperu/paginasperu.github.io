@@ -18,7 +18,7 @@ export function prepareLocationOptions(rows) {
     const key = [option.distrito, option.provincia, option.departamento].join("|");
     if (unique.has(key)) continue;
     option.label = `${option.distrito} — ${option.provincia} — ${option.departamento}`;
-    option.searchText = normalizeLocationSearch(option.label);
+    option.searchText = normalizeLocationSearch(option.distrito);
     unique.set(key, option);
   }
   return [...unique.values()].sort((a, b) => a.label.localeCompare(b.label, "es-PE"));
