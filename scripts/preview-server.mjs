@@ -31,7 +31,14 @@ function resolveRequestPath(requestUrl) {
   const filePath = resolve(projectRoot, relativePath);
   if (filePath !== projectRoot && !filePath.startsWith(`${projectRoot}${sep}`)) return null;
 
-  if (existsSync(filePath) && statSync(filePath).isFile()) return filePath;
+  if (existsSync(filePath)) {
+    const stats = statSync(filePath);
+    if (stats.isFile()) return filePath;
+    if (stats.isDirectory()) {
+      const indexFile = join(filePath, "index.html");
+      if (existsSync(indexFile) && statSync(indexFile).isFile()) return indexFile;
+    }
+  }
 
   // GitHub Pages serves these extensionless URLs through its root-level 404 page.
   const cleanPage = resolve(projectRoot, `${relativePath}.html`);
@@ -68,6 +75,8 @@ server.on("error", error => {
   process.exitCode = 1;
 });
 server.listen(port, "127.0.0.1", () => {
-  console.log(`Vista previa local: http://127.0.0.1:${port}`);
+  const address = server.address();
+  const activePort = typeof address === "object" && address ? address.port : port;
+  console.log(`Vista previa local: http://127.0.0.1:${activePort}`);
   console.log("Detén el servidor con Ctrl+C.");
 });

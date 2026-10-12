@@ -4,6 +4,7 @@
  */
 const REVIEW_SHEET_NAME = "perfiles";
 const PUBLIC_SHEET_NAME = "publico";
+const REVIEW_SPREADSHEET_ID = "1HUWM3j-RvhrBJlufeUwycP04ZKHZANEuOwVTHNps754";
 const REVIEW_HEADERS = [
   "id", "nombres", "apellidos", "genero", "fecha_nacimiento", "departamento", "provincia", "distrito",
   "whatsapp_publico", "whatsapp_interno", "correo", "behance_usuario", "instagram_usuario", "linkedin_usuario",
@@ -25,6 +26,67 @@ function onOpen() {
     .addItem("Abrir ficha de revisión", "showReviewSidebar")
     .addToUi();
 }
+
+function doGet() {
+  return HtmlService.createTemplateFromFile("Admin")
+    .evaluate()
+    .setTitle("Gestión de perfiles · Oficial");
+}
+
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}
+
+/** Admin list API: minimal fields only; private data is returned by getReviewRecord after selection. */
+function getAdminRecords(filters) {
+  const query = filters && typeof filters === "object" ? filters : {};
+  const statusFilter = String(query.status || "Todos");
+  const categoryFilter = String(query.category || "Todas");
+  const districtFilter = String(query.district || "Todos");
+  if (statusFilter !== "Todos" && REVIEW_STATUSES.indexOf(statusFilter) === -1) throw new Error("El filtro de estado no es válido.");
+  const categories = ["Diseñadores gráficos", "Volanteras", "Anfitrionas"];
+  if (categoryFilter !== "Todas" && categories.indexOf(categoryFilter) === -1) throw new Error("El filtro de categoría no es válido.");
+  const search = String(query.search || "").trim().slice(0, 100).toLocaleLowerCase("es-PE");
+  const sheet = getSheetWithHeaders_(REVIEW_SHEET_NAME, REVIEW_HEADERS);
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return { records: [], districts: [], counts: emptyAdminCounts_() };
+  const rows = sheet.getRange(2, 1, lastRow - 1, REVIEW_HEADERS.length).getDisplayValues();
+  const col = function (field) { return REVIEW_HEADERS.indexOf(field); };
+  const seen = new Set();
+  const records = rows.filter(function (row) { return row[col("id")] !== ""; }).map(function (row) {
+    const id = row[col("id")];
+    if (!/^[1-9]\d*$/.test(id) || seen.has(id)) throw new Error("Hay un ID inválido o duplicado; no se puede abrir la gestión.");
+    seen.add(id);
+    return {
+      id: id,
+      name: [row[col("nombres")], row[col("apellidos")]].filter(Boolean).join(" "),
+      category: row[col("categoria")],
+      district: row[col("distrito")],
+      province: row[col("provincia")],
+      department: row[col("departamento")],
+      status: row[col("estado")],
+      verified: row[col("es_verificado")] === "TRUE",
+      featured: row[col("es_destacado")] === "TRUE",
+      photo: row[col("foto_perfil")],
+      date: row[col("fecha_registro")],
+    };
+  });
+  const counts = emptyAdminCounts_();
+  records.forEach(function (record) { if (Object.prototype.hasOwnProperty.call(counts, record.status)) counts[record.status]++; counts.total++; });
+  const districts = Array.from(new Set(records.map(function (record) { return record.district; }).filter(Boolean))).sort();
+  const visible = records.filter(function (record) {
+    if (statusFilter !== "Todos" && record.status !== statusFilter) return false;
+    if (categoryFilter !== "Todas" && record.category !== categoryFilter) return false;
+    if (districtFilter !== "Todos" && record.district !== districtFilter) return false;
+    if (query.verified === true && !record.verified) return false;
+    if (query.featured === true && !record.featured) return false;
+    if (search && ![record.id, record.name, record.category, record.district, record.province, record.department].join(" ").toLocaleLowerCase("es-PE").includes(search)) return false;
+    return true;
+  });
+  return { records: visible, districts: districts, counts: counts };
+}
+
+function emptyAdminCounts_() { return { total: 0, Pendiente: 0, Activo: 0, Rechazado: 0, Inactivo: 0 }; }
 
 function showReviewSidebar() {
   const html = HtmlService.createHtmlOutputFromFile("ReviewSidebar")
@@ -76,7 +138,8 @@ function saveReview(update) {
   }
   const notes = String(update.notas == null ? "" : update.notas);
   if (notes.length > 2000) throw new Error("Las notas no pueden superar 2000 caracteres.");
-  const lock = LockService.getDocumentLock();
+  // ScriptLock also works when this bound project runs as a web app without an active document.
+  const lock = LockService.getScriptLock();
   lock.waitLock(15000);
   try {
     const sheet = getSheetWithHeaders_(REVIEW_SHEET_NAME, REVIEW_HEADERS);
@@ -108,7 +171,8 @@ function getPublicCsvData() {
 }
 
 function getSheetWithHeaders_(name, headers) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name);
+  // A bound script has no active spreadsheet context when executed as a web app.
+  const sheet = SpreadsheetApp.openById(REVIEW_SPREADSHEET_ID).getSheetByName(name);
   if (!sheet) throw new Error("No se encontró la pestaña " + name + ".");
   const actual = sheet.getRange(1, 1, 1, headers.length).getDisplayValues()[0];
   if (headers.some(function (header, index) { return actual[index] !== header; })) {
