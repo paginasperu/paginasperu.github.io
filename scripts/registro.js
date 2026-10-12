@@ -1,4 +1,4 @@
-import { attachFieldValidation } from './form-validation.js';
+import { attachFieldValidation } from './form-validation.js?v=20261011-2';
 import { prepareLocationOptions, searchLocations } from './location-picker.js';
 
 const SITE_CONFIG = {
@@ -467,9 +467,9 @@ async function uploadToCloudinary(file) {
   return { url: result.secure_url, deleteToken: result.delete_token || null, uploadedAt: Date.now() };
 }
 
-async function uploadOptionalImage(input, dimensions, filename) {
+async function uploadRequiredImage(input, dimensions, filename) {
   const output = form.querySelector(`[data-file-for="${input.name}"]`);
-  if (!input.files || !input.files[0]) return { url: null, failed: false };
+  if (!input.files || !input.files[0]) throw new Error(`${imageFieldName(input)}: selecciona una imagen antes de enviar.`);
   const key = input.name + imageFingerprint(input);
   if (uploadedImages.has(key)) return { url: uploadedImages.get(key).url, failed: false };
 
@@ -484,9 +484,12 @@ async function uploadOptionalImage(input, dimensions, filename) {
     uploadedImages.set(key, asset);
     output.textContent = `Imagen lista: JPG · ${dimensions[0]} × ${dimensions[1]} px`;
     return { url: asset.url, failed: false };
-  } catch {
-    output.textContent = "No se pudo cargar; el perfil continuará sin esta imagen.";
-    return { url: null, failed: true };
+  } catch (cause) {
+    const error = new Error(`${imageFieldName(input)}: no se pudo cargar. Revisa la imagen o tu conexión e inténtalo de nuevo.`);
+    error.definitive = true;
+    output.textContent = error.message;
+    fieldValidation.setError(input, error.message);
+    throw error;
   }
 }
 
@@ -572,28 +575,20 @@ form.addEventListener("submit", async (event) => {
     Object.assign(payload, { submissionId: pendingSubmission.id, startedAt, website: form.elements.website.value });
     submitButton.textContent = "Validando datos…";
     await sendToAppsScript({ ...payload, action: "validate" });
-    const hasSelectedImages = Boolean(form.foto_perfil.files?.[0] || form.imagen_portada.files?.[0]);
-    submitButton.textContent = hasSelectedImages ? "Preparando imágenes…" : "Enviando…";
-    const [profilePhoto, coverImage] = await Promise.all([
-      uploadOptionalImage(form.foto_perfil, [150, 150], "foto-perfil.jpg"),
-      uploadOptionalImage(form.imagen_portada, [540, 720], "imagen-portada.jpg"),
+    submitButton.textContent = "Preparando imágenes…";
+    const imageResults = await Promise.allSettled([
+      uploadRequiredImage(form.foto_perfil, [150, 150], "foto-perfil.jpg"),
+      uploadRequiredImage(form.imagen_portada, [540, 720], "imagen-portada.jpg"),
     ]);
+    const imageFailure = imageResults.find(result => result.status === "rejected");
+    if (imageFailure) throw imageFailure.reason;
+    const [profilePhoto, coverImage] = imageResults.map(result => result.value);
     payload.foto_perfil = profilePhoto.url;
     payload.imagen_portada = coverImage.url;
     submitButton.textContent = "Enviando…";
     const result = await sendToAppsScript(payload);
-    const failedImages = [
-      profilePhoto.failed ? "la foto de perfil" : "",
-      coverImage.failed ? "la imagen de portada" : "",
-    ].filter(Boolean);
     const confirmation = `Solicitud #${result.id} recibida. Tu perfil está pendiente de revisión; aún no es público.`;
-    if (failedImages.length === 2) {
-      showMessage(`${confirmation} No se pudieron cargar las imágenes; agrégalas antes de publicar el perfil.`, "warning");
-    } else if (failedImages.length === 1) {
-      showMessage(`${confirmation} No se pudo cargar ${failedImages[0]}; agrégala antes de publicar el perfil.`, "warning");
-    } else {
-      showMessage(confirmation);
-    }
+    showMessage(confirmation);
     form.reset();
     fieldValidation.reset();
     message.tabIndex = -1;

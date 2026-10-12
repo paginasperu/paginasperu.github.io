@@ -110,7 +110,8 @@ function validateAndNormalize_(payload) {
   record.acepta_privacidad = record.acepta_privacidad === true || record.acepta_privacidad === "Sí" || record.acepta_privacidad === "true";
 
   const required = ["nombres", "apellidos", "departamento", "provincia", "distrito",
-    "whatsapp_interno", "categoria", "descripcion_corta"];
+    "whatsapp_interno", "portafolio_url", "categoria", "descripcion_corta"];
+  if (payload.action !== "validate") required.push("foto_perfil", "imagen_portada");
   required.forEach(function (field) {
     if (record[field] === null || record[field] === "") throw inputError_("Completa el campo obligatorio: " + field + ".");
   });
@@ -191,23 +192,25 @@ function validateImageUrl_(field, value) {
 function validatePortfolioUrl_(value) {
   if (value === null) return;
   if (typeof value !== "string" || value.length > 500 || /[\s\\\u0000-\u001F\u007F]/.test(value)) {
-    throw inputError_("El portafolio debe ser una URL pública HTTPS válida.");
+    throw inputError_("El portafolio debe enlazar a Instagram, TikTok, LinkedIn o Behance.");
   }
   const match = /^https:\/\/([^/?#]+)(?:[/?#][^\s\\]*)?$/i.exec(value);
   if (!match || match[1].indexOf("@") !== -1) {
-    throw inputError_("El portafolio debe ser una URL pública HTTPS válida.");
+    throw inputError_("El portafolio debe enlazar a Instagram, TikTok, LinkedIn o Behance.");
   }
   const authority = match[1];
   const portMatch = authority.match(/:(\d+)$/);
   const host = portMatch ? authority.slice(0, -portMatch[0].length) : authority;
-  if (portMatch && (Number(portMatch[1]) < 1 || Number(portMatch[1]) > 65535)) {
-    throw inputError_("El portafolio debe ser una URL pública HTTPS válida.");
+  if (portMatch && Number(portMatch[1]) !== 443) {
+    throw inputError_("El portafolio debe enlazar a Instagram, TikTok, LinkedIn o Behance.");
   }
-  const labels = host.split(".");
-  if (host.length > 253 || labels.length < 2 || labels.some(function (label) {
-    return label.length > 63 || !/^[\p{L}\p{M}\p{N}](?:[\p{L}\p{M}\p{N}-]*[\p{L}\p{M}\p{N}])?$/u.test(label);
-  })) {
-    throw inputError_("El portafolio debe ser una URL pública HTTPS válida.");
+  const normalizedHost = host.toLowerCase().replace(/\.$/, "");
+  const allowedDomains = ["instagram.com", "tiktok.com", "linkedin.com", "behance.net", "lnkd.in"];
+  const allowedHost = allowedDomains.some(function (domain) {
+    return normalizedHost === domain || normalizedHost.endsWith("." + domain);
+  });
+  if (!allowedHost) {
+    throw inputError_("El portafolio debe enlazar a Instagram, TikTok, LinkedIn o Behance.");
   }
 }
 

@@ -1,7 +1,7 @@
 export function fieldError(control, today = new Date()) {
   if (control.disabled || !control.name || control.name === 'website') return '';
   const value = String(control.value || '').trim();
-  if (control.required && (control.type === 'checkbox' ? !control.checked : !value)) return control.type === 'checkbox' ? 'Acepta la política de privacidad para continuar.' : control.tagName === 'SELECT' ? 'Selecciona una opción.' : 'Completa este campo.';
+  if (control.required && (control.type === 'checkbox' ? !control.checked : !value)) return control.type === 'checkbox' ? 'Acepta la política de privacidad para continuar.' : control.tagName === 'SELECT' ? 'Selecciona una opción' : 'Completa este campo.';
   if (!value) return '';
   if (control.type === 'file') return control.validationMessage || '';
   if (control.minLength > 0 && value.length < control.minLength) return `Escribe al menos ${control.minLength} caracteres.`;
@@ -16,9 +16,12 @@ export function fieldError(control, today = new Date()) {
   if (control.name === 'portafolio_url') {
     try {
       const url = new URL(value);
-      if (url.protocol !== 'https:' || !url.hostname.includes('.') || url.username || url.password) return 'Ingresa una URL pública HTTPS válida.';
+      const host = url.hostname.toLowerCase().replace(/\.$/, '');
+      const allowedDomains = ['instagram.com', 'tiktok.com', 'linkedin.com', 'behance.net', 'lnkd.in'];
+      const allowedHost = allowedDomains.some(domain => host === domain || host.endsWith(`.${domain}`));
+      if (url.protocol !== 'https:' || !allowedHost || (url.port && url.port !== '443') || url.username || url.password) return 'Usa un enlace HTTPS de Instagram, TikTok, LinkedIn o Behance.';
     } catch {
-      return 'Ingresa una URL pública HTTPS válida.';
+      return 'Usa un enlace HTTPS de Instagram, TikTok, LinkedIn o Behance.';
     }
   }
   if (control.validity?.typeMismatch) return 'Ingresa un enlace válido.';

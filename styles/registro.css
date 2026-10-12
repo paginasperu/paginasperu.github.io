@@ -400,7 +400,8 @@
 }
 
 .register-field .field-error, .register-consent .field-error { color: #a61b1b; font-size: 12px; line-height: 1.5; }
-.register-field [aria-invalid="true"] { border-color: #b3261e; background: #fffafa; }
+.register-field input:not([type="file"])[aria-invalid="true"], .register-field select[aria-invalid="true"], .register-field textarea[aria-invalid="true"] { border-color: #b3261e; background: #fffafa; }
+.register-upload:has(input[aria-invalid="true"]) { border-color: #b3261e; background: #fffafa; }
 .register-field input:focus-visible, .register-field textarea:focus-visible, .register-field select:focus-visible, .image-crop__canvas:focus-visible { outline: 3px solid #2359d1; outline-offset: 3px; }
 .register-field small, .register-upload output, .image-crop__hint { color: #595959; }
 .register-upload > label { display: grid; gap: 8px; }

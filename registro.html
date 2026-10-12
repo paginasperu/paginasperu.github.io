@@ -6,8 +6,8 @@
     <meta name="description" content="Registra tu perfil profesional en el Directorio Oficial de Publicidad." />
     <title>Registro | Directorio Oficial de Publicidad</title>
     <link rel="stylesheet" href="./styles/index.css?v=20261011-14" />
-    <link rel="stylesheet" href="./styles/registro.css?v=20261011-5" />
-    <script type="module" src="./scripts/registro.js?v=20261011-8"></script>
+    <link rel="stylesheet" href="./styles/registro.css?v=20261011-6" />
+    <script type="module" src="./scripts/registro.js?v=20261011-9"></script>
     <link rel="canonical" href="https://oficial.pe/registro" />
     <meta property="og:url" content="https://oficial.pe/registro" />
   </head>
@@ -33,9 +33,9 @@
                 </div>
                 <small id="ubicacion-status" class="location-status" role="status" aria-live="polite"></small>
               </div>
-              <label class="register-field" for="whatsapp_publico"><span>WhatsApp público</span><input id="whatsapp_publico" name="whatsapp_publico" type="tel" inputmode="tel" autocomplete="tel" placeholder="950 141 414" maxlength="20" pattern="[0-9+() -]*" title="Usa solo números, espacios, +, paréntesis o guiones." /><small>Será visible para cualquier persona</small></label>
-              <label class="register-field" for="whatsapp_interno"><span>WhatsApp privado <b aria-hidden="true">*</b></span><input id="whatsapp_interno" name="whatsapp_interno" type="tel" inputmode="tel" autocomplete="tel" placeholder="950 141 414" maxlength="20" pattern="[0-9+() -]*" title="Usa solo números, espacios, +, paréntesis o guiones." required /><small>Será visible solo para nuestra agencia</small></label>
-              <label class="register-field register-field--wide" for="portafolio_url"><span>Portafolio</span><input id="portafolio_url" name="portafolio_url" type="url" inputmode="url" autocomplete="url" placeholder="https://" maxlength="500" /><small>Puede ser tu web, Instagram u otro enlace de trabajo. Usa una URL HTTPS.</small></label>
+              <label class="register-field" for="whatsapp_publico"><span>WhatsApp público <span class="register-optional">Opcional</span></span><input id="whatsapp_publico" name="whatsapp_publico" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" pattern="[0-9+() -]*" title="Usa solo números, espacios, +, paréntesis o guiones." /><small>Será visible para cualquier persona</small></label>
+              <label class="register-field" for="whatsapp_interno"><span>WhatsApp privado <b aria-hidden="true">*</b></span><input id="whatsapp_interno" name="whatsapp_interno" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" pattern="[0-9+() -]*" title="Usa solo números, espacios, +, paréntesis o guiones." required /><small>Será visible solo para nuestra agencia</small></label>
+              <label class="register-field register-field--wide" for="portafolio_url"><span>Portafolio <b aria-hidden="true">*</b></span><input id="portafolio_url" name="portafolio_url" type="url" inputmode="url" autocomplete="url" maxlength="500" required /><small>Puede ser un enlace a Instagram, TikTok, LinkedIn o Behance.</small></label>
             </div>
           </section>
 
@@ -44,15 +44,15 @@
             <div class="register-grid">
               <label class="register-field" for="categoria"><span>Categoría <b aria-hidden="true">*</b></span><select id="categoria" name="categoria" required><option value="">Selecciona</option><option>Diseñadores gráficos</option><option>Anfitrionas</option><option>Volanteras</option></select></label>
               <label class="register-field register-field--wide" for="descripcion_corta"><span>Descripción corta <b aria-hidden="true">*</b></span><textarea id="descripcion_corta" name="descripcion_corta" rows="3" minlength="10" maxlength="150" required></textarea></label>
-              <label class="register-field register-field--wide" for="descripcion_larga"><span>Descripción larga</span><textarea id="descripcion_larga" name="descripcion_larga" rows="5" maxlength="1000"></textarea></label>
+              <label class="register-field register-field--wide" for="descripcion_larga"><span>Descripción larga <span class="register-optional">Opcional</span></span><textarea id="descripcion_larga" name="descripcion_larga" rows="5" maxlength="1000"></textarea></label>
             </div>
           </section>
 
           <section class="register-section" aria-labelledby="section-images">
-            <div class="register-section__heading"><span>03</span><div><h2 id="section-images">Imágenes <span class="register-optional">Opcional</span></h2></div></div>
+            <div class="register-section__heading"><span>03</span><div><h2 id="section-images">Imágenes</h2></div></div>
             <div class="register-grid">
-              <div class="register-field register-upload"><label for="foto_perfil"><span>Foto de perfil</span><input id="foto_perfil" name="foto_perfil" aria-describedby="foto_perfil-help" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" /></label><div class="image-crop" data-crop-for="foto_perfil" hidden><canvas class="image-crop__canvas" data-preview-for="foto_perfil" aria-label="Vista previa del recorte de foto de perfil"></canvas><label class="image-crop__zoom">Zoom <input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="foto_perfil" /></label><small class="image-crop__hint">Arrastra o usa las flechas del teclado para encuadrar</small></div><small id="foto_perfil-help">JPG, PNG o WebP · hasta 1 MB. Recortamos y ajustamos a 150 × 150 px.</small><output data-file-for="foto_perfil" aria-live="polite"></output></div>
-              <div class="register-field register-upload"><label for="imagen_portada"><span>Imagen de portada</span><input id="imagen_portada" name="imagen_portada" aria-describedby="imagen_portada-help" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" /></label><div class="image-crop" data-crop-for="imagen_portada" hidden><canvas class="image-crop__canvas" data-preview-for="imagen_portada" aria-label="Vista previa del recorte de imagen de portada"></canvas><label class="image-crop__zoom">Zoom <input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="imagen_portada" /></label><small class="image-crop__hint">Arrastra o usa las flechas del teclado para encuadrar</small></div><small id="imagen_portada-help">JPG, PNG o WebP · hasta 1 MB. Recortamos y ajustamos a 540 × 720 px.</small><output data-file-for="imagen_portada" aria-live="polite"></output></div>
+              <div class="register-field register-upload"><label for="foto_perfil"><span>Foto de perfil <b aria-hidden="true">*</b></span><input id="foto_perfil" name="foto_perfil" aria-describedby="foto_perfil-help" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" required /></label><div class="image-crop" data-crop-for="foto_perfil" hidden><canvas class="image-crop__canvas" data-preview-for="foto_perfil" aria-label="Vista previa del recorte de foto de perfil"></canvas><label class="image-crop__zoom">Zoom<input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="foto_perfil" /></label><small class="image-crop__hint">Arrastra o usa las flechas del teclado para encuadrar</small></div><small id="foto_perfil-help">JPG, PNG o WebP · hasta 1 MB. Recortamos y ajustamos a 150 × 150 px.</small><output data-file-for="foto_perfil" aria-live="polite"></output></div>
+              <div class="register-field register-upload"><label for="imagen_portada"><span>Imagen de portada <b aria-hidden="true">*</b></span><input id="imagen_portada" name="imagen_portada" aria-describedby="imagen_portada-help" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" required /></label><div class="image-crop" data-crop-for="imagen_portada" hidden><canvas class="image-crop__canvas" data-preview-for="imagen_portada" aria-label="Vista previa del recorte de imagen de portada"></canvas><label class="image-crop__zoom">Zoom<input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="imagen_portada" /></label><small class="image-crop__hint">Arrastra o usa las flechas del teclado para encuadrar</small></div><small id="imagen_portada-help">JPG, PNG o WebP · hasta 1 MB. Recortamos y ajustamos a 540 × 720 px.</small><output data-file-for="imagen_portada" aria-live="polite"></output></div>
             </div>
           </section>
 
