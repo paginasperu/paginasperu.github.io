@@ -3,6 +3,77 @@
   const form = document.querySelector("#business-form");
   const button = document.querySelector("#submit-button");
   const status = document.querySelector("#form-status");
+  const locationFields = [form.querySelector("#tipo-lugar"), form.querySelector("#lugar")];
+  const repeatFields = [form.querySelector("#piso"), form.querySelector("#seccion"), form.querySelector("#pasillo")];
+  const prefilledBadges = repeatFields.map((field) => field.closest(".field").querySelector(".prefilled-badge"));
+  const locationStorageKey = "registro-negocios-lugar-v1";
+  const locationEditor = document.querySelector("#location-editor");
+  const locationSummary = document.querySelector("#location-summary");
+  const locationDisplay = document.querySelector("#location-display");
+  let activeLocation = null;
+  let editingLocation = false;
+
+  try {
+    activeLocation = JSON.parse(window.localStorage.getItem(locationStorageKey) || "null");
+  } catch {
+    // Continue without a remembered location when browser storage is unavailable.
+  }
+
+  function renderLocation() {
+    const hasLocation = Boolean(activeLocation?.type && activeLocation?.name);
+    locationSummary.hidden = !hasLocation;
+    document.querySelector("#add-location").hidden = hasLocation;
+    locationEditor.hidden = hasLocation || !editingLocation;
+    if (hasLocation) {
+      locationDisplay.textContent = `${activeLocation.type} ${activeLocation.name}`;
+      locationFields[0].value = activeLocation.type;
+      locationFields[1].value = activeLocation.name;
+    }
+  }
+
+  function openLocationEditor() {
+    editingLocation = true;
+    locationEditor.hidden = false;
+    locationSummary.hidden = true;
+    document.querySelector("#add-location").hidden = true;
+    locationFields[0].value = activeLocation?.type || "";
+    locationFields[1].value = activeLocation?.name || "";
+    locationFields[0].focus();
+  }
+
+  function saveLocation() {
+    const type = locationFields[0].value;
+    const name = locationFields[1].value.trim();
+    if (!type || !name) {
+      showStatus("Selecciona el tipo y escribe el nombre del lugar.", "error");
+      (type ? locationFields[1] : locationFields[0]).focus();
+      return;
+    }
+    activeLocation = { type, name };
+    editingLocation = false;
+    try {
+      window.localStorage.setItem(locationStorageKey, JSON.stringify(activeLocation));
+    } catch {
+      // The current page keeps the active location if browser storage is unavailable.
+    }
+    renderLocation();
+    showStatus("Lugar guardado para los siguientes registros.", "success");
+  }
+
+  document.querySelector("#add-location").addEventListener("click", openLocationEditor);
+  document.querySelector("#change-location").addEventListener("click", openLocationEditor);
+  document.querySelector("#save-location").addEventListener("click", saveLocation);
+  document.querySelector("#cancel-location").addEventListener("click", () => {
+    editingLocation = false;
+    renderLocation();
+  });
+  renderLocation();
+
+  repeatFields.forEach((field, index) => {
+    field.addEventListener("input", () => {
+      prefilledBadges[index].hidden = true;
+    });
+  });
 
   function showStatus(message, state) {
     status.textContent = message;
@@ -45,10 +116,16 @@
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     showStatus("", "");
+    if (!activeLocation?.type || !activeLocation?.name) {
+      showStatus("Agrega y guarda el lugar antes de registrar negocios.", "error");
+      openLocationEditor();
+      return;
+    }
     if (!form.reportValidity()) return;
 
     setSending(true);
     showStatus("Enviando el registro…", "info");
+    const retainedValues = repeatFields.map((field) => field.value);
 
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 20000);
@@ -64,6 +141,11 @@
         throw new Error("El servidor rechazó el envío.");
       }
       form.reset();
+      renderLocation();
+      repeatFields.forEach((field, index) => {
+        field.value = retainedValues[index];
+        prefilledBadges[index].hidden = !retainedValues[index];
+      });
       showStatus("Registro guardado. Gracias.", "success");
     } catch (error) {
       showStatus(
@@ -78,3 +160,4 @@
     }
   });
 })();
+

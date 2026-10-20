@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#15304b">
   <meta name="description" content="Registro de negocios.">
   <title>Registro de negocios</title>
-  <link rel="stylesheet" href="styles.css?v=registro-generico-layout-11">
-  <script src="app.js?v=registro-generico-layout-11" defer></script>
+  <link rel="stylesheet" href="styles.css?v=registro-fecha-prellenado-16">
+  <script src="app.js?v=registro-fecha-prellenado-16" defer></script>
 </head>
 <body>
   <main class="page-shell">
@@ -15,17 +15,49 @@
       <h1 id="page-title">Registro de negocios</h1>
 
       <form id="business-form" action="" method="post" novalidate>
+        <section class="location-section" aria-labelledby="location-title">
+          <div class="location-heading-row">
+            <h2 id="location-title">Lugar:</h2>
+            <div id="location-summary" class="location-summary" hidden>
+              <p id="location-display" class="location-display"></p>
+              <button id="change-location" class="text-button" type="button">Cambiar</button>
+            </div>
+            <button id="add-location" class="secondary-button" type="button">Agregar lugar</button>
+          </div>
+          <div id="location-editor" class="location-editor" hidden>
+            <div class="form-grid location-grid">
+            <div class="field">
+              <label for="tipo-lugar">Tipo</label>
+              <select id="tipo-lugar" name="tipo_lugar" data-sheet-header="Tipo de lugar">
+                <option value="">Selecciona el tipo</option>
+                <option value="Mercado">Mercado</option>
+                <option value="Galería">Galería</option>
+                <option value="Centro comercial">Centro comercial</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="lugar">Nombre</label>
+              <input id="lugar" name="lugar" data-sheet-header="Lugar" type="text" maxlength="160" autocomplete="off">
+            </div>
+          </div>
+            <div class="location-actions">
+              <button id="save-location" class="secondary-button" type="button">Guardar</button>
+              <button id="cancel-location" class="text-button" type="button">Cancelar</button>
+            </div>
+          </div>
+        </section>
+
         <div class="form-grid">
           <div class="field">
-            <label for="piso">Piso</label>
+            <label for="piso">Piso <span class="prefilled-badge" hidden>Prellenado</span></label>
             <input id="piso" name="piso" data-sheet-header="Piso" type="text" maxlength="60">
           </div>
           <div class="field">
-            <label for="seccion">Sección <span class="required" aria-hidden="true">*</span></label>
+            <label for="seccion">Sección <span class="required" aria-hidden="true">*</span> <span class="prefilled-badge" hidden>Prellenado</span></label>
             <input id="seccion" name="seccion" data-sheet-header="Sección" type="text" maxlength="120" required>
           </div>
           <div class="field">
-            <label for="pasillo">Pasillo</label>
+            <label for="pasillo">Pasillo <span class="prefilled-badge" hidden>Prellenado</span></label>
             <input id="pasillo" name="pasillo" data-sheet-header="Pasillo" type="text" maxlength="80">
           </div>
           <div class="field">
@@ -44,6 +76,14 @@
             <label for="whatsapp">WhatsApp</label>
             <input id="whatsapp" name="whatsapp" data-sheet-header="WhatsApp" type="tel" maxlength="9" pattern="[0-9]{9}" autocomplete="tel-national" inputmode="numeric" title="Ingresa exactamente 9 dígitos.">
           </div>
+          <div class="field field-wide">
+            <label for="descripcion">Descripción</label>
+            <input id="descripcion" name="descripcion" data-sheet-header="Descripción" type="text" maxlength="180">
+          </div>
+          <div class="field field-wide">
+            <label for="catalogo">Catálogo</label>
+            <input id="catalogo" name="catalogo" data-sheet-header="Catálogo" type="text" maxlength="180">
+          </div>
         </div>
 
         <div class="form-footer">
@@ -58,3 +98,4 @@
   </main>
 </body>
 </html>
+
