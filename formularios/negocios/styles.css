@@ -158,9 +158,9 @@ button:disabled { cursor: wait; opacity: 0.72; transform: none; }
   .form-card { padding: 24px 19px; border-radius: 17px; }
   .intro { margin-bottom: 25px; }
   .form-grid { gap: 17px 12px; }
+  .field-name { grid-column: 1 / -1; }
   .form-footer { align-items: stretch; flex-direction: column; }
   .form-actions { width: 100%; min-width: 0; align-items: stretch; }
   .status { text-align: left; }
   button { width: 100%; }
 }
-
