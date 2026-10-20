@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#15304b">
   <meta name="description" content="Registro de negocios.">
   <title>Registro de negocios</title>
-  <link rel="stylesheet" href="styles.css?v=registro-categoria-7">
-  <script src="app.js?v=registro-categoria-6" defer></script>
+  <link rel="stylesheet" href="styles.css?v=registro-generico-layout-11">
+  <script src="app.js?v=registro-generico-layout-11" defer></script>
 </head>
 <body>
   <main class="page-shell">
@@ -18,35 +18,31 @@
         <div class="form-grid">
           <div class="field">
             <label for="piso">Piso</label>
-            <input id="piso" name="piso" type="text" maxlength="60">
+            <input id="piso" name="piso" data-sheet-header="Piso" type="text" maxlength="60">
           </div>
           <div class="field">
-            <label for="seccion">Sección</label>
-            <input id="seccion" name="seccion" type="text" maxlength="80">
+            <label for="seccion">Sección <span class="required" aria-hidden="true">*</span></label>
+            <input id="seccion" name="seccion" data-sheet-header="Sección" type="text" maxlength="120" required>
           </div>
           <div class="field">
             <label for="pasillo">Pasillo</label>
-            <input id="pasillo" name="pasillo" type="text" maxlength="80">
-          </div>
-          <div class="field">
-            <label for="categoria">Categoría <span class="required" aria-hidden="true">*</span></label>
-            <input id="categoria" name="categoria" type="text" maxlength="120" required>
+            <input id="pasillo" name="pasillo" data-sheet-header="Pasillo" type="text" maxlength="80">
           </div>
           <div class="field">
             <label for="tipo">Tipo <span class="required" aria-hidden="true">*</span></label>
-            <input id="tipo" name="tipo" type="text" maxlength="100" required>
+            <input id="tipo" name="tipo" data-sheet-header="Tipo" type="text" maxlength="100" required>
           </div>
           <div class="field field-name">
             <label for="nombre">Nombre <span class="required" aria-hidden="true">*</span></label>
-            <input id="nombre" name="nombre" type="text" maxlength="120" autocomplete="organization" required>
+            <input id="nombre" name="nombre" data-sheet-header="Nombre" type="text" maxlength="120" autocomplete="organization" required>
           </div>
           <div class="field">
             <label for="puesto">Puesto <span class="required" aria-hidden="true">*</span></label>
-            <input id="puesto" name="puesto" type="text" maxlength="80" required>
+            <input id="puesto" name="puesto" data-sheet-header="Puesto" type="text" maxlength="80" required>
           </div>
           <div class="field">
             <label for="whatsapp">WhatsApp</label>
-            <input id="whatsapp" name="whatsapp" type="tel" maxlength="9" pattern="[0-9]{9}" autocomplete="tel-national" inputmode="numeric" title="Ingresa exactamente 9 dígitos.">
+            <input id="whatsapp" name="whatsapp" data-sheet-header="WhatsApp" type="tel" maxlength="9" pattern="[0-9]{9}" autocomplete="tel-national" inputmode="numeric" title="Ingresa exactamente 9 dígitos.">
           </div>
         </div>
 

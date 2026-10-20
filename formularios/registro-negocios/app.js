@@ -14,6 +14,17 @@
     button.querySelector("span").textContent = sending ? "Enviando…" : "Guardar registro";
   }
 
+  function makeSubmissionBody() {
+    const body = new URLSearchParams();
+    for (const element of form.elements) {
+      if (!element.name || element.disabled) continue;
+      if ((element.type === "checkbox" || element.type === "radio") && !element.checked) continue;
+      const header = element.dataset.sheetHeader || element.name;
+      body.append(header, element.value);
+    }
+    return body;
+  }
+
   const tipo = form.querySelector("#tipo");
   const whatsapp = form.querySelector("#whatsapp");
   const lettersOnly = /[^A-Za-zÁÉÍÓÚÜÑáéíóúüñÀ-ÖØ-öø-ÿ\u0300-\u036f ]/g;
@@ -45,7 +56,7 @@
       const response = await fetch(ENDPOINT_URL, {
         method: "POST",
         mode: "no-cors",
-        body: new URLSearchParams(new FormData(form)),
+        body: makeSubmissionBody(),
         signal: controller.signal
       });
       // no-cors returns an opaque response; confirm receipt in the sheet if needed.
