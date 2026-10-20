@@ -47,7 +47,7 @@
     const type = locationFields[0].value;
     const name = locationFields[1].value.trim();
     if (!type || !name) {
-      showLocationStatus("Selecciona el tipo y escribe el nombre del lugar.", "error");
+      showLocationStatus("Selecciona el tipo y escribe el nombre del lugar", "error");
       (type ? locationFields[1] : locationFields[0]).focus();
       return;
     }
@@ -59,7 +59,7 @@
       // The current page keeps the active location if browser storage is unavailable.
     }
     renderLocation();
-    showLocationStatus("Lugar guardado para los siguientes registros.", "success");
+    showLocationStatus("Lugar guardado para los siguientes registros", "success");
   }
 
   document.querySelector("#add-location").addEventListener("click", openLocationEditor);
@@ -116,7 +116,7 @@
 
   if (!ENDPOINT_URL || ENDPOINT_URL === "SET_APPS_SCRIPT_WEB_APP_URL") {
     button.disabled = true;
-    showStatus("El formulario está en preparación.", "info");
+    showStatus("El formulario está en preparación", "info");
     return;
   }
 
@@ -124,7 +124,7 @@
     event.preventDefault();
     showStatus("", "");
     if (!activeLocation?.type || !activeLocation?.name) {
-      showLocationStatus("Agrega y guarda el lugar antes de registrar negocios.", "error");
+      showLocationStatus("Agrega y guarda el lugar antes de registrar negocios", "error");
       openLocationEditor();
       return;
     }
@@ -145,7 +145,7 @@
       });
       // no-cors returns an opaque response; confirm receipt in the sheet if needed.
       if (response.type !== "opaque" && !response.ok) {
-        throw new Error("El servidor rechazó el envío.");
+        throw new Error("El servidor rechazó el envío");
       }
       form.reset();
       renderLocation();
@@ -153,12 +153,12 @@
         field.value = retainedValues[index];
         prefilledBadges[index].hidden = !retainedValues[index];
       });
-      showStatus("Registro guardado. Gracias.", "success");
+      showStatus("Registro guardado, gracias", "success");
     } catch (error) {
       showStatus(
         error.name === "AbortError"
-          ? "El envío tardó demasiado. Revisa la hoja antes de intentarlo de nuevo."
-          : "No se pudo completar el envío. Revisa tu conexión e inténtalo de nuevo.",
+          ? "El envío tardó demasiado; revisa la hoja antes de volver a intentarlo"
+          : "No se pudo completar el envío; revisa tu conexión e inténtalo de nuevo",
         "error"
       );
     } finally {
