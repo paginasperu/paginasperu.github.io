@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#15304b">
+  <meta name="description" content="Registro de negocios.">
+  <title>Registro de negocios</title>
+  <link rel="stylesheet" href="styles.css?v=registro-validation-4">
+  <script src="app.js?v=registro-validation-4" defer></script>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="form-card" aria-labelledby="page-title">
+      <h1 id="page-title">Registro de negocios</h1>
+
+      <form id="business-form" action="" method="post" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <label for="piso">Piso</label>
+            <input id="piso" name="piso" type="text" maxlength="60">
+          </div>
+          <div class="field">
+            <label for="seccion">Sección</label>
+            <input id="seccion" name="seccion" type="text" maxlength="80">
+          </div>
+          <div class="field">
+            <label for="pasillo">Pasillo</label>
+            <input id="pasillo" name="pasillo" type="text" maxlength="80">
+          </div>
+          <div class="field">
+            <label for="tipo">Tipo <span class="required" aria-hidden="true">*</span></label>
+            <input id="tipo" name="tipo" type="text" maxlength="100" required>
+          </div>
+          <div class="field field-wide">
+            <label for="nombre">Nombre del negocio <span class="required" aria-hidden="true">*</span></label>
+            <input id="nombre" name="nombre" type="text" maxlength="120" autocomplete="organization" required>
+          </div>
+          <div class="field">
+            <label for="puesto">Puesto <span class="required" aria-hidden="true">*</span></label>
+            <input id="puesto" name="puesto" type="text" maxlength="80" required>
+          </div>
+          <div class="field">
+            <label for="whatsapp">WhatsApp</label>
+            <input id="whatsapp" name="whatsapp" type="tel" maxlength="9" pattern="[0-9]{9}" autocomplete="tel-national" inputmode="numeric" title="Ingresa exactamente 9 dígitos.">
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <p class="required-note"><span class="required">*</span> Campos obligatorios</p>
+          <div class="form-actions">
+            <button id="submit-button" type="submit"><span>Guardar registro</span><span aria-hidden="true">→</span></button>
+            <p id="form-status" class="status" role="status" aria-live="polite"></p>
+          </div>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
+
