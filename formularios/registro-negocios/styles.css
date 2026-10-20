@@ -131,6 +131,17 @@ h1 {
   margin-top: 14px;
 }
 
+.location-status {
+  min-height: 0;
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.location-status:empty { display: none; }
+.location-status[data-state="success"] { color: var(--accent-dark); }
+.location-status[data-state="error"] { color: #b43f3d; }
+
 .location-heading-row > .secondary-button { margin-left: auto; }
 
 .text-button {

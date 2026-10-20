@@ -3,6 +3,7 @@
   const form = document.querySelector("#business-form");
   const button = document.querySelector("#submit-button");
   const status = document.querySelector("#form-status");
+  const locationStatus = document.querySelector("#location-status");
   const locationFields = [form.querySelector("#tipo-lugar"), form.querySelector("#lugar")];
   const repeatFields = [form.querySelector("#piso"), form.querySelector("#seccion"), form.querySelector("#pasillo")];
   const prefilledBadges = repeatFields.map((field) => field.closest(".field").querySelector(".prefilled-badge"));
@@ -32,6 +33,7 @@
   }
 
   function openLocationEditor() {
+    showLocationStatus("", "");
     editingLocation = true;
     locationEditor.hidden = false;
     locationSummary.hidden = true;
@@ -45,7 +47,7 @@
     const type = locationFields[0].value;
     const name = locationFields[1].value.trim();
     if (!type || !name) {
-      showStatus("Selecciona el tipo y escribe el nombre del lugar.", "error");
+      showLocationStatus("Selecciona el tipo y escribe el nombre del lugar.", "error");
       (type ? locationFields[1] : locationFields[0]).focus();
       return;
     }
@@ -57,7 +59,7 @@
       // The current page keeps the active location if browser storage is unavailable.
     }
     renderLocation();
-    showStatus("Lugar guardado para los siguientes registros.", "success");
+    showLocationStatus("Lugar guardado para los siguientes registros.", "success");
   }
 
   document.querySelector("#add-location").addEventListener("click", openLocationEditor);
@@ -78,6 +80,11 @@
   function showStatus(message, state) {
     status.textContent = message;
     status.dataset.state = state;
+  }
+
+  function showLocationStatus(message, state) {
+    locationStatus.textContent = message;
+    locationStatus.dataset.state = state;
   }
 
   function setSending(sending) {
@@ -117,7 +124,7 @@
     event.preventDefault();
     showStatus("", "");
     if (!activeLocation?.type || !activeLocation?.name) {
-      showStatus("Agrega y guarda el lugar antes de registrar negocios.", "error");
+      showLocationStatus("Agrega y guarda el lugar antes de registrar negocios.", "error");
       openLocationEditor();
       return;
     }
