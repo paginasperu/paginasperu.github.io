@@ -16,6 +16,9 @@ const message = document.querySelector("#mensaje");
 const submitButton = document.querySelector("#enviar");
 const privacyDialog = document.querySelector("#privacy-dialog");
 const privacyDialogContent = document.querySelector("#privacy-dialog-content");
+const exampleDialog = document.querySelector("#registration-example-dialog");
+const exampleTitle = document.querySelector("#registration-example-title");
+const exampleImage = document.querySelector("#registration-example-image");
 const birthDateInput = form.elements.namedItem("fecha_nacimiento");
 const locationInput = document.querySelector("#ubicacion");
 const locationList = document.querySelector("#ubicacion-listbox");
@@ -33,6 +36,21 @@ const uploadedImages = new Map();
 let startedAt = Date.now();
 let pendingSubmission = null;
 birthDateInput.max = new Date().toISOString().slice(0, 10);
+
+document.querySelectorAll("[data-example-open]").forEach((button) => {
+  button.addEventListener("click", () => {
+    if (!exampleDialog || typeof exampleDialog.showModal !== "function") return;
+    exampleTitle.textContent = button.dataset.exampleTitle;
+    exampleImage.src = button.dataset.exampleSrc;
+    exampleImage.alt = button.dataset.exampleAlt;
+    exampleDialog.showModal();
+  });
+});
+
+exampleDialog?.querySelector("[data-example-close]")?.addEventListener("click", () => exampleDialog.close());
+exampleDialog?.addEventListener("click", (event) => {
+  if (event.target === exampleDialog) exampleDialog.close();
+});
 
 let privacyPolicyLoaded = false;
 document.querySelector("[data-privacy-dialog-open]")?.addEventListener("click", async (event) => {

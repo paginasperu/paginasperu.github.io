@@ -6,12 +6,12 @@
     <meta name="description" content="Registra tu perfil profesional en el Directorio Oficial de Publicidad." />
     <title>Registro | Directorio Oficial de Publicidad</title>
     <link rel="stylesheet" href="./styles/index.css?v=20261011-14" />
-    <link rel="stylesheet" href="./styles/registro.css?v=20261011-8" />
+    <link rel="stylesheet" href="./styles/registro.css?v=20261021-1" />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <link rel="preconnect" href="https://vhsocvvjquikjtmqbkwx.supabase.co" crossorigin />
     <link rel="preconnect" href="https://api.cloudinary.com" crossorigin />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3" defer></script>
-    <script type="module" src="./scripts/registro.js?v=20261011-12"></script>
+    <script type="module" src="./scripts/registro.js?v=20261021-1"></script>
     <link rel="canonical" href="https://www.oficial.pe/registro" />
     <meta property="og:url" content="https://www.oficial.pe/registro" />
   </head>
@@ -27,8 +27,8 @@
           <section class="register-section" aria-labelledby="section-images">
             <div class="register-section__heading"><span>01</span><div><h2 id="section-images">Imágenes</h2></div></div>
             <div class="register-grid">
-              <div class="register-field register-upload"><label for="foto_perfil"><span>Foto de perfil <b aria-hidden="true">*</b></span><input id="foto_perfil" name="foto_perfil" aria-describedby="foto_perfil-help" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" required /></label><div class="image-crop" data-crop-for="foto_perfil" hidden><canvas class="image-crop__canvas" data-preview-for="foto_perfil" aria-label="Vista previa del recorte de foto de perfil"></canvas><label class="image-crop__zoom">Zoom<input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="foto_perfil" /></label><small class="image-crop__hint">Arrastra o usa las flechas del teclado para encuadrar</small></div><small id="foto_perfil-help">JPG, PNG o WebP · hasta 1 MB. Recortamos y ajustamos a 150 × 150 px.</small><output data-file-for="foto_perfil" aria-live="polite"></output></div>
-              <div class="register-field register-upload"><label for="imagen_portada"><span>Imagen de portada <b aria-hidden="true">*</b></span><input id="imagen_portada" name="imagen_portada" aria-describedby="imagen_portada-help" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" required /></label><div class="image-crop" data-crop-for="imagen_portada" hidden><canvas class="image-crop__canvas" data-preview-for="imagen_portada" aria-label="Vista previa del recorte de imagen de portada"></canvas><label class="image-crop__zoom">Zoom<input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="imagen_portada" /></label><small class="image-crop__hint">Arrastra o usa las flechas del teclado para encuadrar</small></div><small id="imagen_portada-help">JPG, PNG o WebP · hasta 1 MB. Recortamos y ajustamos a 540 × 720 px.</small><output data-file-for="imagen_portada" aria-live="polite"></output></div>
+              <div class="register-field register-upload"><div class="register-upload__heading"><label for="foto_perfil">Foto de perfil <b aria-hidden="true">*</b></label><button class="register-example-link" type="button" data-example-open data-example-title="Ejemplo de foto de perfil" data-example-src="./assets/registration-examples/profile-example.jpg" data-example-alt="Retrato de ejemplo: rostro centrado, con el cabello completo y fondo sencillo">Ver ejemplo</button></div><input id="foto_perfil" name="foto_perfil" aria-describedby="foto_perfil-help" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" required /><div class="image-crop" data-crop-for="foto_perfil" hidden><canvas class="image-crop__canvas" data-preview-for="foto_perfil" aria-label="Vista previa del recorte de foto de perfil"></canvas><label class="image-crop__zoom">Zoom<input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="foto_perfil" /></label><small class="image-crop__hint">Arrastra o usa las flechas del teclado para encuadrar</small></div><small id="foto_perfil-help">JPG, PNG o WebP · hasta 1 MB. Recortamos y ajustamos a 150 × 150 px.</small><output data-file-for="foto_perfil" aria-live="polite"></output></div>
+              <div class="register-field register-upload"><div class="register-upload__heading"><label for="imagen_portada">Foto de portada <b aria-hidden="true">*</b></label><button class="register-example-link" type="button" data-example-open data-example-title="Ejemplo de foto de portada" data-example-src="./assets/registration-examples/cover-example.jpg" data-example-alt="Ejemplo de foto de portada: una persona de pie en el interior de un local, junto a un letrero">Ver ejemplo</button></div><input id="imagen_portada" name="imagen_portada" aria-describedby="imagen_portada-help" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" required /><div class="image-crop" data-crop-for="imagen_portada" hidden><canvas class="image-crop__canvas" data-preview-for="imagen_portada" aria-label="Vista previa del recorte de foto de portada"></canvas><label class="image-crop__zoom">Zoom<input type="range" min="1" max="3" step="0.01" value="1" data-zoom-for="imagen_portada" /></label><small class="image-crop__hint">Arrastra o usa las flechas del teclado para encuadrar</small></div><small id="imagen_portada-help">JPG, PNG o WebP · hasta 1 MB. Recortamos y ajustamos a 540 × 720 px.</small><output data-file-for="imagen_portada" aria-live="polite"></output></div>
             </div>
           </section>
           <section class="register-section" aria-labelledby="section-basic">
@@ -110,6 +110,13 @@
             <p role="status">Cargando política de privacidad…</p>
           </div>
           <div class="privacy-dialog__footer"><button type="button" class="privacy-dialog__return" data-privacy-dialog-close>Volver al formulario</button></div>
+        </dialog>
+        <dialog id="registration-example-dialog" class="registration-example-dialog" aria-labelledby="registration-example-title">
+          <div class="registration-example-dialog__header">
+            <h2 id="registration-example-title">Ejemplo de foto</h2>
+            <button type="button" class="privacy-dialog__close" data-example-close aria-label="Cerrar ejemplo">Cerrar</button>
+          </div>
+          <div class="registration-example-dialog__content"><img id="registration-example-image" src="" alt="" /></div>
         </dialog>
         <footer class="contact-footer" aria-label="Enlaces del sitio">
           <a href="./">Directorio</a>
