@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Encuentra diseñadores gráficos, anfitrionas y volanteras para tus proyectos y eventos en Perú."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Directorio Oficial de Publicidad" />
+    <meta
+      property="og:description"
+      content="Encuentra diseñadores gráficos, anfitrionas y volanteras para tus proyectos y eventos en Perú."
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Directorio Oficial de Publicidad" />
+    <meta
+      name="twitter:description"
+      content="Encuentra diseñadores gráficos, anfitrionas y volanteras para tus proyectos y eventos en Perú."
+    />
+    <title>Directorio Oficial de Publicidad</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23000'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://vhsocvvjquikjtmqbkwx.supabase.co" crossorigin />
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+    <link rel="stylesheet" href="./styles/index.css?v=20261012-1" />
+    <script src="./scripts/index.js?v=20261012-2" type="module"></script>
+    <link rel="canonical" href="https://www.oficial.pe/" />
+    <meta property="og:url" content="https://www.oficial.pe/" />
+  </head>
+  <body>
+    <a class="skip-link" href="#gallery">Saltar a los perfiles</a>
+    <main class="page">
+      <div class="page__content">
+        <header class="directory-header">
+          <h1 id="directory-title" class="visually-hidden">DIRECTORIO OFICIAL</h1>
+          <div class="directory-topbar">
+            <div class="search">
+            <svg aria-hidden="true" class="search__icon" fill="none" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8" />
+              <path
+                d="m16 16 4 4"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-width="1.8"
+              />
+            </svg>
+            <label class="visually-hidden" for="search-input">Buscar talento</label>
+            <input
+              id="search-input"
+              autocomplete="off"
+              class="search__input"
+              placeholder="Buscar por nombre o descripción"
+              type="search"
+            />
+            <button id="clear-search" class="search-clear" type="button" aria-label="Limpiar búsqueda" hidden>×</button>
+            </div>
+            <details class="site-menu">
+              <summary class="site-menu__toggle" aria-label="Abrir menú">
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                  <path d="M3.5 6.5h17M3.5 12h17M3.5 17.5h17" stroke="currentColor" stroke-linecap="round" stroke-width="2.2" />
+                </svg>
+              </summary>
+              <nav class="site-menu__panel" aria-label="Menú principal">
+                <a class="subscribe-link" href="#" target="_blank" rel="noopener noreferrer">Suscríbete</a>
+                <a href="./registro">Registro</a>
+                <a href="./contacto">Contacto</a>
+                <a href="./privacidad">Privacidad</a>
+              </nav>
+            </details>
+          </div>
+
+          <div class="directory-nav">
+            <nav id="categories" class="categories" aria-label="Categorías">
+              <button class="category is-active" data-category="Todos" aria-pressed="true" type="button">Todos</button>
+              <button class="category" data-category="Diseñadores gráficos" type="button">Diseñadores gráficos</button>
+              <button class="category" data-category="Volanteras" type="button">Volanteras</button>
+              <button class="category" data-category="Anfitrionas" type="button">Anfitrionas</button>
+            </nav>
+
+            <div class="directory-actions">
+              <button
+                id="favorites-filter"
+                class="control-button favorites-filter"
+                aria-pressed="false"
+                type="button"
+              >
+                <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
+                  <path d="M12 20.2S4.5 16 4.5 9.8A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.5 2.6C19.5 16 12 20.2 12 20.2Z" stroke="currentColor" stroke-linejoin="round" stroke-width="1.8" />
+                </svg>
+                Favoritos
+                <span id="favorites-count" class="control-button__count">0</span>
+              </button>
+
+              <button
+                id="filter-toggle"
+                class="control-button"
+                aria-controls="filter-panel"
+                aria-expanded="false"
+                type="button"
+              >
+                <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
+                  <path d="M4 7h16M7 12h10M10 17h4" stroke="currentColor" stroke-linecap="round" stroke-width="1.8" />
+                </svg>
+                Filtros
+                <span id="filter-count" class="control-button__count" hidden>0</span>
+              </button>
+
+              <label class="sort-control">
+                <span class="visually-hidden">Ordenar resultados</span>
+                <select id="sort-select">
+                  <option value="relevance">Relevancia</option>
+                  <option value="random">Aleatorio</option>
+                </select>
+              </label>
+              <button id="reshuffle-button" class="control-button reshuffle-button" type="button" hidden>
+                Mezclar de nuevo
+              </button>
+            </div>
+          </div>
+
+          <section id="filter-panel" class="filter-panel" aria-label="Filtros" hidden>
+            <label class="field">
+              <span>Departamento</span>
+              <select id="department-filter"><option value="">Todos</option></select>
+            </label>
+            <label class="field">
+              <span>Provincia</span>
+              <select id="province-filter"><option value="">Todas</option></select>
+            </label>
+            <label class="field">
+              <span>Distrito</span>
+              <select id="district-filter"><option value="">Todos</option></select>
+            </label>
+            <div class="check-group">
+              <label class="check"><input id="verified-filter" type="checkbox" /> Verificados</label>
+              <label class="check"><input id="featured-filter" type="checkbox" /> Destacados</label>
+            </div>
+            <button id="clear-filters" class="clear-button" type="button">Limpiar filtros</button>
+          </section>
+
+          <div class="results-meta" aria-live="polite">
+            <span aria-hidden="true"></span>
+            <p id="results-count">0 perfiles</p>
+            <span aria-hidden="true"></span>
+          </div>
+          <div
+            id="active-filters"
+            class="active-filters"
+            aria-label="Filtros activos"
+            hidden
+          ></div>
+        </header>
+
+        <section tabindex="-1"
+          id="gallery"
+          class="gallery"
+          aria-label="Galería de perfiles"
+        ></section>
+
+        <p id="empty-state" class="empty-state" hidden>
+          No encontramos perfiles con esos criterios.
+        </p>
+        <button id="reset-results" class="reset-results" type="button" hidden>Restablecer búsqueda y filtros</button>
+
+        <div id="loader" class="loader" aria-label="Cargando más perfiles" role="status">
+          <span class="loader__spinner" aria-hidden="true"></span>
+          <span class="visually-hidden">Cargando más perfiles</span>
+        </div>
+
+      </div>
+    </main>
+
+    <button id="back-to-top" class="back-to-top" type="button" hidden>
+      <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
+        <path d="m6.5 14.5 5.5-5 5.5 5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+      </svg>
+      Volver arriba
+    </button>
+
+    <dialog
+      id="profile-modal"
+      class="profile-modal"
+      aria-labelledby="modal-name"
+    >
+      <div class="profile-modal__shell">
+        <button id="modal-close" class="modal-close" aria-label="Cerrar perfil" type="button">×</button>
+        <button id="modal-prev" class="modal-nav modal-nav--prev" aria-label="Perfil anterior" type="button">‹</button>
+
+        <div class="profile-media">
+          <img id="modal-image" alt="" />
+        </div>
+
+        <article class="profile-details">
+          <header class="profile-heading">
+            <img id="modal-avatar" class="profile-avatar" alt="" />
+            <div class="profile-heading__copy">
+              <div class="profile-name-line">
+                <h2 id="modal-name"></h2>
+                <span id="modal-verified" class="verified-badge" aria-label="Perfil verificado" hidden>✓</span>
+              </div>
+              <p id="modal-category"></p>
+            </div>
+          </header>
+
+          <div id="modal-badges" class="profile-badges"></div>
+
+          <div class="profile-actions">
+            <button id="modal-favorite" class="favorite-action" aria-pressed="false" type="button">
+              <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
+                <path d="M12 20.2S4.5 16 4.5 9.8A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.5 2.6C19.5 16 12 20.2 12 20.2Z" stroke="currentColor" stroke-linejoin="round" stroke-width="1.8" />
+              </svg>
+              <span>Guardar favorito</span>
+            </button>
+
+            <button id="modal-share" class="share-button" type="button">
+              <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
+                <circle cx="18" cy="5" r="2.5" stroke="currentColor" stroke-width="1.6" />
+                <circle cx="6" cy="12" r="2.5" stroke="currentColor" stroke-width="1.6" />
+                <circle cx="18" cy="19" r="2.5" stroke="currentColor" stroke-width="1.6" />
+                <path d="m8.2 10.8 7.6-4.5M8.2 13.2l7.6 4.5" stroke="currentColor" stroke-width="1.6" />
+              </svg>
+              <span>Compartir perfil</span>
+            </button>
+          </div>
+
+          <section class="profile-section profile-intro">
+            <p id="modal-short-description"></p>
+          </section>
+
+          <section class="profile-section">
+            <p class="section-eyebrow">Ubicación</p>
+            <p id="modal-location" class="profile-location"></p>
+          </section>
+
+          <section id="modal-contact-section" class="profile-section">
+            <a id="modal-whatsapp" class="whatsapp-button" href="#" target="_blank" rel="noopener noreferrer">
+              <svg
+                aria-hidden="true"
+                class="whatsapp-button__icon"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M12.04 2a9.84 9.84 0 0 0-8.52 14.77L2 22l5.38-1.41A9.96 9.96 0 0 0 12.04 22 10 10 0 0 0 12.04 2Zm0 18.31a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.2.84.85-3.11-.2-.32a8.18 8.18 0 1 1 7.03 3.91Zm4.49-6.13c-.25-.12-1.45-.71-1.67-.8-.23-.08-.39-.12-.56.13-.16.24-.63.8-.77.96-.14.17-.29.19-.53.07-.25-.13-1.04-.39-1.98-1.23a7.35 7.35 0 0 1-1.37-1.71c-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.12-.14.16-.24.24-.41.08-.16.04-.31-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.41-.55-.42h-.47c-.16 0-.43.06-.65.3-.23.25-.86.84-.86 2.05 0 1.2.88 2.37 1 2.53.12.16 1.73 2.64 4.19 3.7.59.26 1.05.41 1.4.52.59.19 1.13.16 1.56.1.48-.08 1.45-.6 1.65-1.17.21-.57.21-1.06.15-1.17-.06-.1-.23-.16-.47-.28Z" />
+              </svg>
+              <strong id="modal-phone"></strong>
+            </a>
+            <small id="modal-contact-note" class="contact-note" hidden></small>
+          </section>
+
+          <section id="modal-portfolio-section" class="profile-section" hidden>
+            <p class="section-eyebrow">Portafolio</p>
+            <a id="modal-portfolio" href="#" target="_blank" rel="noopener noreferrer">Ver portafolio</a>
+          </section>
+
+          <section id="modal-social-section" class="profile-section" hidden>
+            <p class="section-eyebrow">Redes sociales</p>
+            <div id="modal-social-links" class="social-links"></div>
+          </section>
+
+          <section id="modal-description-section" class="profile-section">
+            <p class="section-eyebrow">Acerca de su trabajo</p>
+            <p id="modal-long-description" class="profile-description"></p>
+          </section>
+
+          <section id="modal-tags" class="profile-section" hidden>
+            <div class="profile-tags">
+              <span id="modal-experience-tag" hidden><small>Experiencia</small><strong id="modal-experience"></strong></span>
+              <span id="modal-price-tag" hidden><small>Nivel de precios</small><strong id="modal-price"></strong></span>
+            </div>
+          </section>
+
+          <section id="modal-services-section" class="profile-section" hidden>
+            <p class="section-eyebrow">Productos y servicios</p>
+            <p id="modal-services" class="profile-description"></p>
+          </section>
+
+        </article>
+
+        <button id="modal-next" class="modal-nav modal-nav--next" aria-label="Perfil siguiente" type="button">›</button>
+      </div>
+    </dialog>
+  </body>
+</html>
+
