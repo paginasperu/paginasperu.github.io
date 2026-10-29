@@ -1,5 +1,7 @@
 # AGENTS
 
+Antes de trabajar, lee la documentación privada: https://github.com/paginasperu/docs/tree/main/oficial-pe
+
 Sitio público y panel privado de Oficial.pe.
 
 - Frontend estático en GitHub Pages (`www.oficial.pe`). Sin framework ni build.
