@@ -2,7 +2,7 @@
 
 Antes de responder a la primera tarea, lee la documentación privada: https://github.com/paginasperu/docs/tree/main/oficial
 
-Tu primera respuesta empieza con: `Leí: docs/oficial/README.md`.
+Tu primera respuesta empieza con: `Leí: docs/oficial/README.md` y una línea con el estado actual.
 Si no puedes acceder, responde `No pude leer: docs/oficial/README.md` y detente.
 
 Sitio público y panel privado de Oficial.pe.
