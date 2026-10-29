@@ -15,5 +15,6 @@ Sitio público y panel privado de Oficial.pe.
 - Verificar antes de decir que está listo: `npm test`.
 - No borrar, mover ni renombrar archivos sin confirmación explícita.
 - Tarea grande = plan por fases. Al cerrar cada fase: verificar, avisar, commit y push.
+- Respuestas cortas y precisas; no omitas decisiones críticas.
 - No modificar producción ni borrar datos sin confirmación del dueño.
 - Al cerrar, di en una línea qué verificaste.
