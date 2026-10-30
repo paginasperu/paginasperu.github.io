@@ -8,7 +8,7 @@ const index = read("./index.js");
 const registration = read("./registro.js");
 const admin = read("./admin.js");
 const html = read("../admin/index.html");
-const publicHtml = read("../index.html");
+const publicHtml = read("../index-directorio.html");
 const registrationHtml = read("../registro.html");
 const config = read("./supabase-config.js");
 
