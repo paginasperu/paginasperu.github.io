@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <link rel="icon" type="image/svg+xml" href="/assets/img/favicon-oficial.svg">
+    <link rel="apple-touch-icon" href="/assets/img/icon-oficial-192.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -74,6 +76,8 @@
         .cta-button:hover { background: #111; color: #fff; border-color: #111; }
         @keyframes fadeIn { to { opacity: 1; } }
 
+        .error-brand { display: block; width: 84px; height: auto; margin: 0 auto 18px; }
+
         /* Si estamos redirigiendo, ocultamos el mensaje de error por defecto */
         .is-error { display: block; }
         .is-redirecting { display: none; }
@@ -87,6 +91,7 @@
     </main>
 
     <main id="error-ui" class="container">
+        <img class="error-brand" src="/assets/img/logo-oficial-claro.svg" alt="oficial.pe" width="84" height="24">
         <span style="color:#999; font-weight:500; font-size:0.9rem; display:block; margin-bottom:10px;">ERROR 404</span>
         <h1>Enlace no oficial</h1>
         <p>Esta dirección no existe o ya no está disponible.</p>
